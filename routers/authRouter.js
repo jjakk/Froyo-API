@@ -7,6 +7,21 @@ const router = express.Router();
 
 router.post('/signup', async (req, res) => {
     const { email, username, password } = req.body;
+    // Email check
+    if(email.indexOf('@') === -1){
+        return res.status(422).send('Not a valid email');
+    }
+    User.findOne({email}).then(
+        (user) => {
+            return res.status(422).send('Email already in use');
+        }
+    );
+    // Username check
+    User.findOne({username}).then(
+        (user) => {
+            return res.status(422).send('Username taken');
+        }
+    );
 
     try{
         const user = new User({ email, username, password });
@@ -16,7 +31,7 @@ router.post('/signup', async (req, res) => {
         res.send({ token });
     }
     catch(err){
-        return res.status(422).send(err.message);
+        return res.status(422).send('An error occured setting up your account');
     }
 });
 
