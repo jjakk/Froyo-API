@@ -7,6 +7,7 @@ const router = express.Router();
 // Create new post
 router.post('/', (req, res) => {
     const post = new Post(req.body);
+    
     post.save((err, post) => {
         if (err) {
             return res.status(500).send(err);
@@ -20,13 +21,15 @@ router.put('./:id', async (req, res) => {
     try{
         const id = req.params.id;
         const post = await Post.findById(id);
-        if(post.author === req.body.userId){
-            await post.update(req.body);
-            return res.status(200).send(newPost);
+
+        if(!post){
+            return res.status(404).send('Post not found');
         }
-        else{
+        if(post.author !== req.body.userId){
             return res.status(403).send('You cannot edit this post');
         }
+        await post.update(req.body);
+        return res.status(200).send(newPost); 
     }
     catch(err){
         return res.status(500).send('An error occured editing your post');
@@ -38,13 +41,15 @@ router.delete('./:id', async (req, res) => {
     try{
         const id = req.params.id;
         const post = await Post.findById(id);
-        if(post.author === req.body.userId){
-            await Post.deleteOne({ _id: id });
-            res.status(200).send('Post deleted');
+
+        if(!post){
+            return res.status(404).send('Post not found');
         }
-        else{
+        if(post.author !== req.body.userId){
             return res.status(403).send('You cannot delete this post');
         }
+        await Post.deleteOne({ _id: id });
+        res.status(200).send('Post deleted');
     }
     catch(err){
         return res.status(500).send('An error occured deleting your post');
@@ -56,12 +61,11 @@ router.get('/', async (req, res) => {
     try{
         const id = req.params.id;
         const post = await Post.findById(id);
-        if(post){
-            return res.status(200).send(post);
-        }
-        else{
+
+        if(!post){
             return res.status(404).send('Post not found');
         }
+        return res.status(200).send(post);
     }
     catch(err){
         return res.status(500).send('An error occured getting your post');
@@ -73,7 +77,11 @@ router.put('/:id/like', async (req, res) => {
     try{
         const id = req.params.id;
         const post = await Post.findById(id);
-        if(post){
+
+        if(!post){
+            res.status(404).send('Post not found');
+        }
+        else{
             if(!post.likes.includes(req.body.userId)){
                 post.likes.push(req.body.userId);
                 await post.save();
@@ -84,9 +92,6 @@ router.put('/:id/like', async (req, res) => {
                 await post.save();
                 return res.status(200).send('Unliked post');
             }
-        }
-        else{
-            res.status(404).send('Invalid post');
         }
 
     }
@@ -100,7 +105,11 @@ router.put('/:id/dislike', async (req, res) => {
     try{
         const id = req.params.id;
         const post = await Post.findById(id);
-        if(post){
+
+        if(!post){
+            return res.status(404).send('Invalid post');
+        }
+        else{
             if(!post.dislikes.includes(req.body.userId)){
                 post.dislikes.push(req.body.userId);
                 await post.save();
@@ -111,9 +120,6 @@ router.put('/:id/dislike', async (req, res) => {
                 await post.save();
                 return res.status(200).send('Undisliked post');
             }
-        }
-        else{
-            res.status(404).send('Invalid post');
         }
 
     }
