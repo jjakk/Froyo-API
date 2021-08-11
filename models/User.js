@@ -21,6 +21,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    dateOfBirth: {
+        type : Date,
+        required: true
+    },
+    dateOfRegistration: {
+        type : Date,
+        default: Date.now
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
     followers: {
         type: Array,
         default: [],
@@ -36,6 +48,11 @@ const userSchema = new mongoose.Schema({
     dislikes: {
         type: Array,
         default: [],
+    },
+    description: {
+        type: String,
+        default: '',
+        max: 500
     }
 });
 
