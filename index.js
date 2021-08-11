@@ -16,7 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
-app.use('/', authRouter);
+
+app.use('/auth', authRouter);
+//app.use(requireAuth);
 app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
 
@@ -36,8 +38,9 @@ mongoose.connection.on('error', (err) => {
 });
 
 app.get('/', requireAuth, (req, res) => {
-    const { email, username } = req.user;
-    res.send({ email, username });
+    const user = res.user;
+    user.password = null;
+    res.send(user);
 });
 
 app.listen(PORT, () => {
