@@ -5,12 +5,14 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         unique: true,
+        max: 50,
         required: true,
         lowercase: true
     },
     username: {
         type: String,
         unique: true,
+        max: 50,
         required: true,
         lowercase: true,
         min: 3
@@ -18,6 +20,22 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    followers: {
+        type: Array,
+        default: [],
+    },
+    followings: {
+        type: Array,
+        default: [],
+    },
+    likes: {
+        type: Array,
+        default: [],
+    },
+    dislikes: {
+        type: Array,
+        default: [],
     }
 });
 
