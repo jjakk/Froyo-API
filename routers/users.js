@@ -46,9 +46,22 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Follow a user
-router.put('/:id/follow', (req, res) => {
+router.put('/:id/follow', async (req, res) => {
     try{
         const id = req.params.id;
+        if(req.body.userId === id){
+            return res.status(400).send('Cannot follow yourself');
+        }
+        // user = The person getting the follower
+        // follower = The person following someone
+        const user = await User.findById(id);
+        const follower = await User.findById(req.body.id);
+        if(user.followers.includes(req.body.userId)){
+            return res.status(403).send('Already following');
+        }
+        await user.followers.push(req.body.userId);
+        await follower.following.push(id);
+        return res.status(200).send('Followed');
     }
     catch(err){
         return res.status(400).send('Cannot follow user');
@@ -56,8 +69,21 @@ router.put('/:id/follow', (req, res) => {
 });
 
 // Unfollow a user
-router.put('/:id/unfllow', (req, res) => {
-
+router.put('/:id/unfllow', async (req, res) => {
+    try{
+        const id = req.params.id;
+        const user = await User.findById(id);
+        const follower = await User.findById(req.body.id);
+        if(!user.followers.includes(req.body.userId)){
+            return res.status(403).send("You're not following this user");
+        }
+        await user.followers.pull(req.body.userId);
+        await follower.following.pull(id);
+        res.status(200).send('Unfollowed');
+    }
+    catch(err){
+        res.status(400).send('Cannot unfollow user');
+    }
 });
 
 
