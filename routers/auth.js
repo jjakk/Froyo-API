@@ -31,7 +31,7 @@ router.post('/signup', async (req, res) => {
         res.send({ token });
     }
     catch(err){
-        return res.status(422).send(err);
+        return res.status(422).send('An error occured setting up your account');
     }
 });
 
