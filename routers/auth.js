@@ -6,7 +6,7 @@ const User = mongoose.model('User');
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
-    const { email, username, password } = req.body;
+    const { email, username } = req.body;
     // Email check
     if(email.indexOf('@') === -1){
         return res.status(422).send('Not a valid email');
@@ -24,14 +24,14 @@ router.post('/signup', async (req, res) => {
     );
 
     try{
-        const user = new User({ email, username, password });
+        const user = new User(req.body);
         await user.save();
 
         const token = jwt.sign({ userId: user._id }, process.env.TOKEN_KEY);
         res.send({ token });
     }
     catch(err){
-        return res.status(422).send('An error occured setting up your account');
+        return res.status(422).send(err);
     }
 });
 
@@ -66,6 +66,9 @@ router.post('/signin', async (req, res) => {
 // Check if info is valid for a new account
 router.post('/verifyInfo', async (req, res) => {
     const { email, username } = req.body;
+    if(email.indexOf('@') === -1){
+        return res.status(422).send('Not a valid email');
+    }
     const checkEmail = await User.find({ email });
     if(checkEmail){
         return res.status(400).send('Email already in use');
