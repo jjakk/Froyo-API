@@ -69,11 +69,11 @@ router.post('/verifyInfo', async (req, res) => {
     if(email.indexOf('@') === -1){
         return res.status(422).send('Not a valid email');
     }
-    const checkEmail = await User.find({ email });
+    const checkEmail = await User.findOne({ email });
     if(checkEmail){
         return res.status(400).send('Email already in use');
     }
-    const checkUsername = await User.find({ username });
+    const checkUsername = await User.findOne({ username });
     if(checkUsername){
         return res.status(400).send('Username already taken');
     }
