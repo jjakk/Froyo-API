@@ -86,19 +86,5 @@ router.put('/:id/unfllow', async (req, res) => {
     }
 });
 
-// Check if info is valid for a new account
-router.post('/verifyInfo', async (req, res) => {
-    const { email, username } = req.body;
-    const checkEmail = await User.find({ email });
-    if(checkEmail){
-        return res.status(400).send('Email already in use');
-    }
-    const checkUsername = await User.find({ username });
-    if(checkUsername){
-        return res.status(400).send('Username already taken');
-    }
-    return res.status(200).send('Account info valid');
-});
-
 
 module.exports = router;
