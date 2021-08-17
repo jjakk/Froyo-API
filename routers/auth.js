@@ -6,7 +6,7 @@ const User = mongoose.model('User');
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
-    const { email, username } = req.body;
+    const { email, username, dob, firstName, lastName, password } = req.body;
     // Email check
     if(!email){
         return res.status(400).send('Must enter an email');
@@ -30,9 +30,9 @@ router.post('/signup', async (req, res) => {
     );
 
     try{
-        const user = new User(req.body);
+        
+        const user = new User({ email, username, dateOfBirth: dob, firstName, lastName, password });
         await user.save();
-
         const token = jwt.sign({ userId: user._id }, process.env.TOKEN_KEY);
         res.status(200).send({ token });
     }
