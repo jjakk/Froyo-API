@@ -8,6 +8,9 @@ const router = express.Router();
 router.post('/signup', async (req, res) => {
     const { email, username } = req.body;
     // Email check
+    if(!email){
+        return res.status(400).send('Must enter an email');
+    }
     if(email.indexOf('@') === -1){
         return res.status(422).send('Not a valid email');
     }
@@ -17,6 +20,9 @@ router.post('/signup', async (req, res) => {
         }
     );
     // Username check
+    if(!username){
+        return res.status(400).send('Must enter a username');
+    }
     User.findOne({username}).then(
         (user) => {
             return res.status(422).send('Username taken');
@@ -28,10 +34,10 @@ router.post('/signup', async (req, res) => {
         await user.save();
 
         const token = jwt.sign({ userId: user._id }, process.env.TOKEN_KEY);
-        res.send({ token });
+        res.status(200).send({ token });
     }
     catch(err){
-        return res.status(422).send('An error occured setting up your account');
+        return res.status(422).send(err._message);
     }
 });
 
@@ -56,28 +62,45 @@ router.post('/signin', async (req, res) => {
     try{
         await user.comparePassword(password);
         const token = jwt.sign({ userId: user._id }, process.env.TOKEN_KEY);
-        res.send({ token });
+        res.status(200).send({ token });
     }
     catch(err){
         return res.status(422).send('Invalid password');
     }
 });
 
+// Check if username is valid
+router.post('/checkUsername', async (req, res) => {
+    try{
+        const username = req.body.username;
+        const user = await User.findOne({ username });
+        if(user){
+            return res.status(422).send('Username taken');
+        }
+        else{
+            return res.status(200).send('Username available');
+        }
+    }
+    catch(err){
+        return res.status(422).send(err._message);
+    }
+});
+
 // Check if info is valid for a new account
-router.post('/verifyInfo', async (req, res) => {
-    const { email, username } = req.body;
-    if(email.indexOf('@') === -1){
-        return res.status(422).send('Not a valid email');
+router.post('/checkEmail', async (req, res) => {
+    try{
+        const email = req.body.email;
+        const user = await User.findOne({ email });
+        if(user){
+            return res.status(422).send('Email already in use');
+        }
+        else{
+            return res.status(200).send('Email available');
+        }
     }
-    const checkEmail = await User.findOne({ email });
-    if(checkEmail){
-        return res.status(400).send('Email already in use');
+    catch(err){
+        return res.status(422).send(err._message);
     }
-    const checkUsername = await User.findOne({ username });
-    if(checkUsername){
-        return res.status(400).send('Username already taken');
-    }
-    return res.status(200).send('Account info valid');
 });
 
 module.exports = router;
