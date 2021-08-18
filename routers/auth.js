@@ -14,23 +14,20 @@ router.post('/signup', async (req, res) => {
     if(email.indexOf('@') === -1){
         return res.status(422).send('Not a valid email');
     }
-    await User.findOne({email}).then(
-        (user) => {
-            return res.status(422).send('Email already in use');
-        }
-    );
+    const emailTaken = await User.findOne({email});
+    if(emailTaken){
+        return res.status(422).send('Email already in use');
+    }
     // Username check
     if(!username){
         return res.status(400).send('Must enter a username');
     }
-    await User.findOne({username}).then(
-        (user) => {
-            return res.status(422).send('Username taken');
-        }
-    );
+    const usernameTaken = await User.findOne({username});
+    if(usernameTaken){
+        return res.status(422).send('Username taken');
+    }
 
     try{
-        
         const user = new User({ email, username, dateOfBirth: dob, firstName, lastName, password });
         await user.save();
         const token = jwt.sign({ userId: user._id }, process.env.TOKEN_KEY);
