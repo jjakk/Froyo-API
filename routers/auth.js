@@ -14,7 +14,7 @@ router.post('/signup', async (req, res) => {
     if(email.indexOf('@') === -1){
         return res.status(422).send('Not a valid email');
     }
-    User.findOne({email}).then(
+    await User.findOne({email}).then(
         (user) => {
             return res.status(422).send('Email already in use');
         }
@@ -23,7 +23,7 @@ router.post('/signup', async (req, res) => {
     if(!username){
         return res.status(400).send('Must enter a username');
     }
-    User.findOne({username}).then(
+    await User.findOne({username}).then(
         (user) => {
             return res.status(422).send('Username taken');
         }
