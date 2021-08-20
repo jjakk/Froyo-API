@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const User = mongoose.model('User');
+const { validateEmail } = require('../helperFunctions');
 
 const router = express.Router();
 
@@ -70,6 +71,12 @@ router.post('/signin', async (req, res) => {
 router.post('/checkUsername', async (req, res) => {
     try{
         const username = req.body.username;
+        if(username.length < 3){
+            return res.status(422).send('Username is too short');
+        }
+        if(username.length > 50){
+            return res.status(422).send('Username is too long');
+        }
         const user = await User.findOne({ username });
         if(user){
             return res.status(422).send('Username taken');
@@ -87,6 +94,12 @@ router.post('/checkUsername', async (req, res) => {
 router.post('/checkEmail', async (req, res) => {
     try{
         const email = req.body.email;
+        if(!validateEmail(email)){
+            return res.status(422).send('Not a valid email');
+        }
+        if(email.length > 50){
+            return res.status(422).send('Email is too long');
+        }
         const user = await User.findOne({ email });
         if(user){
             return res.status(422).send('Email already in use');
