@@ -22,7 +22,7 @@ router.put('/:id', async (req, res) => {
     try{
         const id = req.params.id;
         // Stop user from updating another users account
-        if(req.user._id !== id){
+        if(req.user.id !== id){
             return res.status(401).send('Unauthorized');
         }
         const user = await User.findByIdAndUpdate(id, req.body, { new: true, useFindAndModify: false });
@@ -40,7 +40,7 @@ router.delete('/:id', async (req, res) => {
     try{
         const id = req.params.id;
         // Stop user from deleting another users account
-        if(req.user._id !== id){
+        if(req.user.id !== id){
             return res.status(401).send('Unauthorized');
         }
         const user = await User.findByIdAndRemove(id);
