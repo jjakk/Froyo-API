@@ -21,11 +21,16 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try{
         const id = req.params.id;
-        const user = await User.findByIdAndUpdate(id, req.body, { new: true });
+        // Stop user from updating another users account
+        if(req.user._id !== id){
+            return res.status(401).send('Unauthorized');
+        }
+        const user = await User.findByIdAndUpdate(id, req.body, { new: true, useFindAndModify: false });
         user.save();
-        return res.status.send('User info updated');
+        return res.status(400).send('User info updated');
     }
     catch(err){
+        console.log(err);
         return res.status(400).send('Cannot update user info');
     }
 });
@@ -34,6 +39,10 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try{
         const id = req.params.id;
+        // Stop user from deleting another users account
+        if(req.user._id !== id){
+            return res.status(401).send('Unauthorized');
+        }
         const user = await User.findByIdAndRemove(id);
         if(!user){
             return res.status(404).send('User not found');

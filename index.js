@@ -18,10 +18,8 @@ app.use(express.urlencoded({
 }));
 
 app.use('/auth', authRouter);
-app.use(requireAuth);
-//app.use(requireAuth);
-app.use('/posts', postsRouter);
-app.use('/users', usersRouter);
+app.use('/posts', requireAuth, postsRouter);
+app.use('/users', requireAuth, usersRouter);
 
 const mongoURI = `mongodb+srv://admin:${process.env.MONGO_PASSWORD}@cluster0.spbnq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 mongoose.connect(mongoURI, {
@@ -38,7 +36,7 @@ mongoose.connection.on('error', (err) => {
     console.error('Error connecting to mongo', err);
 });
 
-app.get('/', (req, res) => {
+app.get('/', requireAuth, (req, res) => {
     const user = req.user;
     res.send(user._id);
 });

@@ -18,8 +18,13 @@ module.exports = (req, res, next) => {
         const { userId } = payload;
 
         const user = await User.findById(userId);
-        req.user = user;
-        next();
+        if(user){
+            req.user = user;
+            next();
+        }
+        else{
+            return res.status(401).send('Invalid token.');
+        }
     });
 };
 
