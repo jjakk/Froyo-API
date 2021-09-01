@@ -27,7 +27,7 @@ router.put('/:id', async (req, res) => {
         }
         const user = await User.findByIdAndUpdate(id, req.body, { new: true, useFindAndModify: false });
         user.save();
-        return res.status(400).send('User info updated');
+        return res.status(500).send('User info updated');
     }
     catch(err){
         console.log(err);
