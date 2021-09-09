@@ -9,24 +9,14 @@ const router = express.Router();
 router.post('/signup', async (req, res) => {
     const { email, username, dob, firstName, lastName, password } = req.body;
     // Email check
-    if(!email){
-        return res.status(400).send('Must enter an email');
-    }
-    if(email.indexOf('@') === -1){
-        return res.status(422).send('Not a valid email');
-    }
+    if(!email) return res.status(400).send('Must enter an email');
+    if(email.indexOf('@') === -1) return res.status(422).send('Not a valid email');
     const emailTaken = await User.findOne({email});
-    if(emailTaken){
-        return res.status(422).send('Email already in use');
-    }
+    if(emailTaken) return res.status(422).send('Email already in use');
     // Username check
-    if(!username){
-        return res.status(400).send('Must enter a username');
-    }
+    if(!username) return res.status(400).send('Must enter a username');
     const usernameTaken = await User.findOne({username});
-    if(usernameTaken){
-        return res.status(422).send('Username taken');
-    }
+    if(usernameTaken) return res.status(422).send('Username taken');
 
     try{
         const user = new User({ email, username, dateOfBirth: dob, firstName, lastName, password });
@@ -42,20 +32,12 @@ router.post('/signup', async (req, res) => {
 router.post('/signin', async (req, res) => {
     const { email, password } = req.body;
 
-    if(!email && !password){
-        return res.status(422).send('Must provide email and password');
-    }
-    else if(!email){
-        return res.status(422).send('Must provide email');
-    }
-    else if(!password){
-        return res.status(422).send('Must provide password');
-    }
+    if(!email && !password) return res.status(422).send('Must provide email and password');
+    if(!email) return res.status(422).send('Must provide email');
+    if(!password) return res.status(422).send('Must provide password');
 
     const user = await User.findOne({ email });
-    if(!user){
-        return res.status(422).send('Invalid email');
-    }
+    if(!user) return res.status(422).send('Invalid email');
 
     try{
         await user.comparePassword(password);
@@ -71,19 +53,12 @@ router.post('/signin', async (req, res) => {
 router.post('/checkUsername', async (req, res) => {
     try{
         const username = req.body.username;
-        if(username.length < 3){
-            return res.status(422).send('Username is too short');
-        }
-        if(username.length > 50){
-            return res.status(422).send('Username is too long');
-        }
+        if(username.length < 3) return res.status(422).send('Username is too short');
+        if(username.length > 50) return res.status(422).send('Username is too long');
+
         const user = await User.findOne({ username });
-        if(user){
-            return res.status(422).send('Username taken');
-        }
-        else{
-            return res.status(200).send('Username available');
-        }
+        if(user) return res.status(422).send('Username taken');
+        return res.status(200).send('Username available');
     }
     catch(err){
         return res.status(422).send(err._message);
@@ -94,19 +69,11 @@ router.post('/checkUsername', async (req, res) => {
 router.post('/checkEmail', async (req, res) => {
     try{
         const email = req.body.email;
-        if(!validateEmail(email)){
-            return res.status(422).send('Not a valid email');
-        }
-        if(email.length > 50){
-            return res.status(422).send('Email is too long');
-        }
+        if(!validateEmail(email)) return res.status(422).send('Not a valid email');
+        if(email.length > 50) return res.status(422).send('Email is too long');
         const user = await User.findOne({ email });
-        if(user){
-            return res.status(422).send('Email already in use');
-        }
-        else{
-            return res.status(200).send('Email available');
-        }
+        if(user) return res.status(422).send('Email already in use');
+        return res.status(200).send('Email available');
     }
     catch(err){
         return res.status(422).send(err._message);

@@ -6,12 +6,11 @@ const router = express.Router();
 
 // Create new post
 router.post('/', (req, res) => {
-    const post = new Post(req.body);
+    const { body } = req.body;
+    const post = new Post({ body, author: req.user._id });
     
     post.save((err, post) => {
-        if (err) {
-            return res.status(500).send(err);
-        }
+        if (err) return res.status(500).send(err);
         return res.status(201).send(post);
     });
 });
@@ -22,12 +21,8 @@ router.put('./:id', async (req, res) => {
         const id = req.params.id;
         const post = await Post.findById(id);
 
-        if(!post){
-            return res.status(404).send('Post not found');
-        }
-        if(post.author !== req.body.userId){
-            return res.status(403).send('You cannot edit this post');
-        }
+        if(!post) return res.status(404).send('Post not found');
+        if(post.author !== req.body.userId) return res.status(403).send('You cannot edit this post');
         await post.update(req.body);
         return res.status(200).send(newPost); 
     }
@@ -42,12 +37,8 @@ router.delete('./:id', async (req, res) => {
         const id = req.params.id;
         const post = await Post.findById(id);
 
-        if(!post){
-            return res.status(404).send('Post not found');
-        }
-        if(post.author !== req.body.userId){
-            return res.status(403).send('You cannot delete this post');
-        }
+        if(!post) return res.status(404).send('Post not found');
+        if(post.author !== req.body.userId) return res.status(403).send('You cannot delete this post');
         await Post.deleteOne({ _id: id });
         res.status(200).send('Post deleted');
     }
@@ -62,9 +53,7 @@ router.get('/', async (req, res) => {
         const id = req.params.id;
         const post = await Post.findById(id);
 
-        if(!post){
-            return res.status(404).send('Post not found');
-        }
+        if(!post) return res.status(404).send('Post not found');
         return res.status(200).send(post);
     }
     catch(err){
@@ -78,22 +67,17 @@ router.put('/:id/like', async (req, res) => {
         const id = req.params.id;
         const post = await Post.findById(id);
 
-        if(!post){
-            res.status(404).send('Post not found');
+        if(!post) return res.status(404).send('Post not found');
+        if(!post.likes.includes(req.body.userId)){
+            post.likes.push(req.body.userId);
+            await post.save();
+            return res.status(200).send('Liked post');
         }
         else{
-            if(!post.likes.includes(req.body.userId)){
-                post.likes.push(req.body.userId);
-                await post.save();
-                return res.status(200).send('Liked post');
-            }
-            else{
-                post.likes.splice(post.likes.indexOf(req.body.userId), 1);
-                await post.save();
-                return res.status(200).send('Unliked post');
-            }
+            post.likes.splice(post.likes.indexOf(req.body.userId), 1);
+            await post.save();
+            return res.status(200).send('Unliked post');
         }
-
     }
     catch(err){
         res.status(500).send('Unable to like post');
@@ -106,20 +90,16 @@ router.put('/:id/dislike', async (req, res) => {
         const id = req.params.id;
         const post = await Post.findById(id);
 
-        if(!post){
-            return res.status(404).send('Invalid post');
+        if(!post) return res.status(404).send('Invalid post');
+        if(!post.dislikes.includes(req.body.userId)){
+            post.dislikes.push(req.body.userId);
+            await post.save();
+            return res.status(200).send('Disliked post');
         }
         else{
-            if(!post.dislikes.includes(req.body.userId)){
-                post.dislikes.push(req.body.userId);
-                await post.save();
-                return res.status(200).send('Disliked post');
-            }
-            else{
-                post.dislikes.splice(post.dislikes.indexOf(req.body.userId), 1);
-                await post.save();
-                return res.status(200).send('Undisliked post');
-            }
+            post.dislikes.splice(post.dislikes.indexOf(req.body.userId), 1);
+            await post.save();
+            return res.status(200).send('Undisliked post');
         }
 
     }
