@@ -6,13 +6,18 @@ const router = express.Router();
 
 // Create new post
 router.post('/', (req, res) => {
-    const { body } = req.body;
-    const post = new Post({ body, author: req.user._id });
-    
-    post.save((err, post) => {
-        if (err) return res.status(500).send(err);
-        return res.status(201).send(post);
-    });
+    try{
+        const { body } = req.body;
+        const post = new Post({ body, author: req.user._id });
+        
+        post.save((err, post) => {
+            if (err) return res.status(500).send(err);
+            return res.status(201).send(post);
+        });
+    }
+    catch(err){
+        return res.status(500).send("Couln't create post");
+    }
 });
 
 // Update a post
