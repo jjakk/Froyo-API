@@ -58,7 +58,7 @@ router.delete('./:id', async (req, res) => {
 });
 
 // Get a post
-router.get('/', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try{
         const id = req.params.id;
         const post = await Post.findById(id);
