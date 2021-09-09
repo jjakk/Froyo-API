@@ -32,7 +32,7 @@ router.put('./:id', async (req, res) => {
         const post = await Post.findById(id);
 
         if(!post) return res.status(404).send('Post not found');
-        if(post.author !== req.body.userId) return res.status(403).send('You cannot edit this post');
+        if(post.author.toString() !== req.user.id) return res.status(403).send('You cannot edit this post');
         await post.update(req.body);
         return res.status(200).send(newPost); 
     }
@@ -42,13 +42,13 @@ router.put('./:id', async (req, res) => {
 });
 
 // Delete a post
-router.delete('./:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try{
         const id = req.params.id;
         const post = await Post.findById(id);
 
         if(!post) return res.status(404).send('Post not found');
-        if(post.author !== req.body.userId) return res.status(403).send('You cannot delete this post');
+        if(post.author.toString() !== req.user.id) return res.status(403).send('You cannot delete this post');
         await Post.deleteOne({ _id: id });
         res.status(200).send('Post deleted');
     }
