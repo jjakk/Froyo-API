@@ -11,11 +11,16 @@ router.post('/', (req, res) => {
         const post = new Post({ body, author: req.user._id });
         
         post.save((err, post) => {
-            if (err) return res.status(500).send(err);
+            if (err){
+                const cause = err.errors.body.path;
+                if(cause === 'body') return res.status(400).send('Post body is required');
+                return res.status(500).send("Couln't create post");
+            }
             return res.status(201).send(post);
         });
     }
     catch(err){
+        console.log(err);
         return res.status(500).send("Couln't create post");
     }
 });
