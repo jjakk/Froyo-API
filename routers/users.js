@@ -22,9 +22,7 @@ router.put('/:id', async (req, res) => {
     try{
         const id = req.params.id;
         // Stop user from updating another users account
-        if(req.user.id !== id){
-            return res.status(401).send('Unauthorized');
-        }
+        if(req.user.id !== id) return res.status(401).send('Unauthorized');
         const user = await User.findByIdAndUpdate(id, req.body, { new: true, useFindAndModify: false });
         user.save();
         return res.status(200).send('User info updated');
@@ -40,13 +38,9 @@ router.delete('/:id', async (req, res) => {
     try{
         const id = req.params.id;
         // Stop user from deleting another users account
-        if(req.user.id !== id){
-            return res.status(401).send('Unauthorized');
-        }
+        if(req.user.id !== id) return res.status(401).send('Unauthorized');
         const user = await User.findByIdAndRemove(id);
-        if(!user){
-            return res.status(404).send('User not found');
-        }
+        if(!user) return res.status(404).send('User not found');
         return res.status(500).send('User deleted');
     }
     catch(err){
@@ -65,9 +59,7 @@ router.put('/:id/follow', async (req, res) => {
         // follower = The person following someone
         const user = await User.findById(id);
         const follower = await User.findById(req.body.id);
-        if(user.followers.includes(req.body.userId)){
-            return res.status(403).send('Already following');
-        }
+        if(user.followers.includes(req.body.userId)) return res.status(403).send('Already following');
         await user.followers.push(req.body.userId);
         await follower.following.push(id);
         return res.status(200).send('Followed');
@@ -83,9 +75,7 @@ router.put('/:id/unfllow', async (req, res) => {
         const id = req.params.id;
         const user = await User.findById(id);
         const follower = await User.findById(req.body.id);
-        if(!user.followers.includes(req.body.userId)){
-            return res.status(403).send("You're not following this user");
-        }
+        if(!user.followers.includes(req.body.userId)) return res.status(403).send("You're not following this user");
         await user.followers.pull(req.body.userId);
         await follower.following.pull(id);
         res.status(200).send('Unfollowed');
