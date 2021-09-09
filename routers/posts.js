@@ -57,7 +57,19 @@ router.delete('./:id', async (req, res) => {
     }
 });
 
-// Get a post
+// Get all of a user's posts
+router.get('/', async (req, res) => {
+    try{
+        const id = req.user.id;
+        const posts = await Post.find({ author: id });
+        return res.status(200).send(posts);
+    }
+    catch(err){
+        return res.status(400).send('Cannot get user info');
+    }
+});
+
+// Get a specific post
 router.get('/:id', async (req, res) => {
     try{
         const id = req.params.id;

@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
-const Post = mongoose.model('Post');
 
 const router = express.Router();
 
@@ -12,18 +11,6 @@ router.get('/:id', async (req, res) => {
         const user = await User.findById(id);
         const { password, ...userInfo } = user._doc;
         return res.status(200).send(userInfo);
-    }
-    catch(err){
-        return res.status(400).send('Cannot get user info');
-    }
-});
-
-// Get a user's posts
-router.get('/:id/posts', async (req, res) => {
-    try{
-        const id = req.params.id;
-        const posts = await Post.find({ author: id });
-        return res.status(200).send(posts);
     }
     catch(err){
         return res.status(400).send('Cannot get user info');
