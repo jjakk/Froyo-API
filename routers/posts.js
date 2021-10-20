@@ -86,23 +86,24 @@ router.get('/:id', async (req, res) => {
 // Like a post
 router.put('/:id/like', async (req, res) => {
     try{
-        const id = req.params.id;
-        const post = await Post.findById(id);
+        const postId = req.params.id;
+        const userId = req.user.id;
+        const post = await Post.findById(postId);
 
         if(!post) return res.status(404).send('Post not found');
 
         // Remove dislike first (if there is one)
-        if(post.dislikes.includes(id)){
-            post.dislikes.splice(post.likes.indexOf(id), 1);
+        if(post.dislikes.includes(userId)){
+            post.dislikes.splice(post.likes.indexOf(userId), 1);
         }
 
         // Add or remove like
-        if(!post.likes.includes(id)){
-            post.likes.push(id);
+        if(!post.likes.includes(userId)){
+            post.likes.push(userId);
             await post.save();
         }
         else{
-            post.likes.splice(post.likes.indexOf(id), 1);
+            post.likes.splice(post.likes.indexOf(userId), 1);
             await post.save();
         }
         return res.status(200).send(post);
@@ -115,23 +116,24 @@ router.put('/:id/like', async (req, res) => {
 // Dislike a post
 router.put('/:id/dislike', async (req, res) => {
     try{
-        const id = req.params.id;
-        const post = await Post.findById(id);
+        const postId = req.params.id;
+        const userId = req.user.id;
+        const post = await Post.findById(postId);
 
-        if(!post) return res.status(404).send('Invalid post');
+        if(!post) return res.status(404).send('Post not found');
 
         // Remove like first (if there is one)
-        if(post.likes.includes(id)){
-            post.likes.splice(post.likes.indexOf(id), 1);
+        if(post.likes.includes(userId)){
+            post.likes.splice(post.likes.indexOf(userId), 1);
         }
 
         // Add or remove dislike
-        if(!post.dislikes.includes(id)){
-            post.dislikes.push(id);
+        if(!post.dislikes.includes(userId)){
+            post.dislikes.push(userId);
             await post.save();
         }
         else{
-            post.dislikes.splice(post.dislikes.indexOf(id), 1);
+            post.dislikes.splice(post.dislikes.indexOf(userId), 1);
             await post.save();
         }
         return res.status(200).send(post);
