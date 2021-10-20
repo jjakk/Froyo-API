@@ -92,17 +92,17 @@ router.put('/:id/like', async (req, res) => {
         if(!post) return res.status(404).send('Post not found');
 
         // Remove dislike first (if there is one)
-        if(post.dislikes.includes(req.body.userId)){
-            post.dislikes.splice(post.likes.indexOf(req.body.userId), 1);
+        if(post.dislikes.includes(id)){
+            post.dislikes.splice(post.likes.indexOf(id), 1);
         }
 
         // Add or remove like
-        if(!post.likes.includes(req.body.userId)){
-            post.likes.push(req.body.userId);
+        if(!post.likes.includes(id)){
+            post.likes.push(id);
             await post.save();
         }
         else{
-            post.likes.splice(post.likes.indexOf(req.body.userId), 1);
+            post.likes.splice(post.likes.indexOf(id), 1);
             await post.save();
         }
         return res.status(200).send(post);
@@ -121,17 +121,17 @@ router.put('/:id/dislike', async (req, res) => {
         if(!post) return res.status(404).send('Invalid post');
 
         // Remove like first (if there is one)
-        if(post.likes.includes(req.body.userId)){
-            post.likes.splice(post.likes.indexOf(req.body.userId), 1);
+        if(post.likes.includes(id)){
+            post.likes.splice(post.likes.indexOf(id), 1);
         }
 
         // Add or remove dislike
-        if(!post.dislikes.includes(req.body.userId)){
-            post.dislikes.push(req.body.userId);
+        if(!post.dislikes.includes(id)){
+            post.dislikes.push(id);
             await post.save();
         }
         else{
-            post.dislikes.splice(post.dislikes.indexOf(req.body.userId), 1);
+            post.dislikes.splice(post.dislikes.indexOf(id), 1);
             await post.save();
         }
         return res.status(200).send(post);
