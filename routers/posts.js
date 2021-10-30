@@ -34,7 +34,7 @@ router.put('./:id', async (req, res) => {
         if(!post) return res.status(404).send('Post not found');
         if(post.author.toString() !== req.user.id) return res.status(403).send('You cannot edit this post');
         await post.update(req.body);
-        return res.status(200).send(newPost); 
+        return res.status(200).send(post); 
     }
     catch(err){
         return res.status(500).send('An error occured editing your post');
@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
         return res.status(200).send(posts);
     }
     catch(err){
-        return res.status(400).send('Cannot get user info');
+        return res.status(400).send("Cannot get posts");
     }
 });
 

@@ -19,6 +19,7 @@ app.use(express.urlencoded({
 
 app.use('/auth', authRouter);
 app.use('/posts', requireAuth, postsRouter);
+app.use('/comments', requireAuth, commentsRouter);
 app.use('/users', requireAuth, usersRouter);
 
 const mongoURI = `mongodb+srv://admin:${process.env.MONGO_PASSWORD}@cluster0.spbnq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
