@@ -19,9 +19,11 @@ router.post('/', (req, res) => {
                 if(cause === 'body') return res.status(400).send('Comment body is required');
                 return res.status(500).send("Couln't create comment");
             }
-            parentContent.update({ $push: { comments: comment._id } });
-            parentContent.save();
             return res.status(201).send(comment);
+        });
+        parentContent.update({ $push: { comments: comment._id } });
+        parentContent.save((err, post) => {
+            if (err) return res.status(500).send("Couln't create comment");
         });
     }
     catch(err){
