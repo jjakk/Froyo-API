@@ -19,6 +19,7 @@ router.post('/', (req, res) => {
                 if(cause === 'body') return res.status(400).send('Comment body is required');
                 return res.status(500).send("Couln't create comment");
             }
+            parentContent.comments.push(comment);
             return res.status(201).send(comment);
         });
     }
