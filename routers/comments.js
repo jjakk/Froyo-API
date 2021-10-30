@@ -20,6 +20,9 @@ router.post('/', (req, res) => {
                 return res.status(500).send("Couln't create comment");
             }
             parentContent.comments.push(comment);
+            parentContent.save((err, post) => {
+                if(err) return res.status(500).send("Couln't create comment");
+            });
             return res.status(201).send(comment);
         });
     }
