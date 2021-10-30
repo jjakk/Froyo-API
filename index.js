@@ -5,6 +5,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const authRouter = require('./routers/auth');
 const postsRouter = require('./routers/posts');
+const commentsRouter = require('./routers/comments');
 const usersRouter = require('./routers/users');
 const requireAuth = require('./middleware/requireAuth');
 const app = express();
