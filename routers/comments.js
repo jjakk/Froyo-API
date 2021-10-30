@@ -21,10 +21,6 @@ router.post('/', (req, res) => {
             }
             return res.status(201).send(comment);
         });
-        parentContent.update({ $push: { comments: comment._id } });
-        parentContent.save((err, post) => {
-            if (err) return res.status(500).send("Couln't link to parent");
-        });
     }
     catch(err){
         console.log(err);
