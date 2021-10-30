@@ -1,14 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const Post = mongoose.model('Post');
+const Comment = mongoose.model('Post');
 
 const router = express.Router();
 
 // Create new comment
 router.post('/', (req, res) => {
     try{
-        const { body } = req.body;
-        const comment = new Comment({ body, author: req.user._id });
+        const { body, parent } = req.body;
+        const comment = new Comment({ body, parent, author: req.user._id });
         
         comment.save((err, post) => {
             if (err){
