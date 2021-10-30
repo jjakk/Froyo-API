@@ -23,7 +23,7 @@ router.post('/', (req, res) => {
         });
         parentContent.update({ $push: { comments: comment._id } });
         parentContent.save((err, post) => {
-            if (err) return res.status(500).send("Couln't create comment");
+            if (err) return res.status(500).send("Couln't link to parent");
         });
     }
     catch(err){
