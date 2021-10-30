@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const Comment = mongoose.model('Post');
+const Post = mongoose.model('Post');
+const Comment = mongoose.model('Comment');
 
 const router = express.Router();
 
@@ -9,6 +10,8 @@ router.post('/', (req, res) => {
     try{
         const { body, parent } = req.body;
         const comment = new Comment({ body, parent, author: req.user._id });
+        let parentContent = Post.findById(parent);
+        if(!parentContent) parentContent = Comment.findById(parent);
         
         comment.save((err, post) => {
             if (err){
