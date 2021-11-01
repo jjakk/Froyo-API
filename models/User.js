@@ -53,14 +53,6 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: [],
     },
-    likes: {
-        type: Array,
-        default: [],
-    },
-    dislikes: {
-        type: Array,
-        default: [],
-    },
     description: {
         type: String,
         default: '',

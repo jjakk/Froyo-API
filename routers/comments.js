@@ -6,13 +6,12 @@ const Comment = mongoose.model('Comment');
 const router = express.Router();
 
 // Create new comment
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     try{
         const { body, parent } = req.body;
+
+        // Create comment and add to database
         const comment = new Comment({ body, parent, author: req.user._id });
-        let parentContent = Post.findById(parent);
-        if(!parentContent) parentContent = Comment.findById(parent);
-        
         comment.save((err, post) => {
             if (err){
                 const cause = err.errors.body.path;
@@ -21,6 +20,12 @@ router.post('/', (req, res) => {
             }
             return res.status(201).send(comment);
         });
+
+        // Add pointer to comments array in parent content
+        const parentContent = await Post.findById(parent) || (await Comment.findById(parent) || null);
+        if(!parentContent) res.status(500).send('Parent required');
+        parentContent.comments.push(comment._id);
+        parentContent.save();
     }
     catch(err){
         console.log(err);
@@ -47,15 +52,25 @@ router.put('./:id', async (req, res) => {
 // Delete a comment
 router.delete('/:id', async (req, res) => {
     try{
+        // Check to see if comment exists and if user is authorized to delete
         const id = req.params.id;
         const comment = await Comment.findById(id);
-
         if(!comment) return res.status(404).send('Comment not found');
         if(comment.author.toString() !== req.user.id) return res.status(403).send('You cannot delete this post');
+
+        // Remove pointer from comments array in parent content
+        const parentId = comment.parent;
+        const parentContent = await Post.findById(parentId) || (await Comment.findById(parentId) || null);
+        if(!parentContent) res.status(500).send('Parent required');
+        parentContent.comments.pull(comment._id);
+        parentContent.save();
+
+        // Remove comment from database
         await Comment.deleteOne({ _id: id });
         res.status(200).send('Comment deleted');
     }
     catch(err){
+        console.log(err);
         return res.status(500).send('An error occured deleting your comment');
     }
 });
