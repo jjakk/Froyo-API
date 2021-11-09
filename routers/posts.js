@@ -44,11 +44,18 @@ router.put('./:id', async (req, res) => {
 // Delete a post
 router.delete('/:id', async (req, res) => {
     try{
+        // Find if post exists and if user is authorized to delete it
         const id = req.params.id;
         const post = await Post.findById(id);
-
         if(!post) return res.status(404).send('Post not found');
         if(post.author.toString() !== req.user.id) return res.status(403).send('You cannot delete this post');
+
+        // Delete all the post's comments
+        await post.comments.forEach(async comment => {
+            await comment.remove();
+        });
+
+        // Remove post from database
         await Post.deleteOne({ _id: id });
         res.status(200).send('Post deleted');
     }
