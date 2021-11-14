@@ -136,7 +136,7 @@ router.put('/:id/dislike', async (req, res) => {
     try{
         const commentId = req.params.id;
         const userId = req.user.id;
-        const comment = await Post.findById(commentId);
+        const comment = await Comment.findById(commentId);
 
         if(!comment) return res.status(404).send('Comment not found');
 

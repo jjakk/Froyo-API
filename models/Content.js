@@ -1,12 +1,16 @@
-const mongoose = require('mongoose');
-const { contentSchema } = require('./Content');
+// This is the model for user created content
+// Posts & comments are children of this model
 
-const postSchema = new mongoose.Schema({
+const mongoose = require('mongoose');
+
+const contentSchema = new mongoose.Schema({
+    // ID reference of user who created this content
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
+    // Text body of the content
     body: {
         type: String,
         required: true,
@@ -25,16 +29,13 @@ const postSchema = new mongoose.Schema({
         type: Array,
         default: [],
     },
+    // When content was created
     timestamp: {
         type : Date,
         default: Date.now
-    },
-    images: {
-        type: Array,
-        default: [],
     }
 });
 
-const Post = mongoose.model('Post', postSchema);
+const Content = mongoose.model('Content', contentSchema);
 
-module.exports = Post;
+module.exports = { Content, contentSchema };
