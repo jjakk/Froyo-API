@@ -4,9 +4,11 @@ const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const postsRouter = require('./api/posts');
 const commentsRouter = require('./api/comments');
+const rootRouter = require('./api/root');
 
 const router = Router();
 
+router.use('/', rootRouter);
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
 router.use('/posts', postsRouter);

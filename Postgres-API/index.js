@@ -10,6 +10,10 @@ PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use('/api', apiRouter);
 
+app.get('/', (req, res) => {
+    res.send('Go to /api for api functions');
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
