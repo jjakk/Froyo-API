@@ -4,7 +4,7 @@ const queries = {
         // () No paramters = get all users
         // (str) One string paramter = get user with that parameter
         // ([]) Array of parameters = get user with all the given parameters
-        get: (params='id') => {
+        get: (params) => {
             let selection = '';
             if (!params) {
                 return 'SELECT * FROM users';

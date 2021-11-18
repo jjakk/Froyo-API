@@ -16,7 +16,6 @@ const requireAuth = (req, res, next) => {
 
             // Get user ID from token, and retrieve user from database
             const { userId } = payload;
-            console.log(userId);
             pool.query(queries.users.get('id'), [userId], (err, result) => {
                 if (err) return res.status(500).send(err);
 

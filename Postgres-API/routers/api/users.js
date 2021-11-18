@@ -39,7 +39,7 @@ router.post('/', (req, res) => {
         }
 
         // Check the database to make sure the email is not already in use
-        pool.query(queries.users.getBy('email'), [email], async (err, result) => {
+        pool.query(queries.users.get('email'), [email], async (err, result) => {
             if (err) return res.status(400).send(err);
             if (result.rows[0]) return res.status(400).send('Email already in use');
 
@@ -117,11 +117,16 @@ router.put('/:id', requireAuth, (req, res) => {
             last_name,
             password
         } = req.body;
-        
+
         pool.query(queries.users.put, [email, username, dob, first_name, last_name, password, id], (err, result) => {
             if (err) return res.status(500).send(err);
 
-            return res.status(200).send('User successfully updated');
+            // Return the newly updated user
+            pool.query(queries.users.get('id'), [id], (err, result) => {
+                if (err) return res.status(500).send(err);
+                return res.status(200).send(result.rows[0]);
+            });
+            
         });
     }
     catch (err) {
@@ -131,9 +136,17 @@ router.put('/:id', requireAuth, (req, res) => {
 
 // DELETE
 // Delete a user by id
-router.put('/:id', requireAuth, (req, res) => {
+router.delete('/:id', requireAuth, (req, res) => {
     try{
+        const id = req.params.id;
+        // Check that the given user is deleting their own account
+        if(id !== req.user.id) return res.status(403).send('You are not authorized to delete this user');
 
+        // Delete their account
+        poo.query(queries.users('id'), [id], (err, result) => {
+            if (err) return res.status(500).send(err);
+            return res.status(200).send('User deleted');
+        });
     }
     catch (err) {
         res.status(500).send(err);

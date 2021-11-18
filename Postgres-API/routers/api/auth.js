@@ -19,11 +19,12 @@ router.post('/login', (req, res) => {
         }
 
         // Query the database for the user
-        pool.query(queries.users.getBy('email'), [email], async (err, result) => {
+        pool.query(queries.users.get('email'), [email], async (err, result) => {
             if (err) return res.status(400).send(err);
             if(!result.rows[0]) return res.status(400).send('Email not found');
 
             // Verify the attempted password
+            console.log(password, result.rows[0].password);
             const validPass = await bcrypt.compare(password, result.rows[0].password);
             if(!validPass) return res.status(400).send('Invalid password');
 
