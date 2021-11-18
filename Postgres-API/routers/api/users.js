@@ -17,8 +17,8 @@ router.post('/', (req, res) => {
             email,
             username,
             dob,
-            firstName,
-            lastName,
+            first_name,
+            last_name,
             password
         } = req.body;
     
@@ -30,9 +30,9 @@ router.post('/', (req, res) => {
                 return res.status(400).send('Must provide a username');
             case dob:
                 return res.status(400).send('Must provide a date of birth');
-            case firstName:
+            case first_name:
                 return res.status(400).send('Must provide a first name');
-            case lastName:
+            case last_name:
                 return res.status(400).send('Must provide a last name');
             case password:
                 return res.status(400).send('Must provide a password');
@@ -48,11 +48,11 @@ router.post('/', (req, res) => {
             const hashedPassword = await bcrypt.hash(password, salt);
 
             // Create the user
-            pool.query(queries.users.post, [email, username, dob, firstName, lastName, hashedPassword], (err, result) => {
+            pool.query(queries.users.post, [email, username, dob, first_name, last_name, hashedPassword], (err, result) => {
                 if (err) return res.status(400).send(err);
 
                 // Get the newly created user
-                pool.query(queries.users.getBy('email'), [email], (err, result) => {
+                pool.query(queries.users.get('email'), [email], (err, result) => {
                     if (err) return res.status(400).send(err);
 
                     // Generate JWT token and attach to response header
@@ -73,7 +73,7 @@ router.post('/', (req, res) => {
 // Get all users
 router.get('/', (req, res) => {
     try{
-        pool.query(queries.users.getAll, (err, result) => {
+        pool.query(queries.users.get(), (err, result) => {
             if (err) return res.status(500).send(err);
             return res.status(200).send(result.rows);
         });
@@ -88,8 +88,9 @@ router.get('/:id', (req, res) => {
     try{
         const id = req.params.id;
 
-        pool.query(queries.users.getBy('id'), [id], (err, result) => {
+        pool.query(queries.users.get('id'), [id], (err, result) => {
             if (err) return res.status(500).send(err);
+            if (!result.rows[0]) return res.status(404).send('User not found');
             return res.status(200).send(result.rows[0]);
         });
     }
@@ -112,14 +113,15 @@ router.put('/:id', requireAuth, (req, res) => {
             email,
             username,
             dob,
-            firstName,
-            lastName,
+            first_name,
+            last_name,
             password
         } = req.body;
         
-        pool.query(queries.users.put, [email, username, dob, firstName, lastName, password, id], (err, result) => {
+        pool.query(queries.users.put, [email, username, dob, first_name, last_name, password, id], (err, result) => {
             if (err) return res.status(500).send(err);
-            return res.status(200).send(result.rows);
+
+            return res.status(200).send('User successfully updated');
         });
     }
     catch (err) {
