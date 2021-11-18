@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const queries = require('../../queries/queries');
 const pool = require('../../db');
 // Require Auth
@@ -50,13 +51,16 @@ router.post('/', (req, res) => {
             pool.query(queries.users.post, [email, username, dob, firstName, lastName, hashedPassword], (err, result) => {
                 if (err) return res.status(400).send(err);
 
-                // Generate JWT token and attach to response header
-                const token = jwt.sign({ userId: result.rows[0].id }, process.env.TOKEN_KEY);
-                res.headers.authorization = `Bearer ${token}`;
+                // Get the newly created user
+                pool.query(queries.users.getBy('email'), [email], (err, result) => {
+                    if (err) return res.status(400).send(err);
 
-                // Remove the hashed password before sending the user back
-                const { password, ...user } = result.rows[0];
-                res.status(201).send(user);
+                    // Generate JWT token and attach to response header
+                    const token = jwt.sign({ userId: result.rows[0] }, process.env.TOKEN_KEY);
+                    res.set('authorization', `Bearer ${token}`);
+
+                    res.status(201).send(result.rows[0]);
+                });
             });
         });
     }
@@ -86,7 +90,7 @@ router.get('/:id', (req, res) => {
 
         pool.query(queries.users.getBy('id'), [id], (err, result) => {
             if (err) return res.status(500).send(err);
-            return res.status(200).send(result.rows);
+            return res.status(200).send(result.rows[0]);
         });
     }
     catch (err) {
