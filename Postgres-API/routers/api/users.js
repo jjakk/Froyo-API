@@ -128,32 +128,34 @@ router.get('/:id', requireAuth, (req, res) => {
 
 // PUT
 // Update a user by id
-router.put('/:id', requireAuth, (req, res) => {
+router.put('/', requireAuth, (req, res) => {
     try{
-        const id = req.params.id;
+        // Check that the user exists in the database
+        pool.query(queries.get('id'), [req.user.id], (err, result) => {
+            if(err) return res.status(500).send(err);
+            if(!result.rows[0]) return res.status(404).send('User not found');
 
-        // Makes sure that the given user is deleting their own account
-        if (id !== req.user.id) return res.status(403).send('You are not authorized to delete this user');
+            // Get the new user data
+            const {
+                email,
+                username,
+                dob,
+                first_name,
+                last_name,
+                password
+            } = req.body;
 
-        // Get the new user data
-        const {
-            email,
-            username,
-            dob,
-            first_name,
-            last_name,
-            password
-        } = req.body;
-
-        pool.query(queries.users.put, [email, username, dob, first_name, last_name, password, id], (err, result) => {
-            if (err) return res.status(500).send(err);
-
-            // Return the newly updated user
-            pool.query(queries.users.get('id'), [id], (err, result) => {
+            // Update the user with the new information
+            pool.query(queries.users.put, [email, username, dob, first_name, last_name, password, req.user.id], (err, result) => {
                 if (err) return res.status(500).send(err);
-                return res.status(200).send(result.rows[0]);
+
+                // Return the newly updated user
+                pool.query(queries.users.get('id'), [req.user.id], (err, result) => {
+                    if (err) return res.status(500).send(err);
+                    return res.status(200).send(result.rows[0]);
+                });
+                
             });
-            
         });
     }
     catch (err) {
@@ -163,14 +165,10 @@ router.put('/:id', requireAuth, (req, res) => {
 
 // DELETE
 // Delete a user by id
-router.delete('/:id', requireAuth, (req, res) => {
+router.delete('/', requireAuth, (req, res) => {
     try{
-        const id = req.params.id;
-        // Check that the given user is deleting their own account
-        if(id !== req.user.id) return res.status(403).send('You are not authorized to delete this user');
-
         // Delete their account
-        poo.query(queries.users('id'), [id], (err, result) => {
+        poo.query(queries.users('id'), [req.user.id], (err, result) => {
             if (err) return res.status(500).send(err);
             return res.status(200).send('User deleted');
         });

@@ -18,15 +18,10 @@ const requireAuth = (req, res, next) => {
             const { userId } = payload;
             pool.query(queries.users.get('id'), [userId], (err, result) => {
                 if (err) return res.status(500).send(err);
+                if (!result.rows[0]) return res.status(401).send('Invalid token');
 
-                // If the user is in the database add them to the request header
-                if (result.rows[0]) {
-                    req.user = result.rows[0];
-                    next();
-                }
-                else{
-                    return res.status(401).send('Invalid token');
-                }
+                req.user = result.rows[0];
+                next();
             });
         });
     }
