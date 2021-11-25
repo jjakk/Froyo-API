@@ -145,8 +145,27 @@ router.put('/', requireAuth, (req, res) => {
                 password
             } = req.body;
 
+            // Set email_verified to false if email is changed
+            const changedEmail = email === req.user.email;
+
             // Update the user with the new information
-            pool.query(queries.users.put, [email, username, dob, first_name, last_name, password, req.user.id], (err, result) => {
+            pool.query(queries.users.put([
+                'email',
+                'username',
+                'dob',
+                'first_name',
+                'last_name',
+                'password',
+                'email_verfied'
+            ]), [
+                email || req.user.email,
+                username || req.user.username,
+                dob || req.user.dob,
+                first_name || req.user.first_name,
+                last_name || req.user.last_name,
+                password || req.user.password,
+                changedEmail ? false : req.user.email_verified,
+            ], (err, result) => {
                 if (err) return res.status(500).send(err);
 
                 // Return the newly updated user
