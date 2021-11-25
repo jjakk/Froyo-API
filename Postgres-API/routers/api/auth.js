@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const { Router } = require('express');
 const pool = require('../../db');
@@ -24,9 +24,8 @@ router.post('/login', (req, res) => {
             if(!result.rows[0]) return res.status(400).send('Email not found');
 
             // Verify the attempted password
-            console.log(password, result.rows[0].password);
-            const validPass = await bcrypt.compare(password, result.rows[0].password);
-            if(!validPass) return res.status(400).send('Invalid password');
+            const validPassword = await argon2.verify(result.rows[0].password, password);
+            if(!validPassword) return res.status(400).send('Invalid password');
 
             // Generate JWT token and attach to response header
             const token = jwt.sign({ userId: result.rows[0].id }, process.env.TOKEN_KEY);

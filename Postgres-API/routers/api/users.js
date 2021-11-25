@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const queries = require('../../queries/queries');
 const pool = require('../../db');
@@ -23,7 +23,7 @@ router.post('/', (req, res) => {
         } = req.body;
     
         // Check that all required fields are present
-        switch ('') {
+        switch (undefined) {
             case email:
                 return res.status(400).send('Must provide an email');
             case username:
@@ -38,28 +38,36 @@ router.post('/', (req, res) => {
                 return res.status(400).send('Must provide a password');
         }
 
+        // Check that email is valid
+        if(email.indexOf('@') === -1) return res.status(422).send('Not a valid email');
+
         // Check the database to make sure the email is not already in use
         pool.query(queries.users.get('email'), [email], async (err, result) => {
             if (err) return res.status(400).send(err);
             if (result.rows[0]) return res.status(400).send('Email already in use');
-
-            // Hash the given password before inserting it into the database
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(password, salt);
-
-            // Create the user
-            pool.query(queries.users.post, [email, username, dob, first_name, last_name, hashedPassword], (err, result) => {
+            
+            // Check the database to make sure the username is not already taken
+            pool.query(queries.users.get('username'), [username], async (err, result) => {
                 if (err) return res.status(400).send(err);
+                if (result.rows[0]) return res.status(400).send('Username already taken');
 
-                // Get the newly created user
-                pool.query(queries.users.get('email'), [email], (err, result) => {
+                // Hash the given password before inserting it into the database
+                const hashedPassword = await argon2.hash(password);
+
+                // Create the user
+                pool.query(queries.users.post, [email, username, dob, first_name, last_name, hashedPassword], (err, result) => {
                     if (err) return res.status(400).send(err);
 
-                    // Generate JWT token and attach to response header
-                    const token = jwt.sign({ userId: result.rows[0] }, process.env.TOKEN_KEY);
-                    res.set('authorization', `Bearer ${token}`);
+                    // Get the newly created user
+                    pool.query(queries.users.get('email'), [email], (err, result) => {
+                        if (err) return res.status(400).send(err);
 
-                    res.status(201).send(result.rows[0]);
+                        // Generate JWT token and attach to response header
+                        const token = jwt.sign({ userId: result.rows[0] }, process.env.TOKEN_KEY);
+                        res.set('authorization', `Bearer ${token}`);
+
+                        res.status(201).send(result.rows[0]);
+                    });
                 });
             });
         });
@@ -75,7 +83,8 @@ router.get('/', (req, res) => {
     try{
         pool.query(queries.users.get(), (err, result) => {
             if (err) return res.status(500).send(err);
-            return res.status(200).send(result.rows);
+            const ids = result.rows.map(user => user.id);
+            return res.status(200).send(ids);
         });
     }
     catch (err) {
@@ -84,14 +93,32 @@ router.get('/', (req, res) => {
 });
 
 // Get a user by id
-router.get('/:id', (req, res) => {
+router.get('/:id', requireAuth, (req, res) => {
     try{
         const id = req.params.id;
 
         pool.query(queries.users.get('id'), [id], (err, result) => {
             if (err) return res.status(500).send(err);
             if (!result.rows[0]) return res.status(404).send('User not found');
-            return res.status(200).send(result.rows[0]);
+
+            // Remove password and other irrelevant information
+            const {
+                password,
+                email_verified,
+                timestamp,
+                ...user
+            } = result.rows[0];
+
+            // Remove private information if user is not getting their own account
+            if (result.rows[0].id !== req.user.id){
+                const {
+                    dob,
+                    email,
+                    ...result
+                } = user;
+                return res.status(200).send(result);
+            }
+            return res.status(200).send(user);
         });
     }
     catch (err) {
