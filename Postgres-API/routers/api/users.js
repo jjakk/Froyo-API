@@ -73,7 +73,7 @@ router.post('/', (req, res) => {
         });
     }
     catch (err) {
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 });
 
@@ -88,7 +88,7 @@ router.get('/', (req, res) => {
         });
     }
     catch (err) {
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 });
 
@@ -122,7 +122,7 @@ router.get('/:id', requireAuth, (req, res) => {
         });
     }
     catch (err) {
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 });
 
@@ -131,7 +131,7 @@ router.get('/:id', requireAuth, (req, res) => {
 router.put('/', requireAuth, (req, res) => {
     try{
         // Check that the user exists in the database
-        pool.query(queries.get('id'), [req.user.id], (err, result) => {
+        pool.query(queries.users.get('id'), [req.user.id], (err, result) => {
             if(err) return res.status(500).send(err);
             if(!result.rows[0]) return res.status(404).send('User not found');
 
@@ -165,6 +165,7 @@ router.put('/', requireAuth, (req, res) => {
                 last_name || req.user.last_name,
                 password || req.user.password,
                 changedEmail ? false : req.user.email_verified,
+                req.user.id
             ], (err, result) => {
                 if (err) return res.status(500).send(err);
 
@@ -178,7 +179,7 @@ router.put('/', requireAuth, (req, res) => {
         });
     }
     catch (err) {
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 });
 
@@ -187,13 +188,13 @@ router.put('/', requireAuth, (req, res) => {
 router.delete('/', requireAuth, (req, res) => {
     try{
         // Delete their account
-        poo.query(queries.users('id'), [req.user.id], (err, result) => {
+        poo.query(queries.users.get('id'), [req.user.id], (err, result) => {
             if (err) return res.status(500).send(err);
             return res.status(200).send('User deleted');
         });
     }
     catch (err) {
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 });
 
