@@ -194,7 +194,7 @@ router.delete('/', requireAuth, (req, res) => {
     }
 });
 
-// Follow (PUT) a user
+// Follow (PUT) a user. Works as a toggle, so if the user is already following the other user, they will unfollow them
 router.put('/:id/follow', requireAuth, async (req, res) => {
     try {
         const follower_id = req.user.id;
@@ -222,6 +222,7 @@ router.put('/:id/follow', requireAuth, async (req, res) => {
         // Then change the following status accordingly
         switch (userLetter) {
             case 'A':
+                // Extract whether the user is already following the other user
                 const {
                     rows: [
                         {
@@ -229,11 +230,13 @@ router.put('/:id/follow', requireAuth, async (req, res) => {
                         }
                     ]
                 } = await pool.query(queries.connections.getAB, [follower_id, followee_id]);
-                if (a_following_b) return res.status(400).send('You are already following this user');
 
-                await pool.query(queries.connections.followB, [true, follower_id]);
-                break;
+                // Toggle the following status and return the outcome
+                await pool.query(queries.connections.followB, [!a_following_b, follower_id]);
+                if (a_following_b) return res.status(200).send('Unfollowed user');
+                return res.status(200).send('Followed user');
             case 'B':
+                // Extract whether the user is already following the other user
                 const {
                     rows: [
                         {
@@ -241,24 +244,13 @@ router.put('/:id/follow', requireAuth, async (req, res) => {
                         }
                     ]
                 } = await pool.query(queries.connections.getAB, [followee_id, follower_id]);
-                if (b_following_a) return res.status(400).send('You are already following this user');
 
-                await pool.query(queries.connections.followA, [true, follower_id]);
-                break;
+                // Toggle the following status and return the outcome
+                await pool.query(queries.connections.followA, [!b_following_a, follower_id]);
+                if (b_following_a) return res.status(200).send('Unfollowed user');
+                return res.status(200).send('Followed user');
         }
 
-        return res.status(200).send('Followed user');
-
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
-// Unfollow (PUT) a user
-router.put('/:id/unfollow', requireAuth, (req, res) => {
-    try {
-        const id = req.params.id;
     }
     catch (err) {
         res.status(500).send(err.message);
