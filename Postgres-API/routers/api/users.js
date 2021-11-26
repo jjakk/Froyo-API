@@ -156,8 +156,8 @@ router.put('/', requireAuth, (req, res) => {
                 'first_name',
                 'last_name',
                 'password',
-                'email_verfied'
-            ]), [
+                'email_verified'
+            ], req.user.id), [
                 email || req.user.email,
                 username || req.user.username,
                 dob || req.user.dob,
@@ -188,7 +188,7 @@ router.put('/', requireAuth, (req, res) => {
 router.delete('/', requireAuth, (req, res) => {
     try{
         // Delete their account
-        poo.query(queries.users.get('id'), [req.user.id], (err, result) => {
+        pool.query(queries.users.delete, [req.user.id], (err, result) => {
             if (err) return res.status(500).send(err);
             return res.status(200).send('User deleted');
         });

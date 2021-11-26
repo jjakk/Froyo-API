@@ -12,10 +12,13 @@ const queries = {
         },
         // Create a user
         post: 'INSERT INTO users (email, username, dob, first_name, last_name, password) VALUES ($1, $2, $3, $4, $5, $6)',
+        // Update a user
+        // Pass the user id after all the other parameters in the same array
         put: (params) => {
-            console.log(`UPDATE users SET ${formatParams(params)} WHERE id = $${params.length+1}`);
             return `UPDATE users SET ${formatParams(params)} WHERE id = $${params.length+1}`;
         },
+        // Delete a user
+        delete: 'DELETE FROM users WHERE id = $1'
         /*follow: '',
         unfollow: ''*/
     },

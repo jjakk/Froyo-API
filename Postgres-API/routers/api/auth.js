@@ -30,7 +30,15 @@ router.post('/login', (req, res) => {
             // Generate JWT token and attach to response header
             const token = jwt.sign({ userId: result.rows[0].id }, process.env.TOKEN_KEY);
 
-            return res.status(201).set('authorization', `Bearer ${token}`).send(result.rows[0]);
+            // Remove password and other irrelevant information before sending back to client
+            const {
+                password: userPassword,
+                email_verified,
+                timestamp,
+                ...user
+            } = result.rows[0];
+
+            return res.status(201).set('authorization', `Bearer ${token}`).send(user);
         });
     }
     catch (err){
