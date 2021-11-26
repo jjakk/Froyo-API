@@ -8,8 +8,7 @@ const requireAuth = require('../../middleware/requireAuth');
 
 const router = Router();
 
-// POST
-// Create a new user
+// Create (POST) a new user
 router.post('/', (req, res) => {
     try{
         // Get user information
@@ -77,8 +76,7 @@ router.post('/', (req, res) => {
     }
 });
 
-// GET
-// Get all users
+// GET all users
 router.get('/', (req, res) => {
     try{
         pool.query(queries.users.get(), (err, result) => {
@@ -92,7 +90,7 @@ router.get('/', (req, res) => {
     }
 });
 
-// Get a user by id
+// GET a user by id
 router.get('/:id', requireAuth, (req, res) => {
     try{
         const id = req.params.id;
@@ -126,8 +124,7 @@ router.get('/:id', requireAuth, (req, res) => {
     }
 });
 
-// PUT
-// Update a user by id
+// Update (PUT) a user by id
 router.put('/', requireAuth, (req, res) => {
     try{
         // Check that the user exists in the database
@@ -183,8 +180,7 @@ router.put('/', requireAuth, (req, res) => {
     }
 });
 
-// DELETE
-// Delete a user by id
+// DELETE a user by id
 router.delete('/', requireAuth, (req, res) => {
     try{
         // Delete their account
@@ -192,6 +188,53 @@ router.delete('/', requireAuth, (req, res) => {
             if (err) return res.status(500).send(err);
             return res.status(200).send('User deleted');
         });
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+// Follow (PUT) a user
+router.put('/:id/follow', requireAuth, async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        // Check that the user isn't following themselves
+        if (id === req.user.id) return res.status(400).send('You cannot follow yourself');
+
+        // Check the database to see if a connection already exists
+        const { rows: [ userExists ] } = await pool.query(queries.connections.get, [req.user.id, id]);
+
+        console.log(userExists);
+        // Create a connection if one doesn't exist
+        if (!userExists) {
+            await pool.query(queries.connections.post, [req.user.id, id]);
+        }
+
+        // Checks the database to see if current user is user A or user B in the connection
+        const { rows: [ isUserA ] } = await pool.query(queries.connections.getAB, [req.user.id, id]);
+        const { rows: [ isUserB ] } = await pool.query(queries.connections.getBA, [req.user.id, id]);
+
+        // Change the following status accordingly
+        switch (true) {
+            case !!isUserA:
+                await pool.query(queries.connections.followB, [true, req.user.id]);
+            case !!isUserB:
+                await pool.query(queries.connections.followA, [true, req.user.id]);
+        }
+
+        return res.status(200).send('Followed user');
+
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+// Unfollow (PUT) a user
+router.put('/:id/unfollow', requireAuth, (req, res) => {
+    try {
+        const id = req.params.id;
     }
     catch (err) {
         res.status(500).send(err.message);

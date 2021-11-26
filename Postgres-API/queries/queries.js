@@ -18,12 +18,21 @@ const queries = {
             return `UPDATE users SET ${formatParams(params)} WHERE id = $${params.length+1}`;
         },
         // Delete a user
-        delete: 'DELETE FROM users WHERE id = $1'
-        /*follow: '',
-        unfollow: ''*/
+        delete: 'DELETE FROM users WHERE id = $1',
+        follow: '',
+        unfollow: ''
     },
     posts: {},
     comments: {},
+    connections: {
+        get: 'SELECT * FROM connections WHERE (user_a_id = $1 AND user_b_id = $2) OR (user_a_id = $2 AND user_b_id = $1)',
+        getAB: 'SELECT * FROM connections WHERE user_a_id = $1 AND user_b_id = $2',
+        getBA: 'SELECT * FROM connections WHERE user_a_id = $2 AND user_b_id = $1',
+        post: 'INSERT INTO connections (user_a_id, user_b_id) VALUES ($1, $2)',
+        followA: 'UPDATE connections SET b_following_a = $1 WHERE user_b_id = $2',
+        followB: 'UPDATE connections SET a_following_b = $1 WHERE user_a_id = $2'
+    },
+    likeness: {}
 };
 
 // Convert an array of parameters into a string
