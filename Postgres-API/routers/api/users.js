@@ -212,9 +212,9 @@ router.put('/:id/follow', requireAuth, async (req, res) => {
         }
 
         // Checks the database to see if current user is user A or user B in the connection
-        const userLetter = await pool.query(queries.connections.getAB, [follower_id, followee_id])
+        const userLetter = (await pool.query(queries.connections.getAB, [follower_id, followee_id])).rows[0]
             ? 'A'
-            : await pool.query(queries.connections.getAB, [followee_id, follower_id])
+            : (await pool.query(queries.connections.getAB, [followee_id, follower_id])).rows[0]
                 ? 'B'
                 : null;
 
