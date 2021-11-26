@@ -27,7 +27,6 @@ const queries = {
     connections: {
         get: 'SELECT * FROM connections WHERE (user_a_id = $1 AND user_b_id = $2) OR (user_a_id = $2 AND user_b_id = $1)',
         getAB: 'SELECT * FROM connections WHERE user_a_id = $1 AND user_b_id = $2',
-        getBA: 'SELECT * FROM connections WHERE user_a_id = $2 AND user_b_id = $1',
         post: 'INSERT INTO connections (user_a_id, user_b_id) VALUES ($1, $2)',
         followA: 'UPDATE connections SET b_following_a = $1 WHERE user_b_id = $2',
         followB: 'UPDATE connections SET a_following_b = $1 WHERE user_a_id = $2'

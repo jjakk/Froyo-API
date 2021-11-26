@@ -206,24 +206,45 @@ router.put('/:id/follow', requireAuth, async (req, res) => {
         // Check the database to see if a connection already exists
         const { rows: [ connectionExists ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
 
-        // Create a connection if one doesn't exist
+        // Create a connection if one doesn't already exist
         if (!connectionExists) {
             await pool.query(queries.connections.post, [follower_id, followee_id]);
         }
-        else {
-
-        }
 
         // Checks the database to see if current user is user A or user B in the connection
-        const { rows: [ isUserA ] } = await pool.query(queries.connections.getAB, [follower_id, followee_id]);
-        const { rows: [ isUserB ] } = await pool.query(queries.connections.getBA, [follower_id, followee_id]);
+        const userLetter = await pool.query(queries.connections.getAB, [follower_id, followee_id])
+            ? 'A'
+            : await pool.query(queries.connections.getAB, [followee_id, follower_id])
+                ? 'B'
+                : null;
 
-        // Change the following status accordingly
-        switch (true) {
-            case !!isUserA:
+        // Check that the follower is not already following the followee
+        // Then change the following status accordingly
+        switch (userLetter) {
+            case 'A':
+                const {
+                    rows: [
+                        {
+                            a_following_b
+                        }
+                    ]
+                } = await pool.query(queries.connections.getAB, [follower_id, followee_id]);
+                if (a_following_b) return res.status(400).send('You are already following this user');
+
                 await pool.query(queries.connections.followB, [true, follower_id]);
-            case !!isUserB:
+                break;
+            case 'B':
+                const {
+                    rows: [
+                        {
+                            b_following_a
+                        }
+                    ]
+                } = await pool.query(queries.connections.getAB, [followee_id, follower_id]);
+                if (b_following_a) return res.status(400).send('You are already following this user');
+
                 await pool.query(queries.connections.followA, [true, follower_id]);
+                break;
         }
 
         return res.status(200).send('Followed user');
