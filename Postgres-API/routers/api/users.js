@@ -197,30 +197,33 @@ router.delete('/', requireAuth, (req, res) => {
 // Follow (PUT) a user
 router.put('/:id/follow', requireAuth, async (req, res) => {
     try {
-        const id = req.params.id;
+        const follower_id = req.user.id;
+        const followee_id = req.params.id;
 
         // Check that the user isn't following themselves
-        if (id === req.user.id) return res.status(400).send('You cannot follow yourself');
+        if (followee_id === follower_id) return res.status(400).send('You cannot follow yourself');
 
         // Check the database to see if a connection already exists
-        const { rows: [ userExists ] } = await pool.query(queries.connections.get, [req.user.id, id]);
+        const { rows: [ connectionExists ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
 
-        console.log(userExists);
         // Create a connection if one doesn't exist
-        if (!userExists) {
-            await pool.query(queries.connections.post, [req.user.id, id]);
+        if (!connectionExists) {
+            await pool.query(queries.connections.post, [follower_id, followee_id]);
+        }
+        else {
+
         }
 
         // Checks the database to see if current user is user A or user B in the connection
-        const { rows: [ isUserA ] } = await pool.query(queries.connections.getAB, [req.user.id, id]);
-        const { rows: [ isUserB ] } = await pool.query(queries.connections.getBA, [req.user.id, id]);
+        const { rows: [ isUserA ] } = await pool.query(queries.connections.getAB, [follower_id, followee_id]);
+        const { rows: [ isUserB ] } = await pool.query(queries.connections.getBA, [follower_id, followee_id]);
 
         // Change the following status accordingly
         switch (true) {
             case !!isUserA:
-                await pool.query(queries.connections.followB, [true, req.user.id]);
+                await pool.query(queries.connections.followB, [true, follower_id]);
             case !!isUserB:
-                await pool.query(queries.connections.followA, [true, req.user.id]);
+                await pool.query(queries.connections.followA, [true, follower_id]);
         }
 
         return res.status(200).send('Followed user');
