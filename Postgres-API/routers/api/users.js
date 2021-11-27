@@ -9,7 +9,7 @@ const requireAuth = require('../../middleware/requireAuth');
 const router = Router();
 
 // Create (POST) a new user
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     try{
         // Get user information
         const {
@@ -41,35 +41,29 @@ router.post('/', (req, res) => {
         if(email.indexOf('@') === -1) return res.status(422).send('Not a valid email');
 
         // Check the database to make sure the email is not already in use
-        pool.query(queries.users.get('email'), [email], async (err, result) => {
-            if (err) return res.status(400).send(err);
-            if (result.rows[0]) return res.status(400).send('Email already in use');
-            
-            // Check the database to make sure the username is not already taken
-            pool.query(queries.users.get('username'), [username], async (err, result) => {
-                if (err) return res.status(400).send(err);
-                if (result.rows[0]) return res.status(400).send('Username already taken');
+        const { rows: [ emailTaken ] } = await pool.query(queries.users.get('email'), [email]);
+        if (emailTaken) return res.status(400).send('Email already in use');
+        
+        // Check the database to make sure the username is not already taken
+        const { rows: [ usernameTaken ] } = await pool.query(queries.users.get('username'), [username]);
+        if (usernameTaken) return res.status(400).send('Username already taken');
 
-                // Hash the given password before inserting it into the database
-                const hashedPassword = await argon2.hash(password);
+        // Hash the given password before inserting it into the database
+        const hashedPassword = await argon2.hash(password);
 
-                // Create the user
-                pool.query(queries.users.post, [email, username, dob, first_name, last_name, hashedPassword], (err, result) => {
-                    if (err) return res.status(400).send(err);
+        // Create the user
+        const {
+            rows: [ maybeUser ]
+        } = await pool.query(queries.users.post, [email, username, dob, first_name, last_name, hashedPassword]);
 
-                    // Get the newly created user
-                    pool.query(queries.users.get('email'), [email], (err, result) => {
-                        if (err) return res.status(400).send(err);
+        // Get the newly created user
+        const { rows: [ user ] } = await pool.query(queries.users.get('email'), [email]);
 
-                        // Generate JWT token and attach to response header
-                        const token = jwt.sign({ userId: result.rows[0] }, process.env.TOKEN_KEY);
-                        res.set('authorization', `Bearer ${token}`);
+        // Generate JWT token and attach to response header
+        const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
+        res.set('authorization', `Bearer ${token}`);
 
-                        res.status(201).send(result.rows[0]);
-                    });
-                });
-            });
-        });
+        res.status(201).send(user);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -77,13 +71,12 @@ router.post('/', (req, res) => {
 });
 
 // GET all users
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try{
-        pool.query(queries.users.get(), (err, result) => {
-            if (err) return res.status(500).send(err);
-            const ids = result.rows.map(user => user.id);
-            return res.status(200).send(ids);
-        });
+        // Get all users from the database and send back their IDs
+        const { rows: users } = await pool.query(queries.users.get());
+        const ids = users.map(user => user.id);
+        return res.status(200).send(ids);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -91,33 +84,43 @@ router.get('/', (req, res) => {
 });
 
 // GET a user by id
-router.get('/:id', requireAuth, (req, res) => {
+router.get('/:id', requireAuth, async (req, res) => {
     try{
         const id = req.params.id;
+        // Retrieve user then remove password and other irrelevant information
+        const {rows:[{
+            password,
+            email_verified,
+            timestamp,
+            ...user
+        }]} = await pool.query(queries.users.get('id'), [id]);
 
-        pool.query(queries.users.get('id'), [id], (err, result) => {
-            if (err) return res.status(500).send(err);
-            if (!result.rows[0]) return res.status(404).send('User not found');
+        if (!user) return res.status(404).send('User not found');
 
-            // Remove password and other irrelevant information
+        // Remove additional private information if user is not getting their own account
+        if (user.id !== req.user.id){
             const {
-                password,
-                email_verified,
-                timestamp,
-                ...user
-            } = result.rows[0];
+                dob,
+                email,
+                ...rest
+            } = user;
+            return res.status(200).send(rest);
+        }
 
-            // Remove private information if user is not getting their own account
-            if (result.rows[0].id !== req.user.id){
-                const {
-                    dob,
-                    email,
-                    ...result
-                } = user;
-                return res.status(200).send(result);
-            }
-            return res.status(200).send(user);
-        });
+        return res.status(200).send(user);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+// GET all of a user's posts
+router.get('/:id/posts', requireAuth, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { rows: posts } = await pool.query(queries.posts.get, [id]);
+        if (posts.length === 0) return res.status(404).send('No posts found');
+        return res.status(200).send(posts);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -125,55 +128,48 @@ router.get('/:id', requireAuth, (req, res) => {
 });
 
 // Update (PUT) a user by id
-router.put('/', requireAuth, (req, res) => {
+router.put('/', requireAuth, async (req, res) => {
     try{
         // Check that the user exists in the database
-        pool.query(queries.users.get('id'), [req.user.id], (err, result) => {
-            if(err) return res.status(500).send(err);
-            if(!result.rows[0]) return res.status(404).send('User not found');
+        const { rows: [ userExists ] } = await pool.query(queries.users.get('id'), [req.user.id])
+        if(!userExists) return res.status(404).send('User not found');
 
-            // Get the new user data
-            const {
-                email,
-                username,
-                dob,
-                first_name,
-                last_name,
-                password
-            } = req.body;
+        // Get the new user data
+        const {
+            email,
+            username,
+            dob,
+            first_name,
+            last_name,
+            password
+        } = req.body;
 
-            // Set email_verified to false if email is changed
-            const changedEmail = email === req.user.email;
+        // Set email_verified to false if email is changed
+        const changedEmail = email === req.user.email;
 
-            // Update the user with the new information
-            pool.query(queries.users.put([
-                'email',
-                'username',
-                'dob',
-                'first_name',
-                'last_name',
-                'password',
-                'email_verified'
-            ], req.user.id), [
-                email || req.user.email,
-                username || req.user.username,
-                dob || req.user.dob,
-                first_name || req.user.first_name,
-                last_name || req.user.last_name,
-                password || req.user.password,
-                changedEmail ? false : req.user.email_verified,
-                req.user.id
-            ], (err, result) => {
-                if (err) return res.status(500).send(err);
+        // Update the user with the new information
+        await pool.query(queries.users.put([
+            'email',
+            'username',
+            'dob',
+            'first_name',
+            'last_name',
+            'password',
+            'email_verified'
+        ], req.user.id), [
+            email || req.user.email,
+            username || req.user.username,
+            dob || req.user.dob,
+            first_name || req.user.first_name,
+            last_name || req.user.last_name,
+            password || req.user.password,
+            changedEmail ? false : req.user.email_verified,
+            req.user.id
+        ]);
 
-                // Return the newly updated user
-                pool.query(queries.users.get('id'), [req.user.id], (err, result) => {
-                    if (err) return res.status(500).send(err);
-                    return res.status(200).send(result.rows[0]);
-                });
-                
-            });
-        });
+        // Return the newly updated user
+        const { rows: [ user ] } = await pool.query(queries.users.get('id'), [req.user.id]);
+        return res.status(200).send(user);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -181,13 +177,11 @@ router.put('/', requireAuth, (req, res) => {
 });
 
 // DELETE a user by id
-router.delete('/', requireAuth, (req, res) => {
+router.delete('/', requireAuth, async (req, res) => {
     try{
-        // Delete their account
-        pool.query(queries.users.delete, [req.user.id], (err, result) => {
-            if (err) return res.status(500).send(err);
-            return res.status(200).send('User deleted');
-        });
+        // Delete their account from the database
+        await pool.query(queries.users.delete, [req.user.id]);
+        return res.status(200).send('User deleted');
     }
     catch (err) {
         res.status(500).send(err.message);

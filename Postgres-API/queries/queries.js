@@ -22,7 +22,10 @@ const queries = {
         follow: '',
         unfollow: ''
     },
-    posts: {},
+    posts: {
+        get: 'SELECT * FROM posts WHERE id = $1',
+        post: 'INSERT INTO posts (text, image_url, author_id) VALUES ($1, $2, $3)',
+    },
     comments: {},
     connections: {
         get: 'SELECT * FROM connections WHERE (user_a_id = $1 AND user_b_id = $2) OR (user_a_id = $2 AND user_b_id = $1)',
