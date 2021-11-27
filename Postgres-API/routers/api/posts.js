@@ -68,7 +68,7 @@ router.put('/:id', requireAuth, async (req, res) => {
         if (!post) return res.status(404).send('Post not found');
 
         // Make sure that it's the user's own post that their deleting
-        if (post.id !== id) return res.status(403).send('You can only update your own posts');
+        if (post.author_id !== req.user.id) return res.status(403).send('You can only update your own posts');
     
         // Update the post
         await pool.query(queries.posts.put, [text, image_url, id]);
@@ -89,7 +89,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
         if (!post) return res.status(404).send('Post not found');
 
         // Make sure that it's the user's own post that their deleting
-        if (post.id !== id) return res.status(403).send('You can only delete your own posts');
+        if (post.author_id !== req.user.id) return res.status(403).send('You can only delete your own posts');
     
         // Delete the post
         await pool.query(queries.posts.delete, [id]);
