@@ -22,7 +22,6 @@ router.post('/login', async (req, res) => {
         const { rows: [ user ] } = await pool.query(queries.users.get('email'), [email]);
         if(!user) return res.status(400).send('Email not found');
 
-        console.log(user.password);
         // Verify the attempted password
         const validPassword = await argon2.verify(user.password, passwordAttempt);
         if(!validPassword) return res.status(400).send('Invalid password');
@@ -38,7 +37,7 @@ router.post('/login', async (req, res) => {
             ...rest
         } = user;
 
-        return res.status(201).set('authorization', `Bearer ${token}`).send(rest);
+        return res.status(200).set('authorization', `Bearer ${token}`).send(rest);
     }
     catch (err){
         return res.status(400).send(err.message);

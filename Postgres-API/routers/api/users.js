@@ -171,7 +171,11 @@ router.put('/', requireAuth, async (req, res) => {
 
         // Return the newly updated user
         const { rows: [ user ] } = await pool.query(queries.users.get('id'), [req.user.id]);
-        return res.status(200).send(user);
+
+        // Generate JWT token and attach to response header
+        const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
+
+        return res.status(201).set('authorization', `Bearer ${token}`).send(user);
     }
     catch (err) {
         res.status(500).send(err.message);
