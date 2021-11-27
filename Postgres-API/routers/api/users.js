@@ -8,6 +8,63 @@ const requireAuth = require('../../middleware/requireAuth');
 
 const router = Router();
 
+// GET all users
+router.get('/', async (req, res) => {
+    try{
+        // Get all users from the database and send back their IDs
+        const { rows: users } = await pool.query(queries.users.get());
+        const ids = users.map(user => user.id);
+        return res.status(200).send(ids);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+// GET a user by id
+router.get('/:id', requireAuth, async (req, res) => {
+    try{
+        const { id } = req.params;
+        // Retrieve user then remove password and other irrelevant information
+        const {rows:[{
+            password,
+            email_verified,
+            timestamp,
+            ...user
+        }]} = await pool.query(queries.users.get('id'), [id]);
+
+        if (!user) return res.status(404).send('User not found');
+
+        // Remove additional private information if user is not getting their own account
+        if (user.id !== req.user.id){
+            const {
+                dob,
+                email,
+                ...rest
+            } = user;
+            return res.status(200).send(rest);
+        }
+
+        return res.status(200).send(user);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+// GET all of a user's posts
+router.get('/:id/posts', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { rows: posts } = await pool.query(queries.posts.getByAuthor, [id]);
+        if (posts.length === 0) return res.status(404).send('No posts found');
+        return res.status(200).send(posts);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 // Create (POST) a new user
 router.post('/', async (req, res) => {
     try{
@@ -70,63 +127,6 @@ router.post('/', async (req, res) => {
     }
 });
 
-// GET all users
-router.get('/', async (req, res) => {
-    try{
-        // Get all users from the database and send back their IDs
-        const { rows: users } = await pool.query(queries.users.get());
-        const ids = users.map(user => user.id);
-        return res.status(200).send(ids);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
-// GET a user by id
-router.get('/:id', requireAuth, async (req, res) => {
-    try{
-        const { id } = req.params;
-        // Retrieve user then remove password and other irrelevant information
-        const {rows:[{
-            password,
-            email_verified,
-            timestamp,
-            ...user
-        }]} = await pool.query(queries.users.get('id'), [id]);
-
-        if (!user) return res.status(404).send('User not found');
-
-        // Remove additional private information if user is not getting their own account
-        if (user.id !== req.user.id){
-            const {
-                dob,
-                email,
-                ...rest
-            } = user;
-            return res.status(200).send(rest);
-        }
-
-        return res.status(200).send(user);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
-// GET all of a user's posts
-router.get('/:id/posts', requireAuth, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { rows: posts } = await pool.query(queries.posts.getByAuthor, [id]);
-        if (posts.length === 0) return res.status(404).send('No posts found');
-        return res.status(200).send(posts);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
 // Update (PUT) a user by id
 router.put('/', requireAuth, async (req, res) => {
     try{
@@ -143,6 +143,8 @@ router.put('/', requireAuth, async (req, res) => {
             last_name,
             password
         } = req.body;
+
+        const newPassword = password ? await argon2.hash(password) : null;
 
         // Set email_verified to false if email is changed
         const changedEmail = email === req.user.email;
@@ -162,7 +164,7 @@ router.put('/', requireAuth, async (req, res) => {
             dob || req.user.dob,
             first_name || req.user.first_name,
             last_name || req.user.last_name,
-            password || req.user.password,
+            newPassword || req.user.password,
             changedEmail ? false : req.user.email_verified,
             req.user.id
         ]);
