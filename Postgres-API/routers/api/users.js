@@ -86,7 +86,7 @@ router.get('/', async (req, res) => {
 // GET a user by id
 router.get('/:id', requireAuth, async (req, res) => {
     try{
-        const id = req.params.id;
+        const { id } = req.params;
         // Retrieve user then remove password and other irrelevant information
         const {rows:[{
             password,
@@ -117,8 +117,8 @@ router.get('/:id', requireAuth, async (req, res) => {
 // GET all of a user's posts
 router.get('/:id/posts', requireAuth, async (req, res) => {
     try {
-        const id = req.params.id;
-        const { rows: posts } = await pool.query(queries.posts.get, [id]);
+        const { id } = req.params;
+        const { rows: posts } = await pool.query(queries.posts.getByAuthor, [id]);
         if (posts.length === 0) return res.status(404).send('No posts found');
         return res.status(200).send(posts);
     }
@@ -191,8 +191,8 @@ router.delete('/', requireAuth, async (req, res) => {
 // Follow (PUT) a user. Works as a toggle, so if the user is already following the other user, they will unfollow them
 router.put('/:id/follow', requireAuth, async (req, res) => {
     try {
-        const follower_id = req.user.id;
-        const followee_id = req.params.id;
+        const { id: follower_id } = req.user;
+        const { id: followee_id } = req.params;
 
         // Check that the user isn't following themselves
         if (followee_id === follower_id) return res.status(400).send('You cannot follow yourself');
@@ -211,38 +211,38 @@ router.put('/:id/follow', requireAuth, async (req, res) => {
             : (await pool.query(queries.connections.getAB, [followee_id, follower_id])).rows[0]
                 ? 'B'
                 : null;
+        
+        if(userLetter === 'A'){
+            // Extract whether the user is already following the other user
+            const {
+                rows: [
+                    {
+                        id: connection_id,
+                        a_following_b,
+                    }
+                ]
+            } = await pool.query(queries.connections.getAB, [follower_id, followee_id]);
 
-        // Check that the follower is not already following the followee
-        // Then change the following status accordingly
-        switch (userLetter) {
-            case 'A':
-                // Extract whether the user is already following the other user
-                const {
-                    rows: [
-                        {
-                            a_following_b
-                        }
-                    ]
-                } = await pool.query(queries.connections.getAB, [follower_id, followee_id]);
+            // Toggle the following status and return the outcome
+            await pool.query(queries.connections.followB, [!a_following_b, connection_id]);
+            if (a_following_b) return res.status(200).send('Unfollowed user');
+            return res.status(200).send('Followed user');
+        }
+        else if (userLetter === 'B') {
+            // Extract whether the user is already following the other user
+            const {
+                rows: [
+                    {
+                        id: connection_id,
+                        b_following_a
+                    }
+                ]
+            } = await pool.query(queries.connections.getAB, [followee_id, follower_id]);
 
-                // Toggle the following status and return the outcome
-                await pool.query(queries.connections.followB, [!a_following_b, follower_id]);
-                if (a_following_b) return res.status(200).send('Unfollowed user');
-                return res.status(200).send('Followed user');
-            case 'B':
-                // Extract whether the user is already following the other user
-                const {
-                    rows: [
-                        {
-                            b_following_a
-                        }
-                    ]
-                } = await pool.query(queries.connections.getAB, [followee_id, follower_id]);
-
-                // Toggle the following status and return the outcome
-                await pool.query(queries.connections.followA, [!b_following_a, follower_id]);
-                if (b_following_a) return res.status(200).send('Unfollowed user');
-                return res.status(200).send('Followed user');
+            // Toggle the following status and return the outcome
+            await pool.query(queries.connections.followA, [!b_following_a, connection_id]);
+            if (b_following_a) return res.status(200).send('Unfollowed user');
+            return res.status(200).send('Followed user');
         }
 
     }

@@ -18,21 +18,30 @@ const queries = {
             return `UPDATE users SET ${formatParams(params)} WHERE id = $${params.length+1}`;
         },
         // Delete a user
-        delete: 'DELETE FROM users WHERE id = $1',
-        follow: '',
-        unfollow: ''
+        delete: 'DELETE FROM users WHERE id = $1'
     },
     posts: {
+        // Get by post ID
         get: 'SELECT * FROM posts WHERE id = $1',
+        // Get by author ID
+        getByAuthor: 'SELECT * FROM posts WHERE author_id = $1',
+        // Create a post
         post: 'INSERT INTO posts (text, image_url, author_id) VALUES ($1, $2, $3)',
+        // Update a post
+        put: 'UPDATE posts SET text = $1, image_url = $2 WHERE id = $3'
     },
     comments: {},
     connections: {
+        // Get a connection given two user IDs (not in any particular order)
         get: 'SELECT * FROM connections WHERE (user_a_id = $1 AND user_b_id = $2) OR (user_a_id = $2 AND user_b_id = $1)',
+        // Get a connection given user_a_id and user_b_id in that particular order
         getAB: 'SELECT * FROM connections WHERE user_a_id = $1 AND user_b_id = $2',
+        // Creata a new connection given two user IDs
         post: 'INSERT INTO connections (user_a_id, user_b_id) VALUES ($1, $2)',
-        followA: 'UPDATE connections SET b_following_a = $1 WHERE user_b_id = $2',
-        followB: 'UPDATE connections SET a_following_b = $1 WHERE user_a_id = $2'
+        // Set b_following_a
+        followA: 'UPDATE connections SET b_following_a = $1 WHERE id = $2',
+        // set a_following_b
+        followB: 'UPDATE connections SET a_following_b = $1 WHERE id = $2'
     },
     likeness: {}
 };
