@@ -257,4 +257,26 @@ router.put('/:id/follow', requireAuth, async (req, res) => {
     }
 });
 
+// GET if a user is following another user
+router.get('/:user_a_id/following/:user_b_id', requireAuth, async (req, res) => {
+    try {
+        const { user_a_id, user_b_id } = req.params;
+
+        // Check that the user is following the other user
+        const {
+            rows: [
+                {
+                    a_following_b
+                }
+            ]
+        } = await pool.query(queries.connections.getAB, [user_a_id, user_b_id]);
+
+        // Return the following status
+        return res.status(200).send(a_following_b);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 module.exports = router;
