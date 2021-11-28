@@ -185,6 +185,11 @@ router.put('/', requireAuth, async (req, res) => {
 // DELETE a user by id
 router.delete('/', requireAuth, async (req, res) => {
     try{
+        // [TODO] Check the database for any posts, comments, likness, or connections associated with the user
+        // Posts
+        // Comments
+        // Likness
+        // Connections
         // Delete their account from the database
         await pool.query(queries.users.delete, [req.user.id]);
         return res.status(200).send('User deleted');
