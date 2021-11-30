@@ -71,7 +71,7 @@ router.put('/:id', requireAuth, async (req, res) => {
         if (!comment) return res.status(404).send('Comment not found');
 
         // Make sure that the user is updating their own comment
-        if (comment.author_id !== req.user.id) return res.status(403).send('You can only delete your own comments');
+        if (comment.author_id !== req.user.id) return res.status(403).send('You can only update your own comments');
 
         // Update the comment
         await pool.query(queries.comments.put, [text, commentId]);
