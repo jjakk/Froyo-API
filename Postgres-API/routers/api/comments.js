@@ -3,6 +3,7 @@ const queries = require('../../queries/queries');
 const pool = require('../../db');
 // Require Auth
 const requireAuth = require('../../middleware/requireAuth');
+const getComments = require('../../middleware/getComments');
 
 const router = Router();
 
@@ -31,6 +32,9 @@ router.get('/:id', async (req, res) => {
 
     }
 });
+
+// GET a specific comments's comments (by ID)
+router.get('/:id/comments', getComments);
 
 // POST a new comment
 router.post('/', requireAuth, async (req, res) => {

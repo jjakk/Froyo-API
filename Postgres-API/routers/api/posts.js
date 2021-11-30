@@ -3,6 +3,7 @@ const queries = require('../../queries/queries');
 const pool = require('../../db');
 // Require Auth
 const requireAuth = require('../../middleware/requireAuth');
+const getComments = require('../../middleware/getComments');
 
 const router = Router();
 
@@ -21,8 +22,8 @@ router.get('/', requireAuth, async (req, res) => {
 // GET a specific post by ID
 router.get('/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { rows: [ post ] } = await pool.query(queries.posts.get, [id]);
+        const { id: postId } = req.params;
+        const { rows: [ post ] } = await pool.query(queries.posts.get, [postId]);
         if (!post) return res.status(404).send('Post not found');
         return res.status(200).send(post);
     }
@@ -30,6 +31,9 @@ router.get('/:id', async (req, res) => {
         res.status(500).send(err.message);
     }
 });
+
+// GET a specific post's comments (by ID)
+router.get('/:id/comments', getComments);
 
 // Create (POST) a new post
 router.post('/', requireAuth, async (req, res) => {

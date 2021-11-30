@@ -35,10 +35,12 @@ const queries = {
         get: 'SELECT * FROM comments WHERE id = $1',
         // Get by Author ID
         getByAuthor: 'SELECT * FROM comments WHERE author_id = $1',
+        // Get all the comments for a given parent
+        getByParent: 'SELECT * FROM comments WHERE parent_id = $1',
         // Crate a comment
         post: 'INSERT INTO comments (text, parent_id, author_id) VALUES ($1, $2, $3)',
         // Update a comment by ID
-        put: 'UPDATE comments SET text = $1 WHERE id = $2'
+        put: 'UPDATE comments SET text = $1 WHERE id = $2',
     },
     connections: {
         // Get a connection given two user IDs (not in any particular order)

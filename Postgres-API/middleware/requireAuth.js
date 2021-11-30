@@ -26,7 +26,7 @@ const requireAuth = (req, res, next) => {
         });
     }
     catch (err) {
-        res.status(500).send(err);
+        res.status(500).send(err.message);
     }
 };
 
