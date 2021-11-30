@@ -11,7 +11,7 @@ router.get('/', requireAuth, async (req, res) => {
     try {
         const { rows: comments } = await pool.query(queries.comments.getByAuthor, [req.user.id]);
 
-        if (comments.length === 0) return res.status(404).send('No posts found');
+        if (comments.length === 0) return res.status(404).send('No comments found');
         return res.status(200).send(comments);
     }
     catch (err) {
