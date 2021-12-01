@@ -16,13 +16,11 @@ const requireAuth = (req, res, next) => {
 
             // Get user ID from token, and retrieve user from database
             const { userId } = payload;
-            pool.query(queries.users.get('id'), [userId], (err, result) => {
-                if (err) return res.status(500).send(err);
-                if (!result.rows[0]) return res.status(401).send('Invalid token');
+            const { rows: [ user ] } = await pool.query(queries.users.getById, [userId]);
+            if (!user) return res.status(401).send('Invalid token');
 
-                req.user = result.rows[0];
-                next();
-            });
+            req.user = user;
+            next();
         });
     }
     catch (err) {

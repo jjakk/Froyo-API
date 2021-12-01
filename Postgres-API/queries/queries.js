@@ -2,12 +2,14 @@ const formatQuery = require('./formatQuery');
 
 const queries = {
     users: {
-        // Get user(s)
-        get: (where) => formatQuery({
-            table: 'users',
-            method: 'post',
-            where,
-        }),
+        // Get all users
+        getAll: formatQuery({ table: 'users', method: 'get' }),
+        // Get user by ID
+        getById: formatQuery({ table: 'users', method: 'get', where: ['id'] }),
+        // Get user by email
+        getByEmail: formatQuery({ table: 'users', method: 'get', where: ['email'] }),
+        // Get user by username
+        getByUsername: formatQuery({ table: 'users', method: 'get', where: ['username'] }),
         // Create a user
         post: formatQuery({
             table: 'users',
@@ -15,7 +17,6 @@ const queries = {
             params: ['email', 'username', 'dob', 'first_name', 'last_name', 'password'],
         }),
         // Update a user
-        // Pass the user id after all the other parameters in the same array
         put: formatQuery({
             table: 'users',
             method: 'put',
@@ -23,11 +24,7 @@ const queries = {
             where: ['id'],
         }),
         // Delete a user
-        delete: formatQuery({
-            table: 'users',
-            method: 'delete',
-            where: ['id'],
-        })
+        delete: formatQuery({ table: 'users', method: 'delete', where: ['id'] })
     },
     posts: {
         // Get by post ID
@@ -82,8 +79,6 @@ const queries = {
         delete: 'DELETE FROM likeness WHERE user_id = $1 AND content_id = $2'
     }
 };
-
-console.log(queries.users);
 
 
 module.exports = queries;

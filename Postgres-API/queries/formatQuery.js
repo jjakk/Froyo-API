@@ -5,10 +5,11 @@ const formatQuery = (data) => {
         params,
         where,
     } = data;
-    let format
+    let format;
 
     switch (method) {
         case 'get':
+            if (!where) return `SELECT * FROM ${table}`;
             format = where.map(
                 (ele, index) => ele + ' = $' + (index + 1)
             ).join(', ');

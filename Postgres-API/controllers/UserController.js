@@ -14,7 +14,7 @@ const getById = async (req, res) => {
             email_verified,
             timestamp,
             ...user
-        }]} = await pool.query(queries.users.get('id'), [id]);
+        }]} = await pool.query(queries.users.getById, [id]);
 
         if (!user) return res.status(404).send('User not found');
 
@@ -35,6 +35,19 @@ const getById = async (req, res) => {
     }
 }
 
+// GET all users
+const getAllUsers = async (req, res) => {
+    try{
+        // Get all users from the database and send back their IDs
+        const { rows: users } = await pool.query(queries.users.getAll);
+        const ids = users.map(user => user.id);
+        return res.status(200).send(ids);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
 // GET all of a user's posts
 const getPosts = async (req, res) => {
     try {
@@ -42,19 +55,6 @@ const getPosts = async (req, res) => {
         const { rows: posts } = await pool.query(queries.posts.getByAuthor, [id]);
         if (posts.length === 0) return res.status(404).send('No posts found');
         return res.status(200).send(posts);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-};
-
-// GET all users
-const getAllUsers = async (req, res) => {
-    try{
-        // Get all users from the database and send back their IDs
-        const { rows: users } = await pool.query(queries.users.get());
-        const ids = users.map(user => user.id);
-        return res.status(200).send(ids);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -94,11 +94,11 @@ const post = async (req, res) => {
         if(email.indexOf('@') === -1) return res.status(422).send('Not a valid email');
 
         // Check the database to make sure the email is not already in use
-        const { rows: [ emailTaken ] } = await pool.query(queries.users.get('email'), [email]);
+        const { rows: [ emailTaken ] } = await pool.query(queries.users.getByEmail, [email]);
         if (emailTaken) return res.status(400).send('Email already in use');
         
         // Check the database to make sure the username is not already taken
-        const { rows: [ usernameTaken ] } = await pool.query(queries.users.get('username'), [username]);
+        const { rows: [ usernameTaken ] } = await pool.query(queries.users.getByUsername, [username]);
         if (usernameTaken) return res.status(400).send('Username already taken');
 
         // Hash the given password before inserting it into the database
@@ -127,7 +127,7 @@ const post = async (req, res) => {
 const put = async (req, res) => {
     try{
         // Check that the user exists in the database
-        const { rows: [ userExists ] } = await pool.query(queries.users.get('id'), [req.user.id])
+        const { rows: [ userExists ] } = await pool.query(queries.users.getById, [req.user.id])
         if(!userExists) return res.status(404).send('User not found');
 
         // Get the new user data
@@ -158,7 +158,7 @@ const put = async (req, res) => {
         ]);
 
         // Return the newly updated user
-        const { rows: [ user ] } = await pool.query(queries.users.get('id'), [req.user.id]);
+        const { rows: [ user ] } = await pool.query(queries.users.getById, [req.user.id]);
 
         // Generate JWT token and attach to response header
         const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
@@ -289,8 +289,8 @@ const getFollowing = async (req, res) => {
 
 module.exports = {
     getById,
-    getPosts,
     getAllUsers,
+    getPosts,
     post,
     put,
     deleteUser,
