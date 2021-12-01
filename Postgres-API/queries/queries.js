@@ -71,6 +71,8 @@ const queries = {
     likeness: {
         // Get a likeness given a user ID, a content ID, and like_content value (1 = like, 0 = dislike)
         get: formatQuery({ table: 'likeness', method: 'get', where: ['user_id', 'content_id'] }),
+        // Get all the likeness given content ID and like_content value
+        getByContent: formatQuery({ table: 'likeness', method: 'get', where: ['content_id', 'like_content'] }),
         // Create a new likeness given a user ID, a content ID, and like_content value
         post: formatQuery({ table: 'likeness', method: 'post', params: ['user_id', 'content_id', 'like_content'] }),
         // Update a likeness given a like_content value, user ID, and a content ID,

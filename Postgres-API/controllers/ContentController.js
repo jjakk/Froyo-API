@@ -135,11 +135,45 @@ const dislike = (type) => async (req, res) => {
     }
 }
 
+// Get the number of likes for a post or comment by ID
+const getLikes = (type) => async (req, res) => {
+    try {
+        if (type !== 'posts' && type !== 'comments') throw new Error('Invalid type');
+        const { id: contentId } = req.params;
+
+        // Get all likes from the database with the given content ID
+        const { rows: likes } = await pool.query(queries.likeness.getByContent, [contentId, true]);
+        res.status(200).send(likes.length+'');
+        
+    }
+    catch (err) {
+        return res.status(500).send(err.message);
+    }
+}
+
+// Get the number of dislikes for a post or comment by ID
+const getDislikes = (type) => async (req, res) => {
+    try {
+        if (type !== 'posts' && type !== 'comments') throw new Error('Invalid type');
+        const { id: contentId } = req.params;
+
+        // Get all dislikes from the database with the given content ID
+        const { rows: dislikes } = await pool.query(queries.likeness.getByContent, [contentId, false]);
+        res.status(200).send(dislikes.length+'');
+        
+    }
+    catch (err) {
+        return res.status(500).send(err.message);
+    }
+};
+
 module.exports = {
     getComments,
     getAll,
     getById,
     deleteContent,
     like,
-    dislike
+    dislike,
+    getLikes,
+    getDislikes
 };
