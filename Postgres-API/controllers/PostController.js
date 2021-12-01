@@ -1,6 +1,6 @@
+// CRUD operations for posts
 const queries = require('../queries/queries');
 const pool = require('../db');
-const getComments = require('../getComments');
 
 // GET all of the current user's posts
 const getAll = async (req, res) => {
@@ -161,7 +161,6 @@ const dislike = async (req, res) => {
 module.exports = {
     getAll,
     getById,
-    getComments,
     post,
     put,
     deletePost,

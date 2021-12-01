@@ -3,7 +3,7 @@ const router = Router();
 // Controller
 const UserController = require('../../controllers/UserController');
 
-router.get('/:id', UserController.get);
+router.get('/:id', UserController.getById);
 router.get('/', UserController.getAllUsers);
 router.get('/:id/posts', UserController.getPosts);
 router.post('/', UserController.post);

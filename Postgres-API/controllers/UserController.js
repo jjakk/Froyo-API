@@ -1,10 +1,11 @@
+// CRUD operations for users
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const queries = require('../queries/queries');
 const pool = require('../db');
 
 // GET a user by id
-const get = async (req, res) => {
+const getById = async (req, res) => {
     try{
         const { id } = req.params;
         // Retrieve user then remove password and other irrelevant information
@@ -295,7 +296,7 @@ const getFollowing = async (req, res) => {
 }
 
 module.exports = {
-    get,
+    getById,
     getPosts,
     getAllUsers,
     post,

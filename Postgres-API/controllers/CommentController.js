@@ -1,6 +1,6 @@
+// CRUD operations for comments
 const queries = require('../queries/queries');
 const pool = require('../db');
-const getComments = require('../getComments');
 
 // GET all of the current user's comments
 const getAll = async (req, res) => {
@@ -103,7 +103,6 @@ const deleteComment = async (req, res) => {
 module.exports = {
     getAll,
     getById,
-    getComments,
     post,
     put,
     deleteComment
