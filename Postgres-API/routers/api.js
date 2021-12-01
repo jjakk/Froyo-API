@@ -13,8 +13,8 @@ router.get('/', requireAuth, (req, res) => {
     res.status(200).send(req.user.id);
 });
 router.use('/auth', authRouter);
-router.use('/users', usersRouter);
-router.use('/posts', postsRouter);
-router.use('/comments', commentsRouter);
+router.use('/users', requireAuth, usersRouter);
+router.use('/posts', requireAuth, postsRouter);
+router.use('/comments', requireAuth, commentsRouter);
 
 module.exports = router;

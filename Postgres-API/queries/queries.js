@@ -28,7 +28,11 @@ const queries = {
         // Create a post
         post: 'INSERT INTO posts (text, image_url, author_id) VALUES ($1, $2, $3)',
         // Update a post
-        put: 'UPDATE posts SET text = $1, image_url = $2 WHERE id = $3'
+        put: 'UPDATE posts SET text = $1, image_url = $2 WHERE id = $3',
+        // Delete a post
+        delete: 'DELETE FROM posts WHERE id = $1',
+        // Delete a post give author ID
+        deleteByAuthor: 'DELETE FROM posts WHERE author_id = $1'
     },
     comments: {
         // Get by Comment ID
@@ -41,6 +45,8 @@ const queries = {
         post: 'INSERT INTO comments (text, parent_id, author_id) VALUES ($1, $2, $3)',
         // Update a comment by ID
         put: 'UPDATE comments SET text = $1 WHERE id = $2',
+        // Delete a comment by ID
+        delete: 'DELETE FROM comments WHERE id = $1'
     },
     connections: {
         // Get a connection given two user IDs (not in any particular order)
@@ -52,9 +58,20 @@ const queries = {
         // Set b_following_a
         followA: 'UPDATE connections SET b_following_a = $1 WHERE id = $2',
         // set a_following_b
-        followB: 'UPDATE connections SET a_following_b = $1 WHERE id = $2'
+        followB: 'UPDATE connections SET a_following_b = $1 WHERE id = $2',
+        // Delete a connection given one user ID
+        delete: 'DELETE FROM connections WHERE user_a_id = $1 OR user_b_id = $1'
     },
-    likeness: {}
+    likeness: {
+        // Get a likeness given a user ID, a content ID, and like_content value (1 = like, 0 = dislike)
+        get: 'SELECT * FROM likeness WHERE user_id = $1 AND content_id = $2',
+        // Create a new likeness given a user ID, a content ID, and like_content value
+        post: 'INSERT INTO likeness (user_id, content_id, like_content) VALUES ($1, $2, $3)',
+        // Update a likeness given a like_content value, user ID, and a content ID,
+        put: 'UPDATE likeness SET like_content = $3 WHERE user_id = $1 AND content_id = $2',
+        // Delete a likeness given a user ID and a content ID
+        delete: 'DELETE FROM likeness WHERE user_id = $1 AND content_id = $2'
+    }
 };
 
 // Convert an array of parameters into a string

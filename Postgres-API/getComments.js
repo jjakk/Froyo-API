@@ -1,5 +1,5 @@
-const pool = require('../db');
-const queries = require('../queries/queries');
+const pool = require('./db');
+const queries = require('./queries/queries');
 
 // Middleware to get the comments of parent content (post or comment)
 const getComments = async (req, res) => {

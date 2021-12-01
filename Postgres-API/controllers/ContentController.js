@@ -1,0 +1,1 @@
+// Controller for both types of content (post & comment)
