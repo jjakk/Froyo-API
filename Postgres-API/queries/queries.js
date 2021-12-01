@@ -52,7 +52,9 @@ const queries = {
         // Update a comment by ID
         put: formatQuery({ table: 'comments', method: 'put', params: ['text'], where: ['id'] }),
         // Delete a comment by ID
-        delete: formatQuery({ table: 'comments', method: 'delete', where: ['id'] })
+        delete: formatQuery({ table: 'comments', method: 'delete', where: ['id'] }),
+        // Delete a comment given it's author ID
+        deleteByAuthor: formatQuery({ table: 'comments', method: 'delete', where: ['author_id'] })
     },
     connections: {
         // Get a connection given two user IDs (not in any particular order)
@@ -65,8 +67,10 @@ const queries = {
         followA: formatQuery({ table: 'connections', method: 'put', params: ['b_following_a'], where: ['id'] }),
         // set a_following_b
         followB: formatQuery({ table: 'connections', method: 'put', params: ['a_following_b'], where: ['id'] }),
-        // Delete a connection given one user ID
-        delete: formatQuery({ table: 'connections', method: 'delete', where: ['user_a_id', 'user_b_id'] })
+        // Delete a connection given two user IDs
+        delete: formatQuery({ table: 'connections', method: 'delete', where: ['user_a_id', 'user_b_id'] }),
+        // Delete connections given one user ID
+        deleteWithOne: 'DELETE FROM connections WHERE user_a_id = $1 OR user_b_id = $1'
     },
     likeness: {
         // Get a likeness given a user ID, a content ID, and like_content value (1 = like, 0 = dislike)
@@ -78,7 +82,9 @@ const queries = {
         // Update a likeness given a like_content value, user ID, and a content ID,
         put: formatQuery({ table: 'likeness', method: 'put', params: ['like_content'], where: ['user_id', 'content_id'] }),
         // Delete a likeness given a user ID and a content ID
-        delete: formatQuery({ table: 'likeness', method: 'delete', where: ['user_id', 'content_id'] })
+        delete: formatQuery({ table: 'likeness', method: 'delete', where: ['user_id', 'content_id'] }),
+        // Delete all the likeness given a user ID
+        deleteByUser: formatQuery({ table: 'likeness', method: 'delete', where: ['user_id'] })
     }
 };
 

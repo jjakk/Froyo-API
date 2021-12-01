@@ -173,25 +173,21 @@ const put = async (req, res) => {
 // DELETE a user by id
 const deleteUser = async (req, res) => {
     try{
-        // [TODO] Check the database for any posts, comments, likness, or connections associated with the user
-        // Likness
-
-
         // Check that user exists in the database
-        const { rows: [ user ] } = await pool.query(queries.user.get('id'), [id]);
+        const { rows: [ user ] } = await pool.query(queries.users.getById, [req.user.id]);
         if(!user) return res.status(404).send('User not found');
 
         // Delete all of the user's posts
-        await pool.query(queries.posts.deleteByAuthor, [user.id]);
+        await pool.query(queries.posts.deleteByAuthor, [req.user.id]);
 
         // Delete all of the user's comments
-        await pool.query(queries.comments.deleteByAuthor, [user.id]);
+        await pool.query(queries.comments.deleteByAuthor, [req.user.id]);
 
         // Delete all of a user's connections
-        await pool.query(queries.connections.delete, [user.id]);
+        await pool.query(queries.connections.deleteWithOne, [req.user.id]);
 
-        // Delete all of the user's likness [ TODO ]
-        // *****************************************
+        // Delete all of the user's likness
+        await pool.query(queries.likeness.deleteByUser, [req.user.id]);
 
         // Delete their account from the database
         await pool.query(queries.users.delete, [req.user.id]);
