@@ -28,55 +28,55 @@ const queries = {
     },
     posts: {
         // Get by post ID
-        get: 'SELECT * FROM posts WHERE id = $1',
+        get: formatQuery({ table: 'posts', method: 'get', params: ['id'] }),
         // Get by author ID
-        getByAuthor: 'SELECT * FROM posts WHERE author_id = $1',
+        getByAuthor: formatQuery({ table: 'posts', method: 'get', params: ['author_id'] }),
         // Create a post
-        post: 'INSERT INTO posts (text, image_url, author_id) VALUES ($1, $2, $3)',
+        post: formatQuery({ table: 'posts', method: 'post', params: ['text', 'image_url', 'author_id'] }),
         // Update a post
-        put: 'UPDATE posts SET text = $1, image_url = $2 WHERE id = $3',
-        // Delete a post
-        delete: 'DELETE FROM posts WHERE id = $1',
-        // Delete a post give author ID
-        deleteByAuthor: 'DELETE FROM posts WHERE author_id = $1'
+        put: formatQuery({ table: 'posts', method: 'put', params: ['text', 'image_url'], where: ['id'] }),
+        // Delete a post (given post ID)
+        delete: formatQuery({ table: 'posts', method: 'delete', where: ['id'] }),
+        // Delete a post given author ID
+        deleteByAuthor: formatQuery({ table: 'posts', method: 'delete', where: ['author_id'] })
     },
     comments: {
         // Get by Comment ID
-        get: 'SELECT * FROM comments WHERE id = $1',
+        get: formatQuery({ table: 'comments', method: 'get', params: ['id'] }),
         // Get by Author ID
-        getByAuthor: 'SELECT * FROM comments WHERE author_id = $1',
+        getByAuthor: formatQuery({ table: 'comments', method: 'get', where: ['id'] }),
         // Get all the comments for a given parent
-        getByParent: 'SELECT * FROM comments WHERE parent_id = $1',
+        getByParent: formatQuery({ table: 'comments', method: 'get', where: ['parent_id'] }),
         // Crate a comment
-        post: 'INSERT INTO comments (text, parent_id, author_id) VALUES ($1, $2, $3)',
+        post: formatQuery({ table: 'comments', method: 'post', params: ['text', 'parent_id', 'author_id'] }),
         // Update a comment by ID
-        put: 'UPDATE comments SET text = $1 WHERE id = $2',
+        put: formatQuery({ table: 'comments', method: 'put', params: ['text'], where: ['id'] }),
         // Delete a comment by ID
-        delete: 'DELETE FROM comments WHERE id = $1'
+        delete: formatQuery({ table: 'comments', method: 'delete', where: ['id'] })
     },
     connections: {
         // Get a connection given two user IDs (not in any particular order)
         get: 'SELECT * FROM connections WHERE (user_a_id = $1 AND user_b_id = $2) OR (user_a_id = $2 AND user_b_id = $1)',
         // Get a connection given user_a_id and user_b_id in that particular order
-        getAB: 'SELECT * FROM connections WHERE user_a_id = $1 AND user_b_id = $2',
+        getAB: formatQuery({ table: 'connections', method: 'get', params: ['user_a_id', 'user_b_id'] }),
         // Creata a new connection given two user IDs
-        post: 'INSERT INTO connections (user_a_id, user_b_id) VALUES ($1, $2)',
+        post: formatQuery({ table: 'connections', method: 'post', params: ['user_a_id', 'user_b_id'] }),
         // Set b_following_a
-        followA: 'UPDATE connections SET b_following_a = $1 WHERE id = $2',
+        followA: formatQuery({ table: 'connections', method: 'put', params: ['b_following_a'], where: ['id'] }),
         // set a_following_b
-        followB: 'UPDATE connections SET a_following_b = $1 WHERE id = $2',
+        followB: formatQuery({ table: 'connections', method: 'put', params: ['a_following_b'], where: ['id'] }),
         // Delete a connection given one user ID
-        delete: 'DELETE FROM connections WHERE user_a_id = $1 OR user_b_id = $1'
+        delete: formatQuery({ table: 'connections', method: 'delete', where: ['user_a_id', 'user_b_id'] })
     },
     likeness: {
         // Get a likeness given a user ID, a content ID, and like_content value (1 = like, 0 = dislike)
-        get: 'SELECT * FROM likeness WHERE user_id = $1 AND content_id = $2',
+        get: formatQuery({ table: 'likeness', method: 'get', where: ['user_id', 'content_id'] }),
         // Create a new likeness given a user ID, a content ID, and like_content value
-        post: 'INSERT INTO likeness (user_id, content_id, like_content) VALUES ($1, $2, $3)',
+        post: formatQuery({ table: 'likeness', method: 'post', params: ['user_id', 'content_id', 'like_content'] }),
         // Update a likeness given a like_content value, user ID, and a content ID,
         put: 'UPDATE likeness SET like_content = $3 WHERE user_id = $1 AND content_id = $2',
         // Delete a likeness given a user ID and a content ID
-        delete: 'DELETE FROM likeness WHERE user_id = $1 AND content_id = $2'
+        delete: formatQuery({ table: 'likeness', method: 'delete', where: ['user_id', 'content_id'] })
     }
 };
 
