@@ -74,7 +74,7 @@ const queries = {
         // Create a new likeness given a user ID, a content ID, and like_content value
         post: formatQuery({ table: 'likeness', method: 'post', params: ['user_id', 'content_id', 'like_content'] }),
         // Update a likeness given a like_content value, user ID, and a content ID,
-        put: 'UPDATE likeness SET like_content = $3 WHERE user_id = $1 AND content_id = $2',
+        put: formatQuery({ table: 'likeness', method: 'put', params: ['like_content'], where: ['user_id', 'content_id'] }),
         // Delete a likeness given a user ID and a content ID
         delete: formatQuery({ table: 'likeness', method: 'delete', where: ['user_id', 'content_id'] })
     }

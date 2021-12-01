@@ -12,7 +12,7 @@ const formatQuery = (data) => {
             if (!where) return `SELECT * FROM ${table}`;
             format = where.map(
                 (ele, index) => ele + ' = $' + (index + 1)
-            ).join(', ');
+            ).join(' AND ');
             return `SELECT * FROM ${table} WHERE ${format}`;
 
         case 'post':
@@ -31,7 +31,7 @@ const formatQuery = (data) => {
                 ).join(', '),
                 where.map(
                     (ele, index) => ele + ' = $' + (params.length + index + 1)
-                ).join(', ')
+                ).join(' AND ')
             ];
             return `UPDATE ${table} SET ${format[0]} WHERE ${format[1]}`;
 
