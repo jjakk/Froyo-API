@@ -9,6 +9,6 @@ router.get('/:id', ContentController.getById('comments'));
 router.get('/:id/comments', ContentController.getComments);
 router.post('/', CommentController.post);
 router.put('/:id', CommentController.put);
-router.delete('/:id', CommentController.deleteComment);
+router.delete('/:id', ContentController.deleteContent('comments'));
 
 module.exports = router;

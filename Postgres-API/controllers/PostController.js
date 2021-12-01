@@ -49,28 +49,6 @@ const put = async (req, res) => {
         return res.status(500).send(err.message);
     }
 }
-
-// DELETE a post by ID
-const deletePost = async (req, res) => {
-    try {
-        const { id: postId } = req.params;
-
-        // Check that the post exists in the database
-        const { rows: [ post ] } = await pool.query(queries.posts.get, [postId]);
-        if (!post) return res.status(404).send('Post not found');
-
-        // Make sure that it's the user's own post that their deleting
-        if (post.author_id !== req.user.id) return res.status(403).send('You can only delete your own posts');
-    
-        // Delete the post
-        await pool.query(queries.posts.delete, [postId]);
-        return res.status(200).send('Post deleted');
-    }
-    catch (err) {
-        return res.status(500).send(err.message);
-    }
-}
-
 // Like (PUT) a post by ID
 const like = async (req, res) => {
     try {
@@ -136,7 +114,6 @@ const dislike = async (req, res) => {
 module.exports = {
     post,
     put,
-    deletePost,
     like,
     dislike
 };

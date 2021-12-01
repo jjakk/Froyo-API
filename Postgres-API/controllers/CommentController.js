@@ -52,29 +52,7 @@ const put = async (req, res) => {
     }
 }
 
-// DELETE a comment by ID
-const deleteComment = async (req, res) => {
-    try {
-        const { id: commentId } = req.params;
-
-        // Check that the comment exists in the database
-        const comment = await pool.query(queries.comments.get, [commentId]);
-        if (!comment) return res.status(404).send('Comment not found');
-
-        // Make sure that the user is deleting their own comment
-        if (comment.author_id !== req.user.id) return res.status(403).send('You can only delete your own comments');
-
-        // Delete the comment
-        await pool.query(queries.comments.delete, [commentId]);
-        return res.status(201).send('Comment deleted');
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-}
-
 module.exports = {
     post,
-    put,
-    deleteComment
+    put
 };

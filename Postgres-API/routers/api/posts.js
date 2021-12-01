@@ -10,7 +10,7 @@ router.get('/:id', ContentController.getById('posts'));
 router.get('/:id/comments', ContentController.getComments);
 router.post('/', PostController.post);
 router.put('/:id', PostController.put);
-router.delete('/:id', PostController.deletePost);
+router.delete('/:id', ContentController.deleteContent('posts'));
 router.put('/:id/like', PostController.like);
 router.put('/:id/dislike', PostController.dislike);
 

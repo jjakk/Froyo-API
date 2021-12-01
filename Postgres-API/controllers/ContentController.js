@@ -20,9 +20,11 @@ const getComments = async (req, res) => {
 const getById = (type) => async (req, res) => {
     try {
         if (type !== 'posts' && type !== 'comments') throw new Error('Invalid type');
+        const typeName = type.slice(0, -1);
         const { id: contentId } = req.params;
+
         const { rows: [ content ] } = await pool.query(queries[type].get, [contentId]);
-        if (!content) return res.status(404).send('Content not found');
+        if (!content) return res.status(404).send(`${typeName} not found`);
         return res.status(200).send(content);
     }
     catch (err) {
@@ -42,8 +44,32 @@ const getAll = (type) => async (req, res) => {
     }
 }
 
+const deleteContent = (type) => async (req, res) => {
+    try {
+        if (type !== 'posts' && type !== 'comments') throw new Error('Invalid type');
+        const typeName = type.slice(0, -1);
+
+        const { id: contentId } = req.params;
+
+        // Check that the post exists in the database
+        const { rows: [ post ] } = await pool.query(queries[type].get, [contentId]);
+        if (!post) return res.status(404).send(`${typeName} not found`);
+
+        // Make sure that it's the user's own post that their deleting
+        if (post.author_id !== req.user.id) return res.status(403).send(`You can only delete your own ${type}`);
+    
+        // Delete the post
+        await pool.query(queries[type].delete, [contentId]);
+        return res.status(200).send(`${typeName} deleted`);
+    }
+    catch (err) {
+        return res.status(500).send(err.message);
+    }
+};
+
 module.exports = {
     getComments,
     getAll,
-    getById
+    getById,
+    deleteContent
 };

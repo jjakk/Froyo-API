@@ -28,9 +28,9 @@ const queries = {
     },
     posts: {
         // Get by post ID
-        get: formatQuery({ table: 'posts', method: 'get', params: ['id'] }),
+        get: formatQuery({ table: 'posts', method: 'get', where: ['id'] }),
         // Get by author ID
-        getByAuthor: formatQuery({ table: 'posts', method: 'get', params: ['author_id'] }),
+        getByAuthor: formatQuery({ table: 'posts', method: 'get', where: ['author_id'] }),
         // Create a post
         post: formatQuery({ table: 'posts', method: 'post', params: ['text', 'image_url', 'author_id'] }),
         // Update a post
@@ -42,9 +42,9 @@ const queries = {
     },
     comments: {
         // Get by Comment ID
-        get: formatQuery({ table: 'comments', method: 'get', params: ['id'] }),
+        get: formatQuery({ table: 'comments', method: 'get', where: ['id'] }),
         // Get by Author ID
-        getByAuthor: formatQuery({ table: 'comments', method: 'get', where: ['id'] }),
+        getByAuthor: formatQuery({ table: 'comments', method: 'get', where: ['author_id'] }),
         // Get all the comments for a given parent
         getByParent: formatQuery({ table: 'comments', method: 'get', where: ['parent_id'] }),
         // Crate a comment
@@ -58,7 +58,7 @@ const queries = {
         // Get a connection given two user IDs (not in any particular order)
         get: 'SELECT * FROM connections WHERE (user_a_id = $1 AND user_b_id = $2) OR (user_a_id = $2 AND user_b_id = $1)',
         // Get a connection given user_a_id and user_b_id in that particular order
-        getAB: formatQuery({ table: 'connections', method: 'get', params: ['user_a_id', 'user_b_id'] }),
+        getAB: formatQuery({ table: 'connections', method: 'get', where: ['user_a_id', 'user_b_id'] }),
         // Creata a new connection given two user IDs
         post: formatQuery({ table: 'connections', method: 'post', params: ['user_a_id', 'user_b_id'] }),
         // Set b_following_a
