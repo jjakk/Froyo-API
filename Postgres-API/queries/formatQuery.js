@@ -1,0 +1,48 @@
+const formatQuery = (data) => {
+    const {
+        table,
+        method,
+        params,
+        where,
+    } = data;
+    let format
+
+    switch (method) {
+        case 'get':
+            format = where.map(
+                (ele, index) => ele + ' = $' + (index + 1)
+            ).join(', ');
+            return `SELECT * FROM ${table} WHERE ${format}`;
+
+        case 'post':
+            format = [
+                params.join(', '),
+                params.map(
+                    (_, index) => ('$' + (index+1))
+                ).join(', ')
+            ];
+            return `INSERT INTO ${table} (${format[0]}) VALUES (${format[1]})`;
+
+        case 'put':
+            format = [
+                params.map(
+                    (param, index) => param + ' = $' + (index + 1)
+                ).join(', '),
+                where.map(
+                    (ele, index) => ele + ' = $' + (params.length + index + 1)
+                ).join(', ')
+            ];
+            return `UPDATE ${table} SET ${format[0]} WHERE ${format[1]}`;
+
+        case 'delete':
+            format = [
+                where.map(
+                    (ele, index) => ele + ' = $' + (index + 1)
+                ).join(' AND ')
+            ];
+            return `DELETE FROM ${table} WHERE ${format}`;
+    }
+}
+
+module.exports = formatQuery;
+

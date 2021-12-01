@@ -2,18 +2,6 @@
 const queries = require('../queries/queries');
 const pool = require('../db');
 
-// GET all of the current user's posts
-const getAll = async (req, res) => {
-    try {
-        const { rows: posts } = await pool.query(queries.posts.getByAuthor, [req.user.id]);
-        if (posts.length === 0) return res.status(404).send('No posts found');
-        return res.status(200).send(posts);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-}
-
 // Create (POST) a new post
 const post = async (req, res) => {
     try {
@@ -146,7 +134,6 @@ const dislike = async (req, res) => {
 }
 
 module.exports = {
-    getAll,
     post,
     put,
     deletePost,

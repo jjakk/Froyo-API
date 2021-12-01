@@ -146,15 +146,7 @@ const put = async (req, res) => {
         const changedEmail = email === req.user.email;
 
         // Update the user with the new information
-        await pool.query(queries.users.put([
-            'email',
-            'username',
-            'dob',
-            'first_name',
-            'last_name',
-            'password',
-            'email_verified'
-        ], req.user.id), [
+        await pool.query(queries.users.put, [
             email || req.user.email,
             username || req.user.username,
             dob || req.user.dob,

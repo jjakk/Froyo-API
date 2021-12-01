@@ -5,7 +5,7 @@ const PostController = require('../../controllers/PostController');
 
 const router = Router();
 
-router.get('/', PostController.getAll);
+router.get('/', ContentController.getAll('posts'));
 router.get('/:id', ContentController.getById('posts'));
 router.get('/:id/comments', ContentController.getComments);
 router.post('/', PostController.post);

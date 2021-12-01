@@ -30,7 +30,20 @@ const getById = (type) => async (req, res) => {
     }
 };
 
+const getAll = (type) => async (req, res) => {
+    try {
+        if (type !== 'posts' && type !== 'comments') throw new Error('Invalid type');
+        const { rows: contents } = await pool.query(queries[type].getByAuthor, [req.user.id]);
+        if (contents.length === 0) return res.status(404).send(`No ${type} found`);
+        return res.status(200).send(contents);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+}
+
 module.exports = {
     getComments,
+    getAll,
     getById
 };
