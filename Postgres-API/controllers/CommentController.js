@@ -15,20 +15,6 @@ const getAll = async (req, res) => {
     }
 };
 
-// GET a comment by its ID
-const getById = async (req, res) => {
-    try {
-        const { id: commentId } = req.params;
-        const { rows: [ comment ] } = await pool.query(queries.comments.get, [commentId]);
-
-        if (!comment) return res.status(404).send('Comment not found');
-        return res.status(200).send(comment);
-    }
-    catch (err) {
-
-    }
-}
-
 // POST a new comment
 const post = async (req, res) => {
     try {
@@ -102,7 +88,6 @@ const deleteComment = async (req, res) => {
 
 module.exports = {
     getAll,
-    getById,
     post,
     put,
     deleteComment

@@ -14,19 +14,6 @@ const getAll = async (req, res) => {
     }
 }
 
-// GET a specific post by ID
-const getById = async (req, res) => {
-    try {
-        const { id: postId } = req.params;
-        const { rows: [ post ] } = await pool.query(queries.posts.get, [postId]);
-        if (!post) return res.status(404).send('Post not found');
-        return res.status(200).send(post);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-}
-
 // Create (POST) a new post
 const post = async (req, res) => {
     try {
@@ -160,7 +147,6 @@ const dislike = async (req, res) => {
 
 module.exports = {
     getAll,
-    getById,
     post,
     put,
     deletePost,
