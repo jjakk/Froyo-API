@@ -59,6 +59,9 @@ const deleteContent = (type) => async (req, res) => {
 
         // Make sure that it's the user's own post that their deleting
         if (post.author_id !== req.user.id) return res.status(403).send(`You can only delete your own ${type}`);
+
+        // Delete all the post's comments
+        await pool.query(queries.comments.deleteByParent, [contentId]);
     
         // Delete the post
         await pool.query(queries[type].delete, [contentId]);

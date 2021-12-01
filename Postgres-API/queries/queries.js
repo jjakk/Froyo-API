@@ -54,7 +54,9 @@ const queries = {
         // Delete a comment by ID
         delete: formatQuery({ table: 'comments', method: 'delete', where: ['id'] }),
         // Delete a comment given it's author ID
-        deleteByAuthor: formatQuery({ table: 'comments', method: 'delete', where: ['author_id'] })
+        deleteByAuthor: formatQuery({ table: 'comments', method: 'delete', where: ['author_id'] }),
+        // Delete a comment given it's parent ID
+        deleteByParent: formatQuery({ table: 'comments', method: 'delete', where: ['parent_id'] })
     },
     connections: {
         // Get a connection given two user IDs (not in any particular order)
