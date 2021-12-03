@@ -44,9 +44,9 @@ const login = async (req, res) => {
 // Check if the email is already in the database
 const emailTaken = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email } = req.params;
         const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
-        return res.status(200).send(emailTaken);
+        return res.status(200).send(!!emailTaken);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -56,9 +56,9 @@ const emailTaken = async (req, res) => {
 // Check if the username is already in the database
 const usernameTaken = async (req, res) => {
     try {
-        const { username } = req.body;
+        const { username } = req.params;
         const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
-        return res.status(200).send(usernameTaken);
+        return res.status(200).send(!!usernameTaken);
     }
     catch (err) {
         res.status(500).send(err.message);
