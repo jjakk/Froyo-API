@@ -1,27 +1,32 @@
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-const User = mongoose.model('User');
+const queryDB = require('../queries/queryDB');
+const pool = require('../db');
+const queries = require('../queries/queries');
 
-module.exports = (req, res, next) => {
-    const { authorization } = req.headers;
+const requireAuth = (req, res, next) => {
+    try {
+        const { authorization } = req.headers; 
 
-    if(!authorization) return res.status(401).send("You're not logged in.");
+        // Check to see that the authorization is set
+        if (!authorization) return res.status(401).send("You're not logged in");
 
-    const token = authorization.replace('Bearer ', '');
-    jwt.verify(token, process.env.TOKEN_KEY, async (err, payload) => {
-        if(err) return res.status(401).send('Invalid token.');
+        // Get the token from authorization & verify it
+        const token = authorization.replace('Bearer ', '');
+        jwt.verify(token, process.env.TOKEN_KEY, async (err, payload) => {
+            if (err) return res.status(401).send('Invalid token');
 
-        const { userId } = payload;
+            // Get user ID from token, and retrieve user from database
+            const { userId } = payload;
+            const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [userId]);
+            if (!user) return res.status(401).send('Invalid token');
 
-        const user = await User.findById(userId);
-        if(user){
             req.user = user;
             next();
-        }
-        else{
-            return res.status(401).send('Invalid token.');
-        }
-    });
+        });
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
 };
 
-
+module.exports = requireAuth;

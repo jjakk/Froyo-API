@@ -1,48 +1,20 @@
-require('./models/User');
-require('./models/Post');
-require('./models/Comment');
 const express = require('express');
-const mongoose = require('mongoose');
-const authRouter = require('./routers/auth');
-const postsRouter = require('./routers/posts');
-const commentsRouter = require('./routers/comments');
-const usersRouter = require('./routers/users');
-const requireAuth = require('./middleware/requireAuth');
 const app = express();
-const PORT = process.env.PORT || 8000;
 require('dotenv').config();
+// Routers
+const apiRouter = require('./routers/api');
+// Constants
+PORT = process.env.PORT || 8000;
 
 // Middleware
 app.use(express.json());
-app.use(express.urlencoded({
-    extended: true
-}));
+app.use('/api', apiRouter);
 
-app.use('/auth', authRouter);
-app.use('/posts', requireAuth, postsRouter);
-app.use('/comments', requireAuth, commentsRouter);
-app.use('/users', requireAuth, usersRouter);
-
-const mongoURI = `mongodb+srv://admin:${process.env.MONGO_PASSWORD}@cluster0.spbnq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true
-});
-
-mongoose.connection.on('connected', () => {
-    console.log('Connected to mongo instance');
-});
-
-mongoose.connection.on('error', (err) => {
-    console.error('Error connecting to mongo', err);
-});
-
-app.get('/', requireAuth, (req, res) => {
-    const user = req.user;
-    res.send(user._id);
+app.get('/', (req, res) => {
+    res.send('Go to /api for api functions');
 });
 
 app.listen(PORT, () => {
-    console.log(`Running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
+
