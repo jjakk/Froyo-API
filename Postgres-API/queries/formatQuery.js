@@ -8,7 +8,7 @@ const formatQuery = (table, method, data) => {
 
     switch (method) {
         case 'get':
-            if (!where) return `SELECT * FROM ${table}`;
+            if (!where || where.length === 0) return `SELECT * FROM ${table}`;
             format = where.map(
                 (ele, index) => ele + ' = $' + (index + 1)
             ).join(' AND ');

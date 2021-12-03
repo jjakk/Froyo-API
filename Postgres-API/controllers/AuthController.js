@@ -1,7 +1,6 @@
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
-const pool = require('../db');
-const queries = require('../queries/queries');
+const queryDB = require('../queries/queryDB');
 
 const login = async (req, res) => {
     try {
@@ -16,7 +15,7 @@ const login = async (req, res) => {
         }
 
         // Query the database for the user
-        const { rows: [ user ] } = await pool.query(queries.users.getByEmail, [email]);
+        const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
         if(!user) return res.status(400).send('Email not found');
 
         // Verify the attempted password

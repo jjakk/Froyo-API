@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const queryDB = require('../queries/queryDB');
 const pool = require('../db');
 const queries = require('../queries/queries');
 
@@ -16,7 +17,7 @@ const requireAuth = (req, res, next) => {
 
             // Get user ID from token, and retrieve user from database
             const { userId } = payload;
-            const { rows: [ user ] } = await pool.query(queries.users.getById, [userId]);
+            const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [userId]);
             if (!user) return res.status(401).send('Invalid token');
 
             req.user = user;

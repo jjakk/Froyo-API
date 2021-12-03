@@ -3,18 +3,19 @@ const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const queries = require('../queries/queries');
 const pool = require('../db');
+const queryDB = require('../queries/queryDB');
 
 // GET a user by id
 const getById = async (req, res) => {
     try{
-        const { id } = req.params;
+        const { id: userId } = req.params;
         // Retrieve user then remove password and other irrelevant information
-        const {rows:[{
+        const [{
             password,
             email_verified,
             timestamp,
             ...user
-        }]} = await pool.query(queries.users.getById, [id]);
+        }] = await queryDB('users', 'get', { where: ['id'] }, [userId]);
 
         if (!user) return res.status(404).send('User not found');
 
@@ -39,7 +40,7 @@ const getById = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try{
         // Get all users from the database and send back their IDs
-        const { rows: users } = await pool.query(queries.users.getAll);
+        const users = await queryDB('users', 'get', {}, []);
         const ids = users.map(user => user.id);
         return res.status(200).send(ids);
     }
@@ -51,8 +52,8 @@ const getAllUsers = async (req, res) => {
 // GET all of a user's posts
 const getPosts = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { rows: posts } = await pool.query(queries.posts.getByAuthor, [id]);
+        const { id: userId } = req.params;
+        const posts = await queryDB('posts', 'get', { where: ['author_id'] }, [userId]);
         if (posts.length === 0) return res.status(404).send('No posts found');
         return res.status(200).send(posts);
     }
@@ -94,23 +95,24 @@ const post = async (req, res) => {
         if(email.indexOf('@') === -1) return res.status(422).send('Not a valid email');
 
         // Check the database to make sure the email is not already in use
-        const { rows: [ emailTaken ] } = await pool.query(queries.users.getByEmail, [email]);
+        const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
         if (emailTaken) return res.status(400).send('Email already in use');
         
         // Check the database to make sure the username is not already taken
-        const { rows: [ usernameTaken ] } = await pool.query(queries.users.getByUsername, [username]);
+        const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
         if (usernameTaken) return res.status(400).send('Username already taken');
 
         // Hash the given password before inserting it into the database
         const hashedPassword = await argon2.hash(password);
 
         // Create the user
-        const {
-            rows: [ maybeUser ]
-        } = await pool.query(queries.users.post, [email, username, dob, first_name, last_name, hashedPassword]);
+        await queryDB('users', 'post',
+            { params: ['email', 'username', 'dob', 'first_name', 'last_name', 'password'] },
+            [ email, username, dob, first_name, last_name, hashedPassword ]
+        );
 
         // Get the newly created user
-        const { rows: [ user ] } = await pool.query(queries.users.get('email'), [email]);
+        const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
 
         // Generate JWT token and attach to response header
         const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
@@ -127,7 +129,7 @@ const post = async (req, res) => {
 const put = async (req, res) => {
     try{
         // Check that the user exists in the database
-        const { rows: [ userExists ] } = await pool.query(queries.users.getById, [req.user.id])
+        const [ userExists ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
         if(!userExists) return res.status(404).send('User not found');
 
         // Get the new user data
@@ -146,7 +148,18 @@ const put = async (req, res) => {
         const changedEmail = email === req.user.email;
 
         // Update the user with the new information
-        await pool.query(queries.users.put, [
+        await queryDB('users', 'put', {
+                params: [
+                    'email',
+                    'username',
+                    'dob',
+                    'first_name',
+                    'last_name',
+                    'password',
+                    'email_changed'
+                ],
+                where: ['id'],
+        },[
             email || req.user.email,
             username || req.user.username,
             dob || req.user.dob,
@@ -158,7 +171,7 @@ const put = async (req, res) => {
         ]);
 
         // Return the newly updated user
-        const { rows: [ user ] } = await pool.query(queries.users.getById, [req.user.id]);
+        const [ user ] = await queryDB('users', 'get', { where: 'id' }, [req.user.id]);
 
         // Generate JWT token and attach to response header
         const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
@@ -174,23 +187,23 @@ const put = async (req, res) => {
 const deleteUser = async (req, res) => {
     try{
         // Check that user exists in the database
-        const { rows: [ user ] } = await pool.query(queries.users.getById, [req.user.id]);
+        const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
         if(!user) return res.status(404).send('User not found');
 
         // Delete all of the user's posts
-        await pool.query(queries.posts.deleteByAuthor, [req.user.id]);
+        await queryDB('posts', 'delete', { where: ['author_id'] }, [req.user.id]);
 
         // Delete all of the user's comments
-        await pool.query(queries.comments.deleteByAuthor, [req.user.id]);
+        await queryDB('comments', 'delete', { where: ['author_id'] }, [req.user.id]);
 
         // Delete all of a user's connections
         await pool.query(queries.connections.deleteWithOne, [req.user.id]);
 
         // Delete all of the user's likness
-        await pool.query(queries.likeness.deleteByUser, [req.user.id]);
+        await queryDB('likeness', 'delete', { where: 'user_id' }, [req.user.id]);
 
         // Delete their account from the database
-        await pool.query(queries.users.delete, [req.user.id]);
+        await queryDB('users', 'delete', { where: ['id'] }, [req.user.id]);
         return res.status(200).send('User deleted');
     }
     catch (err) {
@@ -210,50 +223,47 @@ const follow = async (req, res) => {
         // Check the database to see if a connection already exists
         const { rows: [ connectionExists ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
 
-        // Create a connection if one doesn't already exist
+        // If a connection doesn't already exist, create it
         if (!connectionExists) {
-            await pool.query(queries.connections.post, [follower_id, followee_id]);
+            await queryDB('connections', 'post', {
+                params: ['user_a_id', 'user_b_id', 'a_following_b']
+            }, [follower_id, followee_id, true]);
+            return res.status(200).send('Followed user');
         }
 
-        // Checks the database to see if current user is user A or user B in the connection
-        const userLetter = (await pool.query(queries.connections.getAB, [follower_id, followee_id])).rows[0]
-            ? 'A'
-            : (await pool.query(queries.connections.getAB, [followee_id, follower_id])).rows[0]
-                ? 'B'
+        // Checks the database for the user's letter in the connection
+        const userLetter = (
+            await queryDB('connections', 'get', {
+                where: ['user_a_id', 'user_b_id'] 
+            }, [follower_id, followee_id])
+        ) ? 'a'
+            : (
+                await queryDB('connections', 'get', {
+                    where: ['user_b_id', 'user_a_id'] 
+                }, [follower_id, followee_id])
+            )
+                ? 'b'
                 : null;
-        
-        if(userLetter === 'A'){
-            // Extract whether the user is already following the other user
-            const {
-                rows: [
-                    {
-                        id: connection_id,
-                        a_following_b,
-                    }
-                ]
-            } = await pool.query(queries.connections.getAB, [follower_id, followee_id]);
+        // Letter of the other user in the connection
+        const otherLetter = userLetter === 'a' ? 'b' : 'a';
 
-            // Toggle the following status and return the outcome
-            await pool.query(queries.connections.followB, [!a_following_b, connection_id]);
-            if (a_following_b) return res.status(200).send('Unfollowed user');
-            return res.status(200).send('Followed user');
-        }
-        else if (userLetter === 'B') {
-            // Extract whether the user is already following the other user
-            const {
-                rows: [
-                    {
-                        id: connection_id,
-                        b_following_a
-                    }
-                ]
-            } = await pool.query(queries.connections.getAB, [followee_id, follower_id]);
+        // Extract whether the user is already following the other user
+        const [
+            {
+                id: connection_id,
+                [`${userLetter}_following_${otherLetter}`]: alreadyFollowing,
+            }
+        ] = await queryDB('connections', 'get', {
+            where: [`user_${userLetter}_id`, `user_${otherLetter}_id`]
+        }, [follower_id, followee_id]);
 
-            // Toggle the following status and return the outcome
-            await pool.query(queries.connections.followA, [!b_following_a, connection_id]);
-            if (b_following_a) return res.status(200).send('Unfollowed user');
-            return res.status(200).send('Followed user');
-        }
+        // Toggle the following status and return the outcome
+        await queryDB('connections', 'put', {
+            params: [`${userLetter}_following_${otherLetter}`],
+            where: ['id']
+        }, [!alreadyFollowing, connection_id]);
+        if (alreadyFollowing) return res.status(200).send('Unfollowed user');
+        return res.status(200).send('Followed user');
 
     }
     catch (err) {
@@ -263,24 +273,39 @@ const follow = async (req, res) => {
 
 // GET if a user is following another user
 const getFollowing = async (req, res) => {
-    try {
-        const { user_a_id, user_b_id } = req.params;
+    //try {
+        const { follower_id, followee_id } = req.params;
 
-        // Check that the user is following the other user
-        const {
-            rows: [
-                {
-                    a_following_b
-                }
-            ]
-        } = await pool.query(queries.connections.getAB, [user_a_id, user_b_id]);
+        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
+        if (!connection) return res.status(200).send(false);
+
+       // Checks the database for the user's letter in the connection
+       const followerLetter = (
+            connection.user_a_id === follower_id
+        ) ? 'a'
+            : (
+                connection.user_b_id === follower_id
+            )
+                ? 'b'
+                : null;
+        // Letter of the other user in the connection
+        const followeeLetter = followerLetter === 'a' ? 'b' : 'a';
+
+        // Extract whether the user is already following the other user
+        const [
+            {
+                [`${followerLetter}_following_${followeeLetter}`]: following,
+            }
+        ] = await queryDB('connections', 'get', {
+            where: [`user_${followerLetter}_id`, `user_${followeeLetter}_id`]
+        }, [follower_id, followee_id]);
 
         // Return the following status
-        return res.status(200).send(a_following_b);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
+        return res.status(200).send(following);
+    //}
+    //catch (err) {
+    //    res.status(500).send(err.message);
+    //}
 }
 
 module.exports = {

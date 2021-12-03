@@ -1,6 +1,5 @@
 // CRUD operations for comments
-const queries = require('../queries/queries');
-const pool = require('../db');
+const queryDB = require('../queries/queryDB');
 
 // POST a new comment
 const post = async (req, res) => {
@@ -19,7 +18,7 @@ const post = async (req, res) => {
         }
 
         // Create the new comment
-        await pool.query(queries.comments.post, [text, parent_id, req.user.id]);
+        await queryDB('comments', 'post', { params: ['text', 'parent_id', 'author_id'] }, [text, parent_id, req.user.id]);
         return res.status(201).send('Comment created');
     }
     catch (err) {
@@ -37,14 +36,14 @@ const put = async (req, res) => {
         if (!text) return res.status(400).send('Must provide text body');
 
         // Check that the comment exists in the database
-        const { rows: [ comment ] } = await pool.query(queries.comments.get, [commentId]);
+        const [ comment ] = await queryDB('comments', 'get', { where: ['id'] }, [commentId]);
         if (!comment) return res.status(404).send('Comment not found');
 
         // Make sure that the user is updating their own comment
         if (comment.author_id !== req.user.id) return res.status(403).send('You can only update your own comments');
 
         // Update the comment
-        await pool.query(queries.comments.put, [text, commentId]);
+        await queryDB('comments', 'put', { params: ['text'], where: ['id'] }, [text, commentId]);
         return res.status(201).send('Comment updated');
     }
     catch (err) {
