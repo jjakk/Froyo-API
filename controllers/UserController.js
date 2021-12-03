@@ -102,6 +102,9 @@ const post = async (req, res) => {
         const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
         if (usernameTaken) return res.status(400).send('Username already taken');
 
+        // Confirm that the user is at least 13 years old
+        // [ TODO ]
+
         // Hash the given password before inserting it into the database
         const hashedPassword = await argon2.hash(password);
 
