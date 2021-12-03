@@ -1,11 +1,10 @@
-const formatQuery = (data) => {
-    const {
-        table,
-        method,
-        params,
-        where,
-    } = data;
+// Ex: ('users', 'get', ['id', 'email']) -> 'SELECT * FROM users WHERE id = $1 AND email = $2'
+const formatQuery = (table, method, data) => {
     let format;
+    const {
+        params,
+        where
+    } = data;
 
     switch (method) {
         case 'get':
