@@ -2,6 +2,7 @@ const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const queryDB = require('../queries/queryDB');
 
+// Generate a JWT given email and password
 const login = async (req, res) => {
     try {
         const { email, password: passwordAttempt } = req.body;
@@ -40,6 +41,32 @@ const login = async (req, res) => {
     }
 };
 
+// Check if the email is already in the database
+const emailTaken = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
+        return res.status(200).send(emailTaken);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
+// Check if the username is already in the database
+const usernameTaken = async (req, res) => {
+    try {
+        const { username } = req.body;
+        const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
+        return res.status(200).send(usernameTaken);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
 module.exports = {
-    login
+    login,
+    emailTaken,
+    usernameTaken
 };
