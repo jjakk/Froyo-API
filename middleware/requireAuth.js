@@ -3,13 +3,13 @@ const queryDB = require('../queries/queryDB');
 
 const requireAuth = (req, res, next) => {
     try {
-        const { Authorization } = req.headers; 
+        const { authorization } = req.headers; 
 
         // Check to see that the authorization is set
-        if (!Authorization) return res.status(401).send("You're not logged in");
+        if (!authorization) return res.status(401).send("You're not logged in");
 
         // Get the token from authorization & verify it
-        const token = Authorization.replace('Bearer ', '');
+        const token = authorization.replace('Bearer ', '');
         jwt.verify(token, process.env.TOKEN_KEY, async (err, payload) => {
             if (err) return res.status(401).send('Invalid token');
 
