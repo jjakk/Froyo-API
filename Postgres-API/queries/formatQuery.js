@@ -1,4 +1,5 @@
-// Ex: ('users', 'get', ['id', 'email']) -> 'SELECT * FROM users WHERE id = $1 AND email = $2'
+// Convert table, method, and parameters to a query string
+// Ex: ('users', 'get', { where: ['id', 'email']}) -> 'SELECT * FROM users WHERE id = $1 AND email = $2'
 const formatQuery = (table, method, data) => {
     let format;
     const {

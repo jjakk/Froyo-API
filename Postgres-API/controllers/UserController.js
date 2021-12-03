@@ -273,7 +273,7 @@ const follow = async (req, res) => {
 
 // GET if a user is following another user
 const getFollowing = async (req, res) => {
-    //try {
+    try {
         const { follower_id, followee_id } = req.params;
 
         const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
@@ -302,10 +302,10 @@ const getFollowing = async (req, res) => {
 
         // Return the following status
         return res.status(200).send(following);
-    //}
-    //catch (err) {
-    //    res.status(500).send(err.message);
-    //}
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
 }
 
 module.exports = {
