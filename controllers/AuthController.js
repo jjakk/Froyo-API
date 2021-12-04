@@ -15,6 +15,7 @@ const login = async (req, res) => {
                 return res.status(400).send('Must provide password');
         }
 
+        console.log(email);
         // Query the database for the user
         const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
         if(!user) return res.status(400).send('Email not found');
