@@ -47,7 +47,9 @@ const validEmail = async (req, res) => {
     try {
         const { email } = req.params;
         const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
-        return res.status(200).send(!!emailTaken && validateEmail(email));
+        if(!validateEmail(email)) return res.status(400).send('Invalid email');
+        if(emailTaken) return res.status(400).send('Email already taken');
+        return res.status(200).send('Valid email');
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -59,7 +61,8 @@ const validUsername = async (req, res) => {
     try {
         const { username } = req.params;
         const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
-        return res.status(200).send(!!usernameTaken);
+        if(usernameTaken) return res.status(400).send('Username already taken');
+        return res.status(200).send('Valid username');
     }
     catch (err) {
         res.status(500).send(err.message);
