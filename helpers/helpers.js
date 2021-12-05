@@ -10,8 +10,20 @@ const validateEmail = (email) => {
     return re.test(String(email).toLowerCase());
 }
 
+// Calculate a user's age in years
+const calculateAge = (birthDate) => {
+    var today = new Date();
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
+
 module.exports = {
     capitalize,
-    validateEmail
+    validateEmail,
+    calculateAge
 };
 

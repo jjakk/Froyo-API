@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const queries = require('../queries/queries');
 const pool = require('../db');
 const queryDB = require('../queries/queryDB');
+const { validateEmail, calculateAge } = require('../helpers/helpers');
 
 // GET a user by id
 const getById = async (req, res) => {
@@ -92,7 +93,7 @@ const post = async (req, res) => {
         }
 
         // Check that email is valid
-        if(email.indexOf('@') === -1) return res.status(422).send('Not a valid email');
+        if(!validateEmail(email)) return res.status(422).send('Not a valid email');
 
         // Check the database to make sure the email is not already in use
         const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
@@ -103,7 +104,7 @@ const post = async (req, res) => {
         if (usernameTaken) return res.status(400).send('Username already taken');
 
         // Confirm that the user is at least 13 years old
-        // [ TODO ]
+        if (calculateAge(new Date(dob)) < 13) return res.status(400).send('Must be at least 13 years old to create an account');
 
         // Hash the given password before inserting it into the database
         const hashedPassword = await argon2.hash(password);
