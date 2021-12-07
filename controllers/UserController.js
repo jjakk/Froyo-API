@@ -8,7 +8,7 @@ const { validateEmail, calculateAge } = require('../helpers/helpers');
 
 // GET a user by id
 const getById = async (req, res) => {
-    try{
+    //try{
         const { id: userId } = req.params;
         // Retrieve user then remove password and other irrelevant information
         const [{
@@ -31,10 +31,10 @@ const getById = async (req, res) => {
         }
 
         return res.status(200).send(user);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
+    //}
+    //catch (err) {
+    //    res.status(500).send(err.message);
+    //}
 }
 
 // GET all users

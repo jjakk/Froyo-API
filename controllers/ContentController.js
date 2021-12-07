@@ -6,8 +6,7 @@ const { capitalize } = require('../helpers/helpers');
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
-        const comments = await queryDB('comments', 'get', ['parent_id'], [parentId]);
-        if (comments.length === 0) return res.status(404).send('No comments found');
+        const comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
         return res.status(200).send(comments);
     }
     catch (err) {
