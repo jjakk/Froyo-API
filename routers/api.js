@@ -4,6 +4,7 @@ const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const postsRouter = require('./api/posts');
 const commentsRouter = require('./api/comments');
+const contentRouter = require('./api/content');
 // Middleware
 const requireAuth = require('../middleware/requireAuth');
 
@@ -16,5 +17,6 @@ router.use('/auth', authRouter);
 router.use('/users', usersRouter);
 router.use('/posts', requireAuth, postsRouter);
 router.use('/comments', requireAuth, commentsRouter);
+router.use('/content', requireAuth, contentRouter);
 
 module.exports = router;
