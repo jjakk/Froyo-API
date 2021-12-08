@@ -31,7 +31,27 @@ const getById = (type) => async (req, res) => {
             )
         );
         if (!content) return res.status(404).send(`${typeName} not found`);
-        return res.status(200).send(content);
+
+        // Get whether the current user likes the content
+        const [ liking ] = await queryDB('likeness', 'get',
+            { where: ['user_id', 'content_id', 'like_content'] },
+            [req.user.id, contentId, true]
+        );
+
+        // Get whether the current user dislikes the content
+        const [ disliking ] = await queryDB('likeness', 'get',
+            { where: ['user_id', 'content_id', 'like_content'] },
+            [req.user.id, contentId, false]
+        );
+
+        // Append like/dislike status to returned content
+        const result = {
+            ...content,
+            liking: !!liking,
+            disliking: !!disliking
+        };
+
+        return res.status(200).send(result);
     }
     catch (err) {
         res.status(500).send(err.message);
