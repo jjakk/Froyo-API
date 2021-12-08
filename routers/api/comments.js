@@ -7,12 +7,14 @@ const router = Router();
 
 router.get('/', ContentController.getAll('comments'));
 router.get('/:id', ContentController.getById('comments'));
-router.get('/:id/comments', ContentController.getComments);
-router.get('/:id/likes', ContentController.getLikes);
-router.get('/:id/dislikes', ContentController.getDislikes);
+router.get('/:id/comments', ContentController.getComments());
+router.get('/:id/likes', ContentController.getLikes());
+router.get('/:id/dislikes', ContentController.getDislikes());
 router.post('/', CommentController.post);
 router.put('/:id', CommentController.put);
 router.delete('/:id', ContentController.deleteContent('comments'));
+router.get('/:id/like', ContentController.liking());
+router.get('/:id/dislike', ContentController.disliking());
 router.put('/:id/like', ContentController.like('comments'));
 router.put('/:id/dislike', ContentController.dislike('comments'));
 

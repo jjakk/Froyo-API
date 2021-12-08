@@ -3,7 +3,7 @@ const queryDB = require('../queries/queryDB');
 const { capitalize } = require('../helpers/helpers');
 
 // GET all the comments of either a post or a comment
-const getComments = async (req, res) => {
+const getComments = () => async (req, res) => {
     try {
         const { id: parentId } = req.params;
         const comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
@@ -26,9 +26,8 @@ const getById = (type) => async (req, res) => {
                 await queryDB(type, 'get', { where: ['id'] }, [contentId])
             ) : (
                 await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-                ?
-                    await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-                    : []
+                ||
+                await queryDB('comments', 'get', { where: ['id'] }, [contentId])
             )
         );
         if (!content) return res.status(404).send(`${typeName} not found`);
@@ -71,9 +70,8 @@ const deleteContent = (type) => async (req, res) => {
                 await queryDB(type, 'get', { where: ['id'] }, [contentId])
             ) : (
                 await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-                ?
-                    await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-                    : null
+                ||
+                await queryDB('comments', 'get', { where: ['id'] }, [contentId])
             )
         );
         if (!content) return res.status(404).send(`${typeName || 'Content'} not found`);
@@ -110,11 +108,10 @@ const like = (type) => async (req, res) => {
             await queryDB(type, 'get', { where: ['id'] }, [contentId])
         ) : (
             await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-            ?
-                await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-                : null
+            ||
+            await queryDB('comments', 'get', { where: ['id'] }, [contentId])
         );
-        if (!content) return res.status(404).send(`${capitalize(typeName)} not found`);
+        if (!content) return res.status(404).send(`${typeName} not found`);
         
         // Check if a likeness already exists. If not, create one
         const [ likeness ] = await queryDB('likeness', 'get', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
@@ -149,9 +146,8 @@ const dislike = (type) => async (req, res) => {
             await queryDB(type, 'get', { where: ['id'] }, [contentId])
         ) : (
             await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-            ?
-                await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-                : null
+            ||
+            await queryDB('comments', 'get', { where: ['id'] }, [contentId])
         );
         if (!content) return res.status(404).send(`${typeName} not found`);
         
@@ -176,6 +172,26 @@ const dislike = (type) => async (req, res) => {
         return res.status(500).send(err.message);
     }
 }
+
+// GET if the current user likes a post or comment by ID
+const liking = () => async (req, res) => {
+    const { id: contentId } = req.params;
+    const [ liking ] = await queryDB('likeness', 'get',
+        { where: ['user_id', 'content_id', 'like_content'] },
+        [req.user.id, contentId, true]
+    );
+    return res.status(200).send(!!liking);
+};
+
+// GET if the current user dislikes a post or comment by ID
+const disliking = () => async (req, res) => {
+    const { id: contentId } = req.params;
+    const [ liking ] = await queryDB('likeness', 'get',
+        { where: ['user_id', 'content_id', 'like_content'] },
+        [req.user.id, contentId, false]
+    );
+    return res.status(200).send(!!liking);
+};
 
 // Get the number of likes for a post or comment by ID
 const getLikes = () => async (req, res) => {
@@ -214,6 +230,8 @@ module.exports = {
     deleteContent,
     like,
     dislike,
+    liking,
+    disliking,
     getLikes,
     getDislikes
 };

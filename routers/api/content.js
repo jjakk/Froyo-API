@@ -6,10 +6,12 @@ const router = Router();
 
 router.get('/', ContentController.getAll());
 router.get('/:id', ContentController.getById());
-router.get('/:id/comments', ContentController.getComments);
+router.get('/:id/comments', ContentController.getComments());
 router.get('/:id/likes', ContentController.getLikes());
 router.get('/:id/dislikes', ContentController.getDislikes());
 router.delete('/:id', ContentController.deleteContent());
+router.get('/:id/like', ContentController.liking());
+router.get('/:id/dislike', ContentController.disliking());
 router.put('/:id/like', ContentController.like());
 router.put('/:id/dislike', ContentController.dislike());
 
