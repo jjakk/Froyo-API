@@ -72,26 +72,25 @@ const getAll = (type) => async (req, res) => {
         );
 
         // Add liking and disliking status of current user to contents
-        contents.forEach(async (content) => {
-            // Get whether the current user likes the content
-                const [ liking ] = await queryDB('likeness', 'get',
+        for(let i = 0; i < contents.length; i++){
+            const [ liking ] = await queryDB('likeness', 'get',
                 { where: ['user_id', 'content_id', 'like_content'] },
-                [req.user.id, content.id, true]
+                [req.user.id, contents[i].id, true]
             );
 
             // Get whether the current user dislikes the content
             const [ disliking ] = await queryDB('likeness', 'get',
                 { where: ['user_id', 'content_id', 'like_content'] },
-                [req.user.id, content.id, false]
+                [req.user.id, contents[i].id, false]
             );
 
             // Append like/dislike status to returned content
-            return {
-                ...content,
+            contents[i] = {
+                ...contents[i],
                 liking: !!liking,
                 disliking: !!disliking
             };
-        });
+        }
 
         return res.status(200).send(contents);
     }
