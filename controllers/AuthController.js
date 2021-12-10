@@ -17,6 +17,9 @@ const login = async (req, res) => {
             case passwordAttempt:
                 return res.status(400).send('Must provide password');
         }
+
+        // Check that email is valid
+        if(!validateEmail(email)) return res.status(422).send('Not a valid email');
         
         // Query the database for the user
         const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
