@@ -76,13 +76,13 @@ const getAll = (type) => async (req, res) => {
             // Get whether the current user likes the content
                 const [ liking ] = await queryDB('likeness', 'get',
                 { where: ['user_id', 'content_id', 'like_content'] },
-                [req.user.id, contentId, true]
+                [req.user.id, content.id, true]
             );
 
             // Get whether the current user dislikes the content
             const [ disliking ] = await queryDB('likeness', 'get',
                 { where: ['user_id', 'content_id', 'like_content'] },
-                [req.user.id, contentId, false]
+                [req.user.id, content.id, false]
             );
 
             // Append like/dislike status to returned content
