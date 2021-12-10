@@ -72,7 +72,7 @@ const getAll = (type) => async (req, res) => {
         );
 
         // Add liking and disliking status of current user to contents
-        contents.forEach(content => {
+        contents.forEach(async (content) => {
             // Get whether the current user likes the content
                 const [ liking ] = await queryDB('likeness', 'get',
                 { where: ['user_id', 'content_id', 'like_content'] },
