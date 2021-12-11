@@ -175,7 +175,7 @@ const put = async (req, res) => {
         ]);
 
         // Return the newly updated user
-        const [ user ] = await queryDB('users', 'get', { where: 'id' }, [req.user.id]);
+        const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
 
         // Generate JWT token and attach to response header
         const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
