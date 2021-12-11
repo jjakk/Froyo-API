@@ -160,7 +160,7 @@ const put = async (req, res) => {
                     'first_name',
                     'last_name',
                     'password',
-                    'email_changed'
+                    'email_verified'
                 ],
                 where: ['id'],
         },[
