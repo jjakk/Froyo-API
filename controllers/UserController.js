@@ -203,7 +203,7 @@ const deleteUser = async (req, res) => {
         // Delete all of a user's connections
         await pool.query(queries.connections.deleteWithOne, [req.user.id]);
 
-        // Delete all of the user's likness
+        // Delete all of the user's likeness
         await queryDB('likeness', 'delete', { where: 'user_id' }, [req.user.id]);
 
         // Delete their account from the database

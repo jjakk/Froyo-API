@@ -123,6 +123,9 @@ const deleteContent = (type) => async (req, res) => {
 
         // Delete all the content's comments
         await queryDB('comments', 'delete', { where: ['parent_id'] }, [contentId]);
+
+        // Delete all the content's likeness
+        await queryDB('likeness', 'delete', { where: ['content_id'] }, [contentId]);
     
         // Delete the content
         if (type) {
