@@ -17,8 +17,8 @@ router.get('/', requireAuth, (req, res) => {
 router.use(getTargetResource);
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
-router.use('/posts', requireAuth, postsRouter);
-router.use('/comments', requireAuth, commentsRouter);
+router.use('/posts', requireAuth, contentRouter, postsRouter);
+router.use('/comments', requireAuth, contentRouter, commentsRouter);
 router.use('/content', requireAuth, contentRouter);
 
 module.exports = router;
