@@ -18,7 +18,6 @@ const deleteComments = async (contentId) => {
     const comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [contentId]);
     if(comments.length === 0) return;
     for (let i = 0; i < comments.length; i++) {
-        console.log(comments[i].text);
         await deleteComments(comments[i].id);
         await deleteComment(comments[i].id);
     }
