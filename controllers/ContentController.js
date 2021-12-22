@@ -3,7 +3,7 @@ const queryDB = require('../queries/queryDB');
 const { capitalize } = require('../helpers/helpers');
 
 // GET all the comments of either a post or a comment
-const getComments = () => async (req, res) => {
+const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
         const comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
@@ -15,8 +15,9 @@ const getComments = () => async (req, res) => {
 };
 
 // Get either a post or comment by ID
-const getById = (type) => async (req, res) => {
+const getById = async (req, res) => {
     try {
+        const type = req.targetResource;
         const { id: contentId } = req.params;
         const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
@@ -59,8 +60,9 @@ const getById = (type) => async (req, res) => {
 };
 
 // Get all a user's posts or comments
-const getAll = (type) => async (req, res) => {
+const getAll = async (req, res) => {
     try {
+        const type = req.targetResource;
         let contents = (
             type ? (
                 await queryDB(type, 'get', { where: ['author_id'] }, [req.user.id])
@@ -100,8 +102,9 @@ const getAll = (type) => async (req, res) => {
 }
 
 // Delete a post or comment by ID
-const deleteContent = (type) => async (req, res) => {
+const deleteContent = async (req, res) => {
     try {
+        const type = req.targetResource;
         const typeName = type ? capitalize(type.slice(0, -1)) : null;
 
         const { id: contentId } = req.params;
@@ -143,8 +146,9 @@ const deleteContent = (type) => async (req, res) => {
 };
 
 // Like (PUT) a post or comment by ID
-const like = (type) => async (req, res) => {
+const like = async (req, res) => {
     try {
+        const type = req.targetResource;
         const { id: contentId } = req.params;
         const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
@@ -181,8 +185,9 @@ const like = (type) => async (req, res) => {
 }
 
 // Dslike (PUT) a post or comment by ID
-const dislike = (type) => async (req, res) => {
+const dislike = async (req, res) => {
     try {
+        const type = req.targetResource;
         const { id: contentId } = req.params;
         const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
@@ -219,7 +224,7 @@ const dislike = (type) => async (req, res) => {
 }
 
 // GET if the current user likes a post or comment by ID
-const liking = () => async (req, res) => {
+const liking = async (req, res) => {
     const { id: contentId } = req.params;
     const [ liking ] = await queryDB('likeness', 'get',
         { where: ['user_id', 'content_id', 'like_content'] },
@@ -229,7 +234,7 @@ const liking = () => async (req, res) => {
 };
 
 // GET if the current user dislikes a post or comment by ID
-const disliking = () => async (req, res) => {
+const disliking = async (req, res) => {
     const { id: contentId } = req.params;
     const [ liking ] = await queryDB('likeness', 'get',
         { where: ['user_id', 'content_id', 'like_content'] },
@@ -239,7 +244,7 @@ const disliking = () => async (req, res) => {
 };
 
 // Get the number of likes for a post or comment by ID
-const getLikes = () => async (req, res) => {
+const getLikes = async (req, res) => {
     try {
         const { id: contentId } = req.params;
 
@@ -254,7 +259,7 @@ const getLikes = () => async (req, res) => {
 }
 
 // Get the number of dislikes for a post or comment by ID
-const getDislikes = () => async (req, res) => {
+const getDislikes = async (req, res) => {
     try {
         const { id: contentId } = req.params;
 

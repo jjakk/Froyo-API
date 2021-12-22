@@ -2,15 +2,24 @@ const { Router } = require('express');
 const router = Router();
 const requireAuth = require('../../middleware/requireAuth');
 // Controller
-const UserController = require('../../controllers/UserController');
+const {
+    getById,
+    getAllUsers,
+    getPosts,
+    getFollowing,
+    post,
+    put,
+    follow,
+    deleteUser
+} = require('../../controllers/UserController');
 
-router.get('/:id', requireAuth, UserController.getById);
-router.get('/', requireAuth, UserController.getAllUsers);
-router.get('/:id/posts', requireAuth, UserController.getPosts);
-router.get('/:follower_id/following/:followee_id', requireAuth, UserController.getFollowing);
-router.post('/', UserController.post);
-router.put('/', requireAuth, UserController.put);
-router.put('/:id/follow', requireAuth, UserController.follow);
-router.delete('/', requireAuth, UserController.deleteUser);
+router.get('/:id', requireAuth, getById);
+router.get('/', requireAuth, getAllUsers);
+router.get('/:id/posts', requireAuth, getPosts);
+router.get('/:follower_id/following/:followee_id', requireAuth, getFollowing);
+router.post('/', post);
+router.put('/', requireAuth, put);
+router.put('/:id/follow', requireAuth, follow);
+router.delete('/', requireAuth, deleteUser);
 
 module.exports = router;

@@ -1,21 +1,36 @@
 const { Router } = require('express');
 // Controllers
-const ContentController = require('../../controllers/ContentController');
-const CommentController = require('../../controllers/CommentController');
+const {
+    getAll,
+    getById,
+    getComments,
+    getLikes,
+    getDislikes,
+    deleteContent,
+    liking,
+    disliking,
+    like,
+    dislike
+} = require('../../controllers/ContentController');
+// Comment Controller
+const {
+    post,
+    put
+} = require('../../controllers/CommentController');
 
 const router = Router();
 
-router.get('/', ContentController.getAll('comments'));
-router.get('/:id', ContentController.getById('comments'));
-router.get('/:id/comments', ContentController.getComments());
-router.get('/:id/likes', ContentController.getLikes());
-router.get('/:id/dislikes', ContentController.getDislikes());
-router.post('/', CommentController.post);
-router.put('/:id', CommentController.put);
-router.delete('/:id', ContentController.deleteContent('comments'));
-router.get('/:id/like', ContentController.liking());
-router.get('/:id/dislike', ContentController.disliking());
-router.put('/:id/like', ContentController.like('comments'));
-router.put('/:id/dislike', ContentController.dislike('comments'));
+router.get('/', getAll);
+router.get('/:id', getById);
+router.get('/:id/comments', getComments);
+router.get('/:id/likes', getLikes);
+router.get('/:id/dislikes', getDislikes);
+router.post('/', post);
+router.put('/:id', put);
+router.delete('/:id', deleteContent);
+router.get('/:id/like', liking);
+router.get('/:id/dislike', disliking);
+router.put('/:id/like', like);
+router.put('/:id/dislike', dislike);
 
 module.exports = router;

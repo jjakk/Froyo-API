@@ -7,12 +7,14 @@ const commentsRouter = require('./api/comments');
 const contentRouter = require('./api/content');
 // Middleware
 const requireAuth = require('../middleware/requireAuth');
+const getTargetResource = require('../middleware/getTargetResource');
 
 const router = Router();
 
 router.get('/', requireAuth, (req, res) => {
     res.status(200).send(req.user.id);
 });
+router.use(getTargetResource);
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
 router.use('/posts', requireAuth, postsRouter);
