@@ -5,7 +5,8 @@ Post, Comment)
 */
 
 const getTargetResource = (req, res, next) => {
-    req.targetResource = (req.path).split('/')[1] || '';
+    req.targetResource = req.path.split('/')[1] || '';
+    if(req.targetResource === 'content') req.targetResource = '';
     next();
 };
 

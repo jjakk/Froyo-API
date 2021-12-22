@@ -1,6 +1,8 @@
 // Controller for both types of content (post & comment)
 const queryDB = require('../queries/queryDB');
+// helpers
 const { capitalize } = require('../helpers/helpers');
+const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
 
 // GET all the comments of either a post or a comment
 const getComments = async (req, res) => {
@@ -124,13 +126,13 @@ const deleteContent = async (req, res) => {
         // Make sure that it's the user's own content that their deleting
         if (content.author_id !== req.user.id) return res.status(403).send(`You can only delete your own ${type}`);
 
-        // Delete all the content's comments
-        await queryDB('comments', 'delete', { where: ['parent_id'] }, [contentId]);
+        // Delete all the content's comments recursively
+        await deleteComments(contentId);
 
         // Delete all the content's likeness
         await queryDB('likeness', 'delete', { where: ['content_id'] }, [contentId]);
     
-        // Delete the content
+        // Delete the content itself
         if (type) {
             await queryDB(type, 'delete', { where: ['id'] }, [contentId])
         }
