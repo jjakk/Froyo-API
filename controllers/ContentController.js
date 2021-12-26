@@ -101,7 +101,13 @@ const getAll = async (req, res) => {
     catch (err) {
         res.status(500).send(err.message);
     }
-}
+};
+
+const search = async (req, res) => {
+    const { query } = req.query;
+    console.log(query);
+    res.send('This is the search route');
+};
 
 // Delete a post or comment by ID
 const deleteContent = async (req, res) => {
@@ -184,7 +190,7 @@ const like = async (req, res) => {
     catch (err) {
         return res.status(500).send(err.message);
     }
-}
+};
 
 // Dslike (PUT) a post or comment by ID
 const dislike = async (req, res) => {
@@ -223,7 +229,7 @@ const dislike = async (req, res) => {
     catch (err) {
         return res.status(500).send(err.message);
     }
-}
+};
 
 // GET if the current user likes a post or comment by ID
 const liking = async (req, res) => {
@@ -258,7 +264,7 @@ const getLikes = async (req, res) => {
     catch (err) {
         return res.status(500).send(err.message);
     }
-}
+};
 
 // Get the number of dislikes for a post or comment by ID
 const getDislikes = async (req, res) => {
@@ -279,6 +285,7 @@ module.exports = {
     getComments,
     getAll,
     getById,
+    search,
     deleteContent,
     like,
     dislike,

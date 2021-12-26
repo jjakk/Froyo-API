@@ -3,6 +3,7 @@ const { Router } = require('express');
 const {
     getAll,
     getById,
+    search,
     getComments,
     getLikes,
     getDislikes,
@@ -16,6 +17,7 @@ const {
 const router = Router();
 
 router.get('/', getAll);
+router.get('/search', search);
 router.get('/:id', getById);
 router.get('/:id/comments', getComments);
 router.get('/:id/likes', getLikes);
