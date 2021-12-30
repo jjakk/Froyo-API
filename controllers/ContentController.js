@@ -65,6 +65,8 @@ const getById = async (req, res) => {
 const get = async (req, res) => {
     try {
         const type = req.targetResource;
+        // Check that the user isn't searching for all posts
+        if (req.query.text === '') return res.status(200).send([]);
         // Get query parameters & set their default values
         let queryParams = Object.keys(req.query);
         let queryValues = Object.values(req.query);
