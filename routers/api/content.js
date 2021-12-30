@@ -1,9 +1,8 @@
 const { Router } = require('express');
 // Controllers
 const {
-    getAll,
+    get,
     getById,
-    search,
     getComments,
     getLikes,
     getDislikes,
@@ -16,8 +15,7 @@ const {
 
 const router = Router();
 
-router.get('/', getAll);
-router.get('/search', search);
+router.get('/', get);
 router.get('/:id', getById);
 router.get('/:id/comments', getComments);
 router.get('/:id/likes', getLikes);

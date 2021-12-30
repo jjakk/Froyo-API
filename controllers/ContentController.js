@@ -62,15 +62,19 @@ const getById = async (req, res) => {
 };
 
 // Get all a user's posts or comments
-const getAll = async (req, res) => {
+const get = async (req, res) => {
     try {
         const type = req.targetResource;
+        // Get query parameters & set their default values
+        const queryParams = Object.keys(req.query) || ['author_id'];
+        const queryValues = Object.values(req.query) || [req.user.id];
+
         let contents = (
             type ? (
-                await queryDB(type, 'get', { where: ['author_id'] }, [req.user.id])
+                await queryDB(type, 'get', { where: queryParams }, req.query)
             ) : (
-                (await queryDB('posts', 'get', { where: ['author_id'] }, [req.user.id])).concat(
-                    await queryDB('comments', 'get', { where: ['author_id'] }, [req.user.id])
+                (await queryDB('posts', 'get', { where: queryParams }, queryValues)).concat(
+                    await queryDB('comments', 'get', { where: queryParams }, queryValues)
                 )
             )
         );
@@ -103,11 +107,6 @@ const getAll = async (req, res) => {
     }
 };
 
-const search = async (req, res) => {
-    const { query } = req.query;
-    console.log(query);
-    res.send('This is the search route');
-};
 
 // Delete a post or comment by ID
 const deleteContent = async (req, res) => {
@@ -282,10 +281,9 @@ const getDislikes = async (req, res) => {
 };
 
 module.exports = {
-    getComments,
-    getAll,
+    get,
     getById,
-    search,
+    getComments,
     deleteContent,
     like,
     dislike,
