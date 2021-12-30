@@ -8,8 +8,6 @@ const login = async (req, res) => {
     try {
         const { email, password: passwordAttempt } = req.body;
 
-        console.log(email, passwordAttempt);
-
         // Confirm that email and password aren't empty
         switch (''){
             case email:
