@@ -143,6 +143,7 @@ const put = async (req, res) => {
             dob,
             first_name,
             last_name,
+            description,
             password
         } = req.body;
 
@@ -159,6 +160,7 @@ const put = async (req, res) => {
                     'dob',
                     'first_name',
                     'last_name',
+                    'description',
                     'password',
                     'email_verified'
                 ],
@@ -169,6 +171,7 @@ const put = async (req, res) => {
             dob || req.user.dob,
             first_name || req.user.first_name,
             last_name || req.user.last_name,
+            description || req.user.description,
             newPassword || req.user.password,
             changedEmail ? false : req.user.email_verified,
             req.user.id
