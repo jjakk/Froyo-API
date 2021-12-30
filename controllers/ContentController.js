@@ -68,17 +68,19 @@ const get = async (req, res) => {
         // Get query parameters & set their default values
         let queryParams = Object.keys(req.query);
         let queryValues = Object.values(req.query);
+        let queryMethod = 'search';
         if(queryParams.length === 0 && queryValues.length === 0) {
             queryParams = ['author_id'];
             queryValues = [req.user.id];
+            queryMethod = 'get';
         }
 
         let contents = (
             type ? (
-                await queryDB(type, 'get', { where: queryParams }, queryValues)
+                await queryDB(type, queryMethod, { where: queryParams }, queryValues)
             ) : (
-                (await queryDB('posts', 'get', { where: queryParams }, queryValues)).concat(
-                    await queryDB('comments', 'get', { where: queryParams }, queryValues)
+                (await queryDB('posts', queryMethod, { where: queryParams }, queryValues)).concat(
+                    await queryDB('comments', queryMethod, { where: queryParams }, queryValues)
                 )
             )
         );

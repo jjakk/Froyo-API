@@ -42,6 +42,14 @@ const formatQuery = (table, method, data) => {
                 ).join(' AND ')
             ];
             return `DELETE FROM ${table} WHERE ${format}`;
+        
+        case 'search':
+            if (!where || where.length === 0) return `SELECT * FROM ${table}`;
+            format = where.map(
+                (ele, index) => ele + ' ~ $' + (index + 1)
+            ).join(' AND ');
+            console.log(`SELECT * FROM ${table} WHERE ${format}`);
+            return `SELECT * FROM ${table} WHERE ${format}`;
     }
 }
 
