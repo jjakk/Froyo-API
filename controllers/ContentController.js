@@ -66,8 +66,12 @@ const get = async (req, res) => {
     try {
         const type = req.targetResource;
         // Get query parameters & set their default values
-        const queryParams = Object.keys(req.query) || ['author_id'];
-        const queryValues = Object.values(req.query) || [req.user.id];
+        let queryParams = Object.keys(req.query);
+        let queryValues = Object.values(req.query);
+        if(queryParams.length === 0 && queryValues.length === 0) {
+            queryParams = ['author_id'];
+            queryValues = [req.user.id];
+        }
 
         let contents = (
             type ? (
