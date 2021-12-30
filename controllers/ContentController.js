@@ -71,7 +71,7 @@ const get = async (req, res) => {
 
         let contents = (
             type ? (
-                await queryDB(type, 'get', { where: queryParams }, req.query)
+                await queryDB(type, 'get', { where: queryParams }, queryValues)
             ) : (
                 (await queryDB('posts', 'get', { where: queryParams }, queryValues)).concat(
                     await queryDB('comments', 'get', { where: queryParams }, queryValues)
