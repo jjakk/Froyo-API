@@ -71,7 +71,7 @@ const get = async (req, res) => {
         let queryParams = Object.keys(req.query);
         let queryValues = Object.values(req.query);
         let queryMethod = 'search';
-        if (queryValues.indexOf('author_id') !== -1) {
+        if (queryParams.indexOf('author_id') !== -1) {
             queryMethod = 'get';
         }
         if (queryParams.length === 0 && queryValues.length === 0) {
