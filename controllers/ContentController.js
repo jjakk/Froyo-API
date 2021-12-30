@@ -61,7 +61,7 @@ const getById = async (req, res) => {
     }
 };
 
-// Get all a user's posts or comments
+// Search posts & comments by query
 const get = async (req, res) => {
     try {
         const type = req.targetResource;
@@ -71,7 +71,10 @@ const get = async (req, res) => {
         let queryParams = Object.keys(req.query);
         let queryValues = Object.values(req.query);
         let queryMethod = 'search';
-        if(queryParams.length === 0 && queryValues.length === 0) {
+        if (queryValues.indexOf('author_id' != -1)) {
+            queryMethod = 'get';
+        }
+        if (queryParams.length === 0 && queryValues.length === 0) {
             queryParams = ['author_id'];
             queryValues = [req.user.id];
             queryMethod = 'get';
