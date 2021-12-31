@@ -4,7 +4,6 @@ const formatUser = (req, res, unformattedUser) => {
     // Remove unnecessary information
     const {
         password,
-        email_verified,
         timestamp,
         ...user
     } = unformattedUser;
@@ -12,6 +11,7 @@ const formatUser = (req, res, unformattedUser) => {
     // Remove additional private information if user is not getting their own account
     if (user.id !== req.user.id){
         const {
+            email_verified,
             dob,
             email,
             ...rest

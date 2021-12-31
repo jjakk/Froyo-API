@@ -26,4 +26,14 @@ const formatContent = async (req, res, content) => {
     };
 }
 
-module.exports = formatContent;
+const formatContents = async (req, res, contents) => {
+    for (let i = 0; i < contents.length; i++){
+        contents[i] = await formatContent(req, res, contents[i]);
+    }
+    return contents;
+};
+
+module.exports = {
+    formatContent,
+    formatContents
+};

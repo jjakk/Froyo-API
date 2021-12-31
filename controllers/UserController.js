@@ -24,7 +24,7 @@ const getById = async (req, res) => {
     }
 }
 
-// GET all users
+// GET all users' IDs
 const getAllUsers = async (req, res) => {
     try{
         // Get all users from the database and send back their IDs

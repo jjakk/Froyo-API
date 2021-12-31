@@ -1,18 +1,21 @@
 // Controller for both types of content (post & comment)
 const queryDB = require('../queries/queryDB');
+const dynamicQuery = require('../queries/dynamicQueryDB');
 // helpers
 const { capitalize } = require('../helpers/helpers');
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
-const formatContent = require('../helpers/resourceFormatting/formatContent');
+const {
+    formatContent,
+    formatContents
+} = require('../helpers/resourceFormatting/formatContent');
 
 // GET all the comments of either a post or a comment
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
         let comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
-        for(let i = 0; i < comments.length; i++){
-            comments[i] = await formatContent(req, res, comments[i]);
-        }
+        comments = formatContents(req, res, comments);
+
         return res.status(200).send(comments);
     }
     catch (err) {
@@ -76,11 +79,7 @@ const get = async (req, res) => {
                 )
             )
         );
-
-        // Add additional fields to the returned content
-        for(let i = 0; i < contents.length; i++){
-            contents[i] = await formatContent(req, res, contents[i]);
-        }
+        contents = await formatContents(req, res, contents);
 
         return res.status(200).send(contents);
     }
