@@ -4,37 +4,24 @@ const jwt = require('jsonwebtoken');
 const queries = require('../queries/queries');
 const pool = require('../db');
 const queryDB = require('../queries/queryDB');
+// Helpers
 const { validateEmail, calculateAge } = require('../helpers/helpers');
+const formatUser = require('../helpers/resourceFormatting/formatUser');
 
 // GET a user by id
 const getById = async (req, res) => {
-    //try{
+    try{
         const { id: userId } = req.params;
-        // Retrieve user then remove password and other irrelevant information
-        const [{
-            password,
-            email_verified,
-            timestamp,
-            ...user
-        }] = await queryDB('users', 'get', { where: ['id'] }, [userId]);
+        let [ user ] = await queryDB('users', 'get', { where: ['id'] }, [userId]);
 
         if (!user) return res.status(404).send('User not found');
-
-        // Remove additional private information if user is not getting their own account
-        if (user.id !== req.user.id){
-            const {
-                dob,
-                email,
-                ...rest
-            } = user;
-            return res.status(200).send(rest);
-        }
-
+        
+        user = formatUser(req, res, user);
         return res.status(200).send(user);
-    //}
-    //catch (err) {
-    //    res.status(500).send(err.message);
-    //}
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
 }
 
 // GET all users

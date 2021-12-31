@@ -3,12 +3,16 @@ const queryDB = require('../queries/queryDB');
 // helpers
 const { capitalize } = require('../helpers/helpers');
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
+const formatContent = require('../helpers/resourceFormatting/formatContent');
 
 // GET all the comments of either a post or a comment
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
-        const comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
+        let comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
+        for(let i = 0; i < comments.length; i++){
+            comments[i] = await formatContent(req, res, comments[i]);
+        }
         return res.status(200).send(comments);
     }
     catch (err) {
@@ -24,7 +28,7 @@ const getById = async (req, res) => {
         const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
         // Search both posts & comments if no type given
-        const [ content ] = (
+        let [ content ] = (
             type ? (
                 await queryDB(type, 'get', { where: ['id'] }, [contentId])
             ) : (
@@ -35,26 +39,9 @@ const getById = async (req, res) => {
         );
         if (!content) return res.status(404).send(`${typeName} not found`);
 
-        // Get whether the current user likes the content
-        const [ liking ] = await queryDB('likeness', 'get',
-            { where: ['user_id', 'content_id', 'like_content'] },
-            [req.user.id, contentId, true]
-        );
+        content = await formatContent(req, res, content);
 
-        // Get whether the current user dislikes the content
-        const [ disliking ] = await queryDB('likeness', 'get',
-            { where: ['user_id', 'content_id', 'like_content'] },
-            [req.user.id, contentId, false]
-        );
-
-        // Append like/dislike status to returned content
-        const result = {
-            ...content,
-            liking: !!liking,
-            disliking: !!disliking
-        };
-
-        return res.status(200).send(result);
+        return res.status(200).send(content);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -90,25 +77,9 @@ const get = async (req, res) => {
             )
         );
 
-        // Add liking and disliking status of current user to contents
+        // Add additional fields to the returned content
         for(let i = 0; i < contents.length; i++){
-            const [ liking ] = await queryDB('likeness', 'get',
-                { where: ['user_id', 'content_id', 'like_content'] },
-                [req.user.id, contents[i].id, true]
-            );
-
-            // Get whether the current user dislikes the content
-            const [ disliking ] = await queryDB('likeness', 'get',
-                { where: ['user_id', 'content_id', 'like_content'] },
-                [req.user.id, contents[i].id, false]
-            );
-
-            // Append like/dislike status to returned content
-            contents[i] = {
-                ...contents[i],
-                liking: !!liking,
-                disliking: !!disliking
-            };
+            contents[i] = await formatContent(req, res, contents[i]);
         }
 
         return res.status(200).send(contents);
