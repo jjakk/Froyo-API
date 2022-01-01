@@ -14,7 +14,7 @@ const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
         let comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
-        comments = formatContents(req, res, comments);
+        comments = await formatContents(req, res, comments);
 
         return res.status(200).send(comments);
     }
