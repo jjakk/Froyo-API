@@ -1,4 +1,5 @@
 // Gets if a user is following in a connection
+// Or gets if a user is followed in a connection
 const getUserLetters = require('./getUserLetters');
 
 const isFollower = (userId, connection) => {

@@ -14,13 +14,14 @@ const getConnections = async (userId) => {
         const userLetters = getUserLetters(userId, connections[i]);
         // Check if they're following the other
         if (isFollower(userId, connections[i])) {
-            followers.push(
+            followees.push(
                 connections[i][`user_${userLetters[1]}_id`]
             );
         }
         // Check if they're followed by the other
         if (isFollowee(userId, connections[i])){
-            followees.push(
+            console.log(`${userId} is followed by ${connections[i][`user_${userLetters[1]}_id`]}`);
+            followers.push(
                 connections[i][`user_${userLetters[1]}_id`]
             );
         }
