@@ -14,8 +14,8 @@ const formatUser = async (req, res, user) => {
 
     user = {
         ...user,
-        follower_count: followers,//.length,
-        followee_count: followees//.length
+        follower_count: followers.length,
+        followee_count: followees.length
     };
 
 
