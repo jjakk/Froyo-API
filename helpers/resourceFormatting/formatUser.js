@@ -11,11 +11,11 @@ const formatUser = async (req, res, user) => {
         followers,
         followees
     } = await getConnections(user.id);
-    
+
     user = {
         ...user,
-        followerCount: followers.length,
-        followeeCount: followees.length
+        follower_count: followers.length,
+        followee_count: followees.length
     };
 
 
