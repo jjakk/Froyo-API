@@ -19,7 +19,7 @@ const getConnections = async (userId) => {
             );
         }
         // Check if they're followed by the other
-        else if (isFollowee(userId, connections[i])){
+        if (isFollowee(userId, connections[i])){
             followees.push(
                 connections[i][`user_${userLetters[1]}_id`]
             );
