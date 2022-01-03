@@ -20,7 +20,6 @@ const getConnections = async (userId) => {
         }
         // Check if they're followed by the other
         if (isFollowee(userId, connections[i])){
-            console.log(`${userId} is followed by ${connections[i][`user_${userLetters[1]}_id`]}`);
             followers.push(
                 connections[i][`user_${userLetters[1]}_id`]
             );
