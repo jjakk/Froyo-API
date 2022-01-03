@@ -1,6 +1,8 @@
 const argon2 = require('argon2');
 const queryDB = require('../queries/queryDB');
+// Helpers
 const getConnections = require('../helpers/followerLogic/getConnections');
+const { formatContents } = require('../helpers/resourceFormatting/formatContent');
 
 // Generate the current's feed
 const get = async (req, res) => {
@@ -13,7 +15,11 @@ const get = async (req, res) => {
         for (let i = 0; i < followees.length; i++) {
             feedPosts.push(
                 ...(
-                    await queryDB('posts', 'get', { where: ['author_id'] }, [followees[i]])
+                    await formatContents(
+                        req,
+                        res,
+                        await queryDB('posts', 'get', { where: ['author_id'] }, [followees[i]])
+                    )
                 )
             );
         }
