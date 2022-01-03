@@ -16,7 +16,7 @@ const formatContent = async (req, res, content) => {
 
     // Replace author_id with author object
     const [ unformattedAuthor ] = await queryDB('users', 'get', { where: ['id'] }, [content.author_id]);
-    const author = formatUser(req, res, unformattedAuthor);
+    const author = await formatUser(req, res, unformattedAuthor);
     delete content.author_id
 
     return {
