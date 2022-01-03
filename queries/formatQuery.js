@@ -4,7 +4,8 @@ const formatQuery = (table, method, data) => {
     let format;
     const {
         params,
-        where
+        where,
+        whereCondition='AND'
     } = data;
 
     switch (method) {
@@ -12,7 +13,7 @@ const formatQuery = (table, method, data) => {
             if (!where || where.length === 0) return `SELECT * FROM ${table}`;
             format = where.map(
                 (ele, index) => ele + ' = $' + (index + 1)
-            ).join(' AND ');
+            ).join(` ${whereCondition} `);
             return `SELECT * FROM ${table} WHERE ${format}`;
 
         case 'post':
@@ -31,7 +32,7 @@ const formatQuery = (table, method, data) => {
                 ).join(', '),
                 where.map(
                     (ele, index) => ele + ' = $' + (params.length + index + 1)
-                ).join(' AND ')
+                ).join(` ${whereCondition} `)
             ];
             return `UPDATE ${table} SET ${format[0]} WHERE ${format[1]}`;
 
@@ -39,7 +40,7 @@ const formatQuery = (table, method, data) => {
             format = [
                 where.map(
                     (ele, index) => ele + ' = $' + (index + 1)
-                ).join(' AND ')
+                ).join(` ${whereCondition} `)
             ];
             return `DELETE FROM ${table} WHERE ${format}`;
         
@@ -47,7 +48,7 @@ const formatQuery = (table, method, data) => {
             if (!where || where.length === 0) return `SELECT * FROM ${table}`;
             format = where.map(
                 (ele, index) => ele + ' ~ $' + (index + 1)
-            ).join(' AND ');
+            ).join(` ${whereCondition} `);
             return `SELECT * FROM ${table} WHERE ${format}`;
     }
 }

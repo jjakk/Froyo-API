@@ -7,6 +7,7 @@ const queryDB = require('../queries/queryDB');
 // Helpers
 const { validateEmail, calculateAge } = require('../helpers/helpers');
 const formatUser = require('../helpers/resourceFormatting/formatUser');
+const { isFollower } = require('../helpers/followerLogic/followStatus');
 
 // GET a user by id
 const getById = async (req, res) => {
@@ -16,7 +17,7 @@ const getById = async (req, res) => {
 
         if (!user) return res.status(404).send('User not found');
         
-        user = formatUser(req, res, user);
+        user = await formatUser(req, res, user);
         return res.status(200).send(user);
     }
     catch (err) {
@@ -215,47 +216,23 @@ const follow = async (req, res) => {
         if (followee_id === follower_id) return res.status(400).send('You cannot follow yourself');
 
         // Check the database to see if a connection already exists
-        const { rows: [ connectionExists ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
+        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
 
         // If a connection doesn't already exist, create it
-        if (!connectionExists) {
+        if (!connection) {
             await queryDB('connections', 'post', {
                 params: ['user_a_id', 'user_b_id', 'a_following_b']
             }, [follower_id, followee_id, true]);
             return res.status(200).send('Followed user');
         }
-
-        // Checks the database for the user's letter in the connection
-        const userLetter = (
-            await queryDB('connections', 'get', {
-                where: ['user_a_id', 'user_b_id'] 
-            }, [follower_id, followee_id])
-        ) ? 'a'
-            : (
-                await queryDB('connections', 'get', {
-                    where: ['user_b_id', 'user_a_id'] 
-                }, [follower_id, followee_id])
-            )
-                ? 'b'
-                : null;
-        // Letter of the other user in the connection
-        const otherLetter = userLetter === 'a' ? 'b' : 'a';
-
-        // Extract whether the user is already following the other user
-        const [
-            {
-                id: connection_id,
-                [`${userLetter}_following_${otherLetter}`]: alreadyFollowing,
-            }
-        ] = await queryDB('connections', 'get', {
-            where: [`user_${userLetter}_id`, `user_${otherLetter}_id`]
-        }, [follower_id, followee_id]);
+        
+        const alreadyFollowing = isFollower(follower_id, connection);
 
         // Toggle the following status and return the outcome
         await queryDB('connections', 'put', {
             params: [`${userLetter}_following_${otherLetter}`],
             where: ['id']
-        }, [!alreadyFollowing, connection_id]);
+        }, [!alreadyFollowing, connection.id]);
         if (alreadyFollowing) return res.status(200).send('Unfollowed user');
         return res.status(200).send('Followed user');
 
@@ -273,26 +250,7 @@ const getFollowing = async (req, res) => {
         const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
         if (!connection) return res.status(200).send(false);
 
-       // Checks the database for the user's letter in the connection
-       const followerLetter = (
-            connection.user_a_id === follower_id
-        ) ? 'a'
-            : (
-                connection.user_b_id === follower_id
-            )
-                ? 'b'
-                : null;
-        // Letter of the other user in the connection
-        const followeeLetter = followerLetter === 'a' ? 'b' : 'a';
-
-        // Extract whether the user is already following the other user
-        const [
-            {
-                [`${followerLetter}_following_${followeeLetter}`]: following,
-            }
-        ] = await queryDB('connections', 'get', {
-            where: [`user_${followerLetter}_id`, `user_${followeeLetter}_id`]
-        }, [follower_id, followee_id]);
+       const following = isFollower(follower_id, connection);
 
         // Return the following status
         return res.status(200).send(following);
