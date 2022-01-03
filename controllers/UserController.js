@@ -8,6 +8,7 @@ const queryDB = require('../queries/queryDB');
 const { validateEmail, calculateAge } = require('../helpers/helpers');
 const formatUser = require('../helpers/resourceFormatting/formatUser');
 const { isFollower } = require('../helpers/followerLogic/followStatus');
+const getUserLetters = require('../helpers/followerLogic/getUserLetters');
 
 // GET a user by id
 const getById = async (req, res) => {
@@ -227,10 +228,11 @@ const follow = async (req, res) => {
         }
         
         const alreadyFollowing = isFollower(follower_id, connection);
+        const userLetters = getUserLetters(follower_id, connection);
 
         // Toggle the following status and return the outcome
         await queryDB('connections', 'put', {
-            params: [`${userLetter}_following_${otherLetter}`],
+            params: [`${userLetters[0]}_following_${userLetters[1]}`],
             where: ['id']
         }, [!alreadyFollowing, connection.id]);
         if (alreadyFollowing) return res.status(200).send('Unfollowed user');
