@@ -2,6 +2,7 @@ const argon2 = require('argon2');
 const queryDB = require('../queries/queryDB');
 // Helpers
 const getConnections = require('../helpers/followerLogic/getConnections');
+const sortContents = require('../helpers/sorting/sortContents');
 const { formatContents } = require('../helpers/resourceFormatting/formatContent');
 
 // Generate the current's feed
@@ -11,7 +12,7 @@ const get = async (req, res) => {
         const { followees } = await getConnections(req.user.id);
 
         // Get all their posts, concatenate them, and send back
-        const feedPosts = [];
+        let feedPosts = [];
         for (let i = 0; i < followees.length; i++) {
             feedPosts.push(
                 ...(
@@ -23,6 +24,9 @@ const get = async (req, res) => {
                 )
             );
         }
+        // Sort the posts
+        feedPosts = sortContents(feedPosts, 'new');
+        console.log(feedPosts);
 
         return res.status(200).send(feedPosts);
     }

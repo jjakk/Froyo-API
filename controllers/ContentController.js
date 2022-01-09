@@ -3,12 +3,12 @@ const queryDB = require('../queries/queryDB');
 const dynamicQuery = require('../queries/dynamicQueryDB');
 // helpers
 const { capitalize } = require('../helpers/helpers');
-const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
 const {
     formatContent,
     formatContents
 } = require('../helpers/resourceFormatting/formatContent');
-
+const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
+const sortContents = require('../helpers/sorting/sortContents');
 // GET all the comments of either a post or a comment
 const getComments = async (req, res) => {
     try {
@@ -79,7 +79,10 @@ const get = async (req, res) => {
                 )
             )
         );
+        // Format contents
         contents = await formatContents(req, res, contents);
+        // Sort contents
+        contents = sortContents(contents, 'new');
 
         return res.status(200).send(contents);
     }
