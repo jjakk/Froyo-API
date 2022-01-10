@@ -1,7 +1,5 @@
 const { Pool } = require('pg');
 
-const isProduction = process.env.NODE_ENV === 'production';
-const connectionString = `postgresql://${process.env.RDS_USERNAME}:${process.env.RDS_PASSWORD}@${process.env.RDS_HOSTNAME}:${process.env.RDS_PORT}/${process.env.RDS_DB_NAME}`;
 const pool = new Pool({
     user: process.env.RDS_USERNAME,
     host: process.env.RDS_HOSTNAME,
@@ -9,5 +7,11 @@ const pool = new Pool({
     password: process.env.RDS_PASSWORD,
     port: process.env.RDS_PORT,
 });
+
+pool.connect((err, client, release) => {
+    if (err) {
+        return console.log('Error acquiring client');
+    }
+})
 
 module.exports = pool;
