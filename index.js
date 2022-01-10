@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
-app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 app.get('/', (req, res) => {
     res.send('Go to /api for api functions');

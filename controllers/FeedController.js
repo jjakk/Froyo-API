@@ -26,7 +26,6 @@ const get = async (req, res) => {
         }
         // Sort the posts
         feedPosts = sortContents(feedPosts, 'new');
-        console.log(feedPosts);
 
         return res.status(200).send(feedPosts);
     }
