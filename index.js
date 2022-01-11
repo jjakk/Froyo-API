@@ -13,10 +13,6 @@ app.use(express.urlencoded({
 }));
 app.use('/', apiRouter);
 
-app.get('/', (req, res) => {
-    res.send('Go to /api for api functions');
-});
-
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

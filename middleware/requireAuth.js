@@ -6,7 +6,7 @@ const requireAuth = (req, res, next) => {
         const { authorization } = req.headers; 
 
         // Check to see that the authorization is set
-        if (!authorization) return res.status(401).send("You're not logged in");
+        if (!authorization) return res.status(200).send("You're not logged in");
 
         // Get the token from authorization & verify it
         const token = authorization.replace('Bearer ', '');
