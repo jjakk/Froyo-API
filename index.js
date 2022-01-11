@@ -12,6 +12,9 @@ app.use(express.urlencoded({
     extended: true
 }));
 app.use('/', apiRouter);
+app.get('/env', (req, res) => {
+    res.send(process.env);
+});
 
 app.get('/', (req, res) => {
     res.send('Go to /api for api functions');
