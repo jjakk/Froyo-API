@@ -14,10 +14,28 @@ const formatContent = async (req, res, content) => {
         [req.user.id, content.id, false]
     );
 
+    // Add like count if it's the current user's post
+    if (content.author_id === req.user.id){
+        const likes = await queryDB('likeness', 'get',
+            { where: ['content_id', 'like_content'] },
+            [content.id, true]
+        );
+
+        const dislikes = await queryDB('likeness', 'get',
+            { where: ['content_id', 'like_content'] },
+            [content.id, false]
+        );
+        content = {
+            ...content,
+            like_count: likes.length,
+            dislike_count: dislikes.length
+        };
+    }
+
     // Replace author_id with author object
     const [ unformattedAuthor ] = await queryDB('users', 'get', { where: ['id'] }, [content.author_id]);
     const author = await formatUser(req, res, unformattedAuthor);
-    delete content.author_id
+    delete content.author_id;
 
     return {
         ...content,
