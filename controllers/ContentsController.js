@@ -104,8 +104,10 @@ const like = async (req, res) => {
             if (likeness.like_content) {
                 await queryDB('likeness', 'delete', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
             }
-            // User currently dislikes the post -> change to like
-            await queryDB('likeness', 'put', { params: ['like_content'], where: ['user_id', 'content_id'] }, [true, req.user.id, contentId]);
+            else {
+                // User currently dislikes the post -> change to like
+                await queryDB('likeness', 'put', { params: ['like_content'], where: ['user_id', 'content_id'] }, [true, req.user.id, contentId]);
+            }
         }
 
         // Get and return updated content
@@ -140,8 +142,10 @@ const dislike = async (req, res) => {
             if (likeness.like_content) {
                 await queryDB('likeness', 'put', { params: ['like_content'], where: ['user_id', 'content_id'] }, [false, req.user.id, contentId]);
             }
-            // User already dislikes the post -> undislike it
-            await queryDB('likeness', 'delete', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
+            else {
+                // User already dislikes the content -> unlike it (delete likeness)
+                await queryDB('likeness', 'delete', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);   
+            }
         }
 
         // Get and return updated content
