@@ -1,32 +1,32 @@
 // Filter certain information from the user object
 const getConnections = require('../followerLogic/getConnections');
 
-const formatUser = async (req, res, user) => {
+const formatUser = async (targetUser, user) => {
     // Remove unnecessary information
-    delete user.password;
-    delete user.timestamp;
+    delete targetUser.password;
+    delete targetUser.timestamp;
 
     // Add follower & followee count
     const {
         followers,
         followees
-    } = await getConnections(user.id);
+    } = await getConnections(targetUser.id);
 
-    user = {
-        ...user,
+    targetUser = {
+        ...targetUser,
         follower_count: followers.length,
         followee_count: followees.length
     };
 
 
     // Remove additional private information if user is not getting their own account
-    if (user.id !== req.user.id){
-        delete user.email_verified;
-        delete user.dob;
-        delete user.email;
+    if (targetUser.id !== user.id){
+        delete targetUser.email_verified;
+        delete targetUser.dob;
+        delete targetUser.email;
     }
 
-    return user;
+    return targetUser;
 };
 
 module.exports = formatUser;

@@ -18,7 +18,7 @@ const getById = async (req, res) => {
 
         if (!user) return res.status(404).send('User not found');
         
-        user = await formatUser(req, res, user);
+        user = await formatUser(user, req.user);
         return res.status(200).send(user);
     }
     catch (err) {

@@ -21,6 +21,6 @@ router.use('/users', usersRouter);
 router.use('/feed', requireAuth, feedRouter);
 router.use('/posts', requireAuth, contentRouter, postsRouter);
 router.use('/comments', requireAuth, contentRouter, commentsRouter);
-router.use('/content', requireAuth, contentRouter);
+router.use('/contents', requireAuth, contentRouter);
 
 module.exports = router;

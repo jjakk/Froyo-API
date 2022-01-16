@@ -7,8 +7,6 @@ const {
     getLikes,
     getDislikes,
     deleteContent,
-    liking,
-    disliking,
     like,
     dislike
 } = require('../../controllers/ContentController');
@@ -21,8 +19,6 @@ router.get('/:id/comments', getComments);
 router.get('/:id/likes', getLikes);
 router.get('/:id/dislikes', getDislikes);
 router.delete('/:id', deleteContent);
-router.get('/:id/like', liking);
-router.get('/:id/dislike', disliking);
 router.put('/:id/like', like);
 router.put('/:id/dislike', dislike);
 

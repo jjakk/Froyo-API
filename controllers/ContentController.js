@@ -1,42 +1,15 @@
-// Controller for both types of content (post & comment)
+// Database queries
 const queryDB = require('../queries/queryDB');
-const dynamicQueryDB = require('../queries/dynamicQueryDB');
+const getContents = require('../queries/contents/getContents');
 // helpers
-const { capitalize } = require('../helpers/helpers');
-const {
-    formatContent,
-    formatContents
-} = require('../helpers/resourceFormatting/formatContent');
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
-const sortContents = require('../helpers/sorting/sortContents');
 // GET all the comments of either a post or a comment
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
-        let comments = await queryDB('comments', 'get', { where: ['parent_id'] }, [parentId]);
-        comments = await formatContents(req, res, comments);
+        const comments = getContents('comment', { parent_id: parentId });
 
         return res.status(200).send(comments);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-};
-
-// Get either a post or comment by ID
-const getById = async (req, res) => {
-    try {
-        const type = req.targetResource;
-        const { id: contentId } = req.params;
-        const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
-
-        // Search both posts & comments if no type given
-        let [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
-        if (!content) return res.status(404).send(`${typeName} not found`);
-
-        content = await formatContent(req, res, content);
-
-        return res.status(200).send(content);
     }
     catch (err) {
         res.status(500).send(err.message);
@@ -46,27 +19,8 @@ const getById = async (req, res) => {
 // Search posts & comments by query
 const get = async (req, res) => {
     try {
-        const type = req.targetResource;
-        // Check that the user isn't searching for all posts
-        if (req.query.text === '') return res.status(200).send([]);
-        // Get query parameters & set their default values
-        let queryParams = Object.keys(req.query);
-        let queryValues = Object.values(req.query);
-        let queryMethod = 'search';
-        if (queryParams.indexOf('author_id') !== -1) {
-            queryMethod = 'get';
-        }
-        if (queryParams.length === 0 && queryValues.length === 0) {
-            queryParams = ['author_id'];
-            queryValues = [req.user.id];
-            queryMethod = 'get';
-        }
-
-        let contents = await dynamicQueryDB(type, queryMethod, { where: queryParams }, queryValues);
-        // Format contents
-        contents = await formatContents(req, res, contents);
-        // Sort contents
-        contents = sortContents(contents, 'new');
+        const { type } = req.resource;
+        const contents = await getContents(type, req.query, req.user);
 
         return res.status(200).send(contents);
     }
@@ -75,18 +29,37 @@ const get = async (req, res) => {
     }
 };
 
+// Get either a post or comment by ID
+const getById = async (req, res) => {
+    try {
+        const {
+            type,
+            typeName
+        } = req.resource;
+        const { id: contentId } = req.params;
+
+        const [ content ] = await getContents(type, { id: contentId }, req.user);
+        if (!content) return res.status(404).send(`${typeName} not found`);
+
+        return res.status(200).send(content);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+};
 
 // Delete a post or comment by ID
 const deleteContent = async (req, res) => {
     try {
-        const type = req.targetResource;
-        const typeName = type ? capitalize(type.slice(0, -1)) : null;
-
+        const {
+            type,
+            typeName
+        } = req.resource;
         const { id: contentId } = req.params;
 
         // Check that the content exists in the database
-        const [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
-        if (!content) return res.status(404).send(`${typeName || 'Content'} not found`);
+        const [ content ] = await getContents(type, { id: contentId }, req.user);
+        if (!content) return res.status(404).send(`${typeName} not found`);
 
         // Make sure that it's the user's own content that their deleting
         if (content.author_id !== req.user.id) return res.status(403).send(`You can only delete your own ${type}`);
@@ -98,7 +71,7 @@ const deleteContent = async (req, res) => {
         await queryDB('likeness', 'delete', { where: ['content_id'] }, [contentId]);
     
         // Delete the content itself
-        await dynamicQueryDB(type, 'delete', { where: ['id'] }, [contentId]);
+        await queryDB(type, 'delete', { where: ['id'] }, [contentId]);
         return res.status(200).send(`${capitalize(typeName)} deleted`);
     }
     catch (err) {
@@ -109,12 +82,14 @@ const deleteContent = async (req, res) => {
 // Like (PUT) a post or comment by ID
 const like = async (req, res) => {
     try {
-        const type = req.targetResource;
+        const {
+            type,
+            typeName
+        } = req.resource;
         const { id: contentId } = req.params;
-        const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
         // Check that the content exists in the database
-        const [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
+        const [ content ] = await getContents(type, { id: contentId }, req.user);
         if (!content) return res.status(404).send(`${typeName} not found`);
         
         // Check if a likeness already exists. If not, create one
@@ -132,9 +107,7 @@ const like = async (req, res) => {
         }
 
         // Get and return updated content
-        let [ updatedContent ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
-        // Format content
-        updatedContent = await formatContent(req, res, updatedContent);
+        let [ updatedContent ] = await getContents(type, { id: contentId });
         return res.status(200).send(updatedContent);
     }
     catch (err) {
@@ -145,12 +118,14 @@ const like = async (req, res) => {
 // Dslike (PUT) a post or comment by ID
 const dislike = async (req, res) => {
     try {
-        const type = req.targetResource;
+        const {
+            type,
+            typeName
+        } = req.resource;
         const { id: contentId } = req.params;
-        const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
         // Check that the content exists in the database
-        const [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
+        const [ content ] = await getContents(type, { id: contentId }, req.user);
         if (!content) return res.status(404).send(`${typeName} not found`);
         
         // Check if a likeness already exists. If not, create one
@@ -168,34 +143,12 @@ const dislike = async (req, res) => {
         }
 
         // Get and return updated content
-        let [ updatedContent ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
-        // Format content
-        updatedContent = await formatContent(req, res, updatedContent);
+        let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
         return res.status(200).send(updatedContent);
     }
     catch (err) {
         return res.status(500).send(err.message);
     }
-};
-
-// GET if the current user likes a post or comment by ID
-const liking = async (req, res) => {
-    const { id: contentId } = req.params;
-    const [ liking ] = await queryDB('likeness', 'get',
-        { where: ['user_id', 'content_id', 'like_content'] },
-        [req.user.id, contentId, true]
-    );
-    return res.status(200).send(!!liking);
-};
-
-// GET if the current user dislikes a post or comment by ID
-const disliking = async (req, res) => {
-    const { id: contentId } = req.params;
-    const [ liking ] = await queryDB('likeness', 'get',
-        { where: ['user_id', 'content_id', 'like_content'] },
-        [req.user.id, contentId, false]
-    );
-    return res.status(200).send(!!liking);
 };
 
 // Get the number of likes for a post or comment by ID
@@ -237,8 +190,6 @@ module.exports = {
     deleteContent,
     like,
     dislike,
-    liking,
-    disliking,
     getLikes,
     getDislikes
 };
