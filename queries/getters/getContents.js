@@ -11,9 +11,11 @@ const getContents = async (type, query, user, sort='new') => {
     let queryParams = Object.keys(query);
     let queryValues = Object.values(query);
     let queryMethod = 'search';
-    if (queryParams.indexOf('author_id') !== -1 || queryParams.indexOf('id') !== -1) {
-        queryMethod = 'get';
-    }
+    queryParams.forEach(param => {
+        if (param.indexOf('id') !== -1) {
+            queryMethod = 'get';
+        }
+    });
     if (queryParams.length === 0 && queryValues.length === 0) {
         queryParams = ['author_id'];
         queryValues = [user.id];

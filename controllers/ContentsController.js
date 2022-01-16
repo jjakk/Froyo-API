@@ -9,7 +9,7 @@ const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
-        const comments = getContents('comment', { parent_id: parentId });
+        const comments = await getContents('comments', { parent_id: parentId }, req.user);
 
         return res.status(200).send(comments);
     }
