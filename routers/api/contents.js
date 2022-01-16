@@ -9,7 +9,7 @@ const {
     deleteContent,
     like,
     dislike
-} = require('../../controllers/ContentController');
+} = require('../../controllers/ContentsController');
 
 const router = Router();
 
