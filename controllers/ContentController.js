@@ -1,6 +1,8 @@
 // Database queries
 const queryDB = require('../queries/queryDB');
+// Getters
 const getContents = require('../queries/getters/getContents');
+const getLikeness = require('../queries/getters/getLikeness');
 // helpers
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
 // GET all the comments of either a post or a comment
@@ -107,7 +109,7 @@ const like = async (req, res) => {
         }
 
         // Get and return updated content
-        let [ updatedContent ] = await getContents(type, { id: contentId });
+        let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
         return res.status(200).send(updatedContent);
     }
     catch (err) {
@@ -156,7 +158,7 @@ const getLikes = async (req, res) => {
     try {
         const { id: contentId } = req.params;
 
-        const likes = getLikeness(contentId, true);
+        const likes = await getLikeness(contentId, true);
         res.status(200).send(likes);
         
     }
@@ -170,7 +172,7 @@ const getDislikes = async (req, res) => {
     try {
         const { id: contentId } = req.params;
 
-        const dislikes = getLikeness(contentId, false);
+        const dislikes = await getLikeness(contentId, false);
         res.status(200).send(dislikes);
         
     }
