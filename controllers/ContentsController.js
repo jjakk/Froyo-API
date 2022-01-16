@@ -7,7 +7,6 @@ const getLikeness = require('../queries/getters/getLikeness');
 const putLikeness = require('../queries/putters/putLikeness');
 // helpers
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
-
 // GET all the comments of either a post or a comment
 const getComments = async (req, res) => {
     try {
