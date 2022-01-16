@@ -3,6 +3,8 @@ const queryDB = require('../queries/queryDB');
 // Getters
 const getContents = require('../queries/getters/getContents');
 const getLikeness = require('../queries/getters/getLikeness');
+// Putters
+const putLikeness = require('../queries/putters/putLikeness');
 // helpers
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
 // GET all the comments of either a post or a comment
@@ -94,21 +96,8 @@ const like = async (req, res) => {
         const [ content ] = await getContents(type, { id: contentId }, req.user);
         if (!content) return res.status(404).send(`${typeName} not found`);
         
-        // Check if a likeness already exists. If not, create one
-        const [ likeness ] = await queryDB('likeness', 'get', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
-        if (!likeness) {
-            await queryDB('likeness', 'post', { params: ['user_id', 'content_id', 'like_content'] }, [req.user.id, contentId, true]);
-        }
-        else {
-            // User already likes the content -> unlike it (delete likeness)
-            if (likeness.like_content) {
-                await queryDB('likeness', 'delete', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
-            }
-            else {
-                // User currently dislikes the post -> change to like
-                await queryDB('likeness', 'put', { params: ['like_content'], where: ['user_id', 'content_id'] }, [true, req.user.id, contentId]);
-            }
-        }
+        // Change the likeness accordingly
+        await putLikeness(contentId, req.user, true);
 
         // Get and return updated content
         let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
@@ -132,21 +121,8 @@ const dislike = async (req, res) => {
         const [ content ] = await getContents(type, { id: contentId }, req.user);
         if (!content) return res.status(404).send(`${typeName} not found`);
         
-        // Check if a likeness already exists. If not, create one
-        const [ likeness ] = await queryDB('likeness', 'get', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
-        if (!likeness) {
-            await queryDB('likeness', 'post', { params: ['user_id', 'content_id', 'like_content']}, [req.user.id, contentId, false]);
-        }
-        else {
-            // User currently likes the content -> dislike it
-            if (likeness.like_content) {
-                await queryDB('likeness', 'put', { params: ['like_content'], where: ['user_id', 'content_id'] }, [false, req.user.id, contentId]);
-            }
-            else {
-                // User already dislikes the content -> unlike it (delete likeness)
-                await queryDB('likeness', 'delete', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);   
-            }
-        }
+        // Change the likeness accordingly
+        await putLikeness(contentId, req.user, false);
 
         // Get and return updated content
         let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
