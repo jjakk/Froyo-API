@@ -64,7 +64,7 @@ const deleteContent = async (req, res) => {
         if (!content) return res.status(404).send(`${typeName} not found`);
 
         // Make sure that it's the user's own content that their deleting
-        if (content.author_id !== req.user.id) return res.status(403).send(`You can only delete your own ${type}`);
+        if (content.author.id !== req.user.id) return res.status(403).send(`You can only delete your own ${type}`);
 
         // Delete all the content's comments recursively
         await deleteComments(contentId);
@@ -74,7 +74,7 @@ const deleteContent = async (req, res) => {
     
         // Delete the content itself
         await queryDB(type, 'delete', { where: ['id'] }, [contentId]);
-        return res.status(200).send(`${capitalize(typeName)} deleted`);
+        return res.status(200).send(`${typeName} deleted`);
     }
     catch (err) {
         return res.status(500).send(err.message);
