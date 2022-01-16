@@ -1,3 +1,5 @@
+const queryDB = require('./queryDB');
+
 // Queries different database tables depending on the input
 const dynamicQueryDB = async (type, queryMethod, { where: queryParams }, queryValues) => {
     return (

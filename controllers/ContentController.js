@@ -1,6 +1,6 @@
 // Controller for both types of content (post & comment)
 const queryDB = require('../queries/queryDB');
-const dynamicQuery = require('../queries/dynamicQueryDB');
+const dynamicQueryDB = require('../queries/dynamicQueryDB');
 // helpers
 const { capitalize } = require('../helpers/helpers');
 const {
@@ -31,15 +31,7 @@ const getById = async (req, res) => {
         const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
         // Search both posts & comments if no type given
-        let [ content ] = (
-            type ? (
-                await queryDB(type, 'get', { where: ['id'] }, [contentId])
-            ) : (
-                await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-                ||
-                await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-            )
-        );
+        let [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
         if (!content) return res.status(404).send(`${typeName} not found`);
 
         content = await formatContent(req, res, content);
@@ -70,15 +62,7 @@ const get = async (req, res) => {
             queryMethod = 'get';
         }
 
-        let contents = (
-            type ? (
-                await queryDB(type, queryMethod, { where: queryParams }, queryValues)
-            ) : (
-                (await queryDB('posts', queryMethod, { where: queryParams }, queryValues)).concat(
-                    await queryDB('comments', queryMethod, { where: queryParams }, queryValues)
-                )
-            )
-        );
+        let contents = await dynamicQueryDB(type, queryMethod, { where: queryParams }, queryValues);
         // Format contents
         contents = await formatContents(req, res, contents);
         // Sort contents
@@ -101,15 +85,7 @@ const deleteContent = async (req, res) => {
         const { id: contentId } = req.params;
 
         // Check that the content exists in the database
-        const [ content ] = (
-            type ? (
-                await queryDB(type, 'get', { where: ['id'] }, [contentId])
-            ) : (
-                await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-                ||
-                await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-            )
-        );
+        const [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
         if (!content) return res.status(404).send(`${typeName || 'Content'} not found`);
 
         // Make sure that it's the user's own content that their deleting
@@ -122,13 +98,7 @@ const deleteContent = async (req, res) => {
         await queryDB('likeness', 'delete', { where: ['content_id'] }, [contentId]);
     
         // Delete the content itself
-        if (type) {
-            await queryDB(type, 'delete', { where: ['id'] }, [contentId])
-        }
-        else {
-            await queryDB('posts', 'delete', { where: ['id'] }, [contentId])
-            await queryDB('comments', 'delete', { where: ['id'] }, [contentId])
-        }
+        await dynamicQueryDB(type, 'delete', { where: ['id'] }, [contentId]);
         return res.status(200).send(`${capitalize(typeName)} deleted`);
     }
     catch (err) {
@@ -144,31 +114,28 @@ const like = async (req, res) => {
         const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
         // Check that the content exists in the database
-        const [ content ] = type ? (
-            await queryDB(type, 'get', { where: ['id'] }, [contentId])
-        ) : (
-            await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-            ||
-            await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-        );
+        const [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
         if (!content) return res.status(404).send(`${typeName} not found`);
         
         // Check if a likeness already exists. If not, create one
         const [ likeness ] = await queryDB('likeness', 'get', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
         if (!likeness) {
             await queryDB('likeness', 'post', { params: ['user_id', 'content_id', 'like_content'] }, [req.user.id, contentId, true]);
-            return res.status(201).send(`${typeName} liked`);
         }
         else {
             // User already likes the content -> unlike it (delete likeness)
             if (likeness.like_content) {
                 await queryDB('likeness', 'delete', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
-                return res.status(200).send(`${typeName} unliked`);  
             }
             // User currently dislikes the post -> change to like
             await queryDB('likeness', 'put', { params: ['like_content'], where: ['user_id', 'content_id'] }, [true, req.user.id, contentId]);
-            return res.status(200).send(`${typeName} liked`);
         }
+
+        // Get and return updated content
+        let [ updatedContent ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
+        // Format content
+        updatedContent = await formatContent(req, res, updatedContent);
+        return res.status(200).send(updatedContent);
     }
     catch (err) {
         return res.status(500).send(err.message);
@@ -183,31 +150,28 @@ const dislike = async (req, res) => {
         const typeName = type ? capitalize(type.slice(0, -1)) : 'Content';
 
         // Check that the content exists in the database
-        const [ content ] = type ? (
-            await queryDB(type, 'get', { where: ['id'] }, [contentId])
-        ) : (
-            await queryDB('posts', 'get', { where: ['id'] }, [contentId])
-            ||
-            await queryDB('comments', 'get', { where: ['id'] }, [contentId])
-        );
+        const [ content ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
         if (!content) return res.status(404).send(`${typeName} not found`);
         
         // Check if a likeness already exists. If not, create one
         const [ likeness ] = await queryDB('likeness', 'get', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
         if (!likeness) {
             await queryDB('likeness', 'post', { params: ['user_id', 'content_id', 'like_content']}, [req.user.id, contentId, false]);
-            return res.status(201).send(`${typeName} disliked`);
         }
         else {
             // User currently likes the content -> dislike it
             if (likeness.like_content) {
                 await queryDB('likeness', 'put', { params: ['like_content'], where: ['user_id', 'content_id'] }, [false, req.user.id, contentId]);
-                return res.status(200).send(`${typeName} disliked`);
             }
             // User already dislikes the post -> undislike it
             await queryDB('likeness', 'delete', { where: ['user_id', 'content_id'] }, [req.user.id, contentId]);
-            return res.status(200).send(`${typeName} undisliked`);
         }
+
+        // Get and return updated content
+        let [ updatedContent ] = await dynamicQueryDB(type, 'get', { where: ['id'] }, [contentId]);
+        // Format content
+        updatedContent = await formatContent(req, res, updatedContent);
+        return res.status(200).send(updatedContent);
     }
     catch (err) {
         return res.status(500).send(err.message);
@@ -240,8 +204,9 @@ const getLikes = async (req, res) => {
         const { id: contentId } = req.params;
 
         // Get all likes from the database with the given content ID
-        const likes  = await queryDB('likeness', 'get', { where: ['content_id', 'like_content'] }, [contentId, true]);
-        res.status(200).send(likes.length+'');
+        let likes  = await queryDB('likeness', 'get', { where: ['content_id', 'like_content'] }, [contentId, true]);
+        likes = likes.map(like => like.user_id);
+        res.status(200).send(likes);
         
     }
     catch (err) {
@@ -255,8 +220,9 @@ const getDislikes = async (req, res) => {
         const { id: contentId } = req.params;
 
         // Get all dislikes from the database with the given content ID
-        const dislikes = await queryDB('likeness', 'get', { where: ['content_id', 'like_content'] }, [contentId, false]);
-        res.status(200).send(dislikes.length+'');
+        let dislikes = await queryDB('likeness', 'get', { where: ['content_id', 'like_content'] }, [contentId, false]);
+        dislikes = dislikes.map(dislike => dislike.user_id);
+        res.status(200).send(dislikes);
         
     }
     catch (err) {
