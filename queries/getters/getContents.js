@@ -1,4 +1,5 @@
-// Query the database for content given (1) the content type, (2) query object, (3) requesting user and (4) sort order - optional
+// Get array of contents
+// Given (1) the content type, (2) query object, (3) requesting user and (4) sort order - optional
 const { formatContents } = require('../../helpers/resourceFormatting/formatContent');
 const sortContents = require('../../helpers/sorting/sortContents');
 const queryDB = require('../queryDB');

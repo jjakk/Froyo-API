@@ -1,6 +1,6 @@
 // Database queries
 const queryDB = require('../queries/queryDB');
-const getContents = require('../queries/contents/getContents');
+const getContents = require('../queries/getters/getContents');
 // helpers
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
 // GET all the comments of either a post or a comment
@@ -156,9 +156,7 @@ const getLikes = async (req, res) => {
     try {
         const { id: contentId } = req.params;
 
-        // Get all likes from the database with the given content ID
-        let likes  = await queryDB('likeness', 'get', { where: ['content_id', 'like_content'] }, [contentId, true]);
-        likes = likes.map(like => like.user_id);
+        const likes = getLikeness(contentId, true);
         res.status(200).send(likes);
         
     }
@@ -172,9 +170,7 @@ const getDislikes = async (req, res) => {
     try {
         const { id: contentId } = req.params;
 
-        // Get all dislikes from the database with the given content ID
-        let dislikes = await queryDB('likeness', 'get', { where: ['content_id', 'like_content'] }, [contentId, false]);
-        dislikes = dislikes.map(dislike => dislike.user_id);
+        const dislikes = getLikeness(contentId, false);
         res.status(200).send(dislikes);
         
     }
