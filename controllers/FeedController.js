@@ -1,4 +1,3 @@
-const argon2 = require('argon2');
 const queryDB = require('../queries/queryDB');
 // Helpers
 const getConnections = require('../helpers/followerLogic/getConnections');
@@ -17,9 +16,8 @@ const get = async (req, res) => {
             feedPosts.push(
                 ...(
                     await formatContents(
-                        req,
-                        res,
-                        await queryDB('posts', 'get', { where: ['author_id'] }, [followees[i]])
+                        await queryDB('posts', 'get', { where: ['author_id'] }, [followees[i]]),
+                        req.user
                     )
                 )
             );
