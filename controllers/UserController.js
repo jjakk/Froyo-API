@@ -8,7 +8,7 @@ const queryDB = require('../queries/queryDB');
 const getUsers = require('../queries/getters/getUsers');
 const { calculateAge } = require('../helpers/helpers');
 const { isFollower } = require('../queries/getters/helpers/followStatus');
-const getUserLetters = require('../queries/getters/helpers/getUserLetters');
+const followUser = require('../queries/putters/followUser');
 const validateParameter = require('../queries/validators/validateParameter');
 
 // Get all users' IDs
@@ -194,31 +194,12 @@ const follow = async (req, res) => {
     try {
         const { id: follower_id } = req.user;
         const { id: followee_id } = req.params;
-
-        // Check that the user isn't following themselves
-        if (followee_id === follower_id) return res.status(400).send('You cannot follow yourself');
-
-        // Check the database to see if a connection already exists
-        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
-
-        // If a connection doesn't already exist, create it
-        if (!connection) {
-            await queryDB('connections', 'post', {
-                params: ['user_a_id', 'user_b_id', 'a_following_b']
-            }, [follower_id, followee_id, true]);
-            return res.status(200).send('Followed user');
-        }
+        const {
+            status,
+            message
+        } = await followUser(follower_id, followee_id);
         
-        const alreadyFollowing = isFollower(follower_id, connection);
-        const userLetters = getUserLetters(follower_id, connection);
-
-        // Toggle the following status and return the outcome
-        await queryDB('connections', 'put', {
-            params: [`${userLetters[0]}_following_${userLetters[1]}`],
-            where: ['id']
-        }, [!alreadyFollowing, connection.id]);
-        if (alreadyFollowing) return res.status(200).send('Unfollowed user');
-        return res.status(200).send('Followed user');
+        return res.status(status).send(message);
 
     }
     catch (err) {
