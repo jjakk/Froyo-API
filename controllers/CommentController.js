@@ -1,7 +1,8 @@
 // CRUD operations for comments
 const queryDB = require('../queries/queryDB');
 
-// POST a new comment
+// Create a new comment
+// POST /
 const post = async (req, res) => {
     try {
         const {
@@ -26,7 +27,8 @@ const post = async (req, res) => {
     }
 }
 
-// Update (PUT) a comment by ID
+// Update a comment by ID
+// PUT /:id
 const put = async (req, res) => {
     try{
         const { id: commentId } = req.params;

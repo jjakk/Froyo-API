@@ -5,6 +5,7 @@ const sortContents = require('../helpers/sorting/sortContents');
 const { formatContents } = require('../helpers/resourceFormatting/formatContent');
 
 // Generate the current's feed
+// GET /
 const get = async (req, res) => {
     try{
         // Get all the users the current user's following

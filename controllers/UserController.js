@@ -10,7 +10,22 @@ const formatUser = require('../helpers/resourceFormatting/formatUser');
 const { isFollower } = require('../helpers/followerLogic/followStatus');
 const getUserLetters = require('../helpers/followerLogic/getUserLetters');
 
-// GET a user by id
+// Get all users' IDs
+// GET /
+const get = async (req, res) => {
+    try{
+        // Get all users from the database and send back their IDs
+        const users = await queryDB('users', 'get', {}, []);
+        const ids = users.map(user => user.id);
+        return res.status(200).send(ids);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
+// Get a user by id
+// GET /:id
 const getById = async (req, res) => {
     try{
         const { id: userId } = req.params;
@@ -26,33 +41,8 @@ const getById = async (req, res) => {
     }
 }
 
-// GET all users' IDs
-const getAllUsers = async (req, res) => {
-    try{
-        // Get all users from the database and send back their IDs
-        const users = await queryDB('users', 'get', {}, []);
-        const ids = users.map(user => user.id);
-        return res.status(200).send(ids);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-};
-
-// GET all of a user's posts
-const getPosts = async (req, res) => {
-    try {
-        const { id: userId } = req.params;
-        const posts = await queryDB('posts', 'get', { where: ['author_id'] }, [userId]);
-        if (posts.length === 0) return res.status(404).send('No posts found');
-        return res.status(200).send(posts);
-    }
-    catch (err) {
-        res.status(500).send(err.message);
-    }
-};
-
-// Create (POST) a new user
+// Create a new user
+// POST /
 const post = async (req, res) => {
     try{
         // Get user information
@@ -118,7 +108,8 @@ const post = async (req, res) => {
     }
 }
 
-// Update (PUT) a user by id
+// Update a user by id
+// PUT /:id
 const put = async (req, res) => {
     try{
         // Check that the user exists in the database
@@ -179,7 +170,8 @@ const put = async (req, res) => {
     }
 }
 
-// DELETE a user by id
+// Delete a user by id
+// DELETE /:id
 const deleteUser = async (req, res) => {
     try{
         // Check that user exists in the database
@@ -207,7 +199,8 @@ const deleteUser = async (req, res) => {
     }
 }
 
-// Follow (PUT) a user. Works as a toggle, so if the user is already following the other user, they will unfollow them
+// Follow a user. Works as a toggle, so if the user is already following the other user, they will unfollow them
+// PUT /:id/follow
 const follow = async (req, res) => {
     try {
         const { id: follower_id } = req.user;
@@ -244,7 +237,8 @@ const follow = async (req, res) => {
     }
 }
 
-// GET if a user is following another user
+// Get if a user is following another user
+// GET /:follower_id/following/:followee_id
 const getFollowing = async (req, res) => {
     try {
         const { follower_id, followee_id } = req.params;
@@ -263,9 +257,8 @@ const getFollowing = async (req, res) => {
 }
 
 module.exports = {
+    get,
     getById,
-    getAllUsers,
-    getPosts,
     post,
     put,
     deleteUser,

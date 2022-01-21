@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');
 const queryDB = require('../queries/queryDB');
 const { validateEmail } = require('../helpers/helpers');
 
-// Generate a JWT given email and password
+// Get a authentication token given email and password
+// POST /login
 const login = async (req, res) => {
     try {
         const { email, password: passwordAttempt } = req.body;
@@ -45,7 +46,8 @@ const login = async (req, res) => {
     }
 };
 
-// Check if the email is already in the database
+// Check if the email is already associated with an account
+// GET /validEmail/:email
 const validEmail = async (req, res) => {
     try {
         const { email } = req.params;
@@ -59,7 +61,8 @@ const validEmail = async (req, res) => {
     }
 };
 
-// Check if the username is already in the database
+// Check if the username is already associated with an account
+// GET /validUsername/:username
 const validUsername = async (req, res) => {
     try {
         const { username } = req.params;

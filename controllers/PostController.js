@@ -1,7 +1,8 @@
 // CRUD operations for posts
 const queryDB = require('../queries/queryDB');
 
-// Create (POST) a new post
+// Create a new post
+// POST /
 const post = async (req, res) => {
     try {
         const {
@@ -21,7 +22,8 @@ const post = async (req, res) => {
     }
 }
 
-// Update (PUT) a post by ID
+// Update a post by ID
+// PUT /:id
 const put = async (req, res) => {
     try {
         const { id: postId } = req.params;

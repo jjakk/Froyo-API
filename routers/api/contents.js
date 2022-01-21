@@ -14,9 +14,9 @@ const router = Router();
 router.get('/', get);
 router.get('/:id', getById);
 router.get('/:id/comments', getComments);
-router.delete('/:id', deleteContent);
 router.put('/:id/like', like);
 router.put('/:id/dislike', dislike);
+router.delete('/:id', deleteContent);
 
 module.exports = router;
 
