@@ -18,6 +18,8 @@ const formatUser = async (targetUser, user) => {
         followee_count: followees.length
     };
 
+    // Get whether the requesting user is following this user
+    /*  [To Do]  */
 
     // Remove additional private information if user is not getting their own account
     if (targetUser.id !== user.id){

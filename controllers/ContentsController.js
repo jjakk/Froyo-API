@@ -7,7 +7,9 @@ const getLikeness = require('../queries/getters/getLikeness');
 const putLikeness = require('../queries/putters/putLikeness');
 // helpers
 const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
-// GET all the comments of either a post or a comment
+
+// Get all the comments of either a post or a comment
+// GET /comments
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
@@ -21,6 +23,7 @@ const getComments = async (req, res) => {
 };
 
 // Search posts & comments by query
+// GET /
 const get = async (req, res) => {
     try {
         const { type } = req.resource;
@@ -34,6 +37,7 @@ const get = async (req, res) => {
 };
 
 // Get either a post or comment by ID
+// GET /:id
 const getById = async (req, res) => {
     try {
         const {
@@ -53,6 +57,7 @@ const getById = async (req, res) => {
 };
 
 // Delete a post or comment by ID
+// DELETE /
 const deleteContent = async (req, res) => {
     try {
         const {
@@ -83,7 +88,8 @@ const deleteContent = async (req, res) => {
     }
 };
 
-// Like (PUT) a post or comment by ID
+// Like a post or comment by ID
+// PUT /:id/like
 const like = async (req, res) => {
     try {
         const {
@@ -108,7 +114,8 @@ const like = async (req, res) => {
     }
 };
 
-// Dslike (PUT) a post or comment by ID
+// Dislike a post or comment by ID
+// PUT /:id/dislike
 const dislike = async (req, res) => {
     try {
         const {
@@ -133,34 +140,6 @@ const dislike = async (req, res) => {
     }
 };
 
-// Get the number of likes for a post or comment by ID
-const getLikes = async (req, res) => {
-    try {
-        const { id: contentId } = req.params;
-
-        const likes = await getLikeness(contentId, true);
-        res.status(200).send(likes);
-        
-    }
-    catch (err) {
-        return res.status(500).send(err.message);
-    }
-};
-
-// Get the number of dislikes for a post or comment by ID
-const getDislikes = async (req, res) => {
-    try {
-        const { id: contentId } = req.params;
-
-        const dislikes = await getLikeness(contentId, false);
-        res.status(200).send(dislikes);
-        
-    }
-    catch (err) {
-        return res.status(500).send(err.message);
-    }
-};
-
 module.exports = {
     get,
     getById,
@@ -168,6 +147,4 @@ module.exports = {
     deleteContent,
     like,
     dislike,
-    getLikes,
-    getDislikes
 };
