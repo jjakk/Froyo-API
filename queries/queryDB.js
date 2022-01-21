@@ -1,5 +1,5 @@
 // Query the database given a table, method, and parameters
-const pool = require('../db');
+const pool = require('./db');
 const formatQuery = require('./formatQuery');
 
 // Query the database given table, method, conditions, and values

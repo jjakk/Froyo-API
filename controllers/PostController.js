@@ -18,7 +18,7 @@ const post = async (req, res) => {
         return res.status(201).send('Post created');
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(err.status || 500).send(err.message);
     }
 }
 
@@ -47,7 +47,7 @@ const put = async (req, res) => {
         return res.status(200).send('Post updated');
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(err.status || 500).send(err.message);
     }
 }
 

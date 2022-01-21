@@ -23,7 +23,7 @@ const post = async (req, res) => {
         return res.status(201).send('Comment created');
     }
     catch (err) {
-        res.status(550).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 
@@ -49,7 +49,7 @@ const put = async (req, res) => {
         return res.status(201).send('Comment updated');
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 

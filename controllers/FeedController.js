@@ -1,8 +1,8 @@
 const queryDB = require('../queries/queryDB');
 // Helpers
-const getConnections = require('../helpers/followerLogic/getConnections');
-const sortContents = require('../helpers/sorting/sortContents');
-const { formatContents } = require('../helpers/resourceFormatting/formatContent');
+const getConnections = require('../queries/getters/getConnections');
+const sortContents = require('../queries/getters/helpers/sortContents');
+const getContents = require('../queries/getters/getContents');
 
 // Generate the current's feed
 // GET /
@@ -16,10 +16,7 @@ const get = async (req, res) => {
         for (let i = 0; i < followees.length; i++) {
             feedPosts.push(
                 ...(
-                    await formatContents(
-                        await queryDB('posts', 'get', { where: ['author_id'] }, [followees[i]]),
-                        req.user
-                    )
+                    await getContents('posts', { author_id: followees[i] }, req.user)
                 )
             );
         }
@@ -29,7 +26,7 @@ const get = async (req, res) => {
         return res.status(200).send(feedPosts);
     }
     catch (err) {
-        return err.message;
+        return res.status(err.status || 500).send(err.message);
     }
 };
 

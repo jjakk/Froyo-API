@@ -3,7 +3,7 @@ This function delete all the comments of some
 content recursively. In other words, it deletes
 all the comments, and their sub-comments, and so on.
 */
-const queryDB = require('../../queries/queryDB');
+const queryDB = require('../queryDB');
 
 // Deletes an individual comment.
 const deleteComment = async (commentId) => {

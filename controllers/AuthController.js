@@ -1,7 +1,7 @@
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const queryDB = require('../queries/queryDB');
-const { validateEmail } = require('../helpers/helpers');
+const validateParameter = require('../queries/validators/validateParameter');
 
 // Get a authentication token given email and password
 // POST /login
@@ -42,7 +42,7 @@ const login = async (req, res) => {
         return res.status(200).set('authorization', `Bearer ${token}`).send(rest);
     }
     catch (err){
-        return res.status(400).send(err.message);
+        return res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -51,13 +51,11 @@ const login = async (req, res) => {
 const validEmail = async (req, res) => {
     try {
         const { email } = req.params;
-        const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
-        if(!validateEmail(email)) return res.status(400).send('Invalid email');
-        if(emailTaken) return res.status(400).send('Email already taken');
+        await validateParameter('email', email);
         return res.status(200).send('Valid email');
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -66,12 +64,11 @@ const validEmail = async (req, res) => {
 const validUsername = async (req, res) => {
     try {
         const { username } = req.params;
-        const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
-        if(usernameTaken) return res.status(400).send('Username already taken');
+        await validateParameter('username', username);
         return res.status(200).send('Valid username');
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 };
 

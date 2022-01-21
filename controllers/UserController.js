@@ -2,25 +2,24 @@
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const queries = require('../queries/queries');
-const pool = require('../db');
+const pool = require('../queries/db');
 const queryDB = require('../queries/queryDB');
 // Helpers
-const { validateEmail, calculateAge } = require('../helpers/helpers');
-const formatUser = require('../helpers/resourceFormatting/formatUser');
-const { isFollower } = require('../helpers/followerLogic/followStatus');
-const getUserLetters = require('../helpers/followerLogic/getUserLetters');
+const getUsers = require('../queries/getters/getUsers');
+const { calculateAge } = require('../helpers/helpers');
+const { isFollower } = require('../queries/getters/helpers/followStatus');
+const getUserLetters = require('../queries/getters/helpers/getUserLetters');
+const validateParameter = require('../queries/validators/validateParameter');
 
 // Get all users' IDs
 // GET /
 const get = async (req, res) => {
     try{
-        // Get all users from the database and send back their IDs
-        const users = await queryDB('users', 'get', {}, []);
-        const ids = users.map(user => user.id);
-        return res.status(200).send(ids);
+        const users = await getUsers();
+        return res.status(200).send(users);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -29,15 +28,12 @@ const get = async (req, res) => {
 const getById = async (req, res) => {
     try{
         const { id: userId } = req.params;
-        let [ user ] = await queryDB('users', 'get', { where: ['id'] }, [userId]);
+        const user = await getUsers(userId);
 
-        if (!user) return res.status(404).send('User not found');
-        
-        user = await formatUser(user, req.user);
         return res.status(200).send(user);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 
@@ -71,16 +67,9 @@ const post = async (req, res) => {
                 return res.status(400).send('Must provide a password');
         }
 
-        // Check that email is valid
-        if(!validateEmail(email)) return res.status(422).send('Not a valid email');
-
-        // Check the database to make sure the email is not already in use
-        const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
-        if (emailTaken) return res.status(400).send('Email already in use');
-        
-        // Check the database to make sure the username is not already taken
-        const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
-        if (usernameTaken) return res.status(400).send('Username already taken');
+        // Validate respective fields
+        await validateParameter('email', email);
+        await validateParameter('username', username);
 
         // Confirm that the user is at least 13 years old
         if (calculateAge(new Date(dob)) < 13) return res.status(400).send('Must be at least 13 years old to create an account');
@@ -104,7 +93,7 @@ const post = async (req, res) => {
         res.status(201).send(user);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 
@@ -166,7 +155,7 @@ const put = async (req, res) => {
         return res.status(201).set('authorization', `Bearer ${token}`).send(user);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 
@@ -195,7 +184,7 @@ const deleteUser = async (req, res) => {
         return res.status(200).send('User deleted');
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 
@@ -233,7 +222,7 @@ const follow = async (req, res) => {
 
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 
@@ -252,7 +241,7 @@ const getFollowing = async (req, res) => {
         return res.status(200).send(following);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 

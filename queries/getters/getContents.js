@@ -1,7 +1,7 @@
 // Get array of contents
 // Given (1) the content type, (2) query object, (3) requesting user and (4) sort order - optional
-const { formatContents } = require('../../helpers/resourceFormatting/formatContent');
-const sortContents = require('../../helpers/sorting/sortContents');
+const formatContent = require('./helpers/formatContent');
+const sortContents = require('./helpers/sortContents');
 const queryDB = require('../queryDB');
 
 const getContents = async (type, query, user, sort='new') => {
@@ -24,7 +24,7 @@ const getContents = async (type, query, user, sort='new') => {
 
     let contents = await queryDB(type, queryMethod, { where: queryParams }, queryValues);
     // Format contents
-    contents = await formatContents(contents, user);
+    contents = await formatContent(contents, user);
     // Sort contents
     contents = sortContents(contents, sort);
     return contents;

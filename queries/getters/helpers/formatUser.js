@@ -1,5 +1,5 @@
 // Filter certain information from the user object
-const getConnections = require('../followerLogic/getConnections');
+const getConnections = require('../getConnections');
 
 const formatUser = async (targetUser, user) => {
     // Remove unnecessary information

@@ -2,11 +2,10 @@
 const queryDB = require('../queries/queryDB');
 // Getters
 const getContents = require('../queries/getters/getContents');
-const getLikeness = require('../queries/getters/getLikeness');
 // Putters
 const putLikeness = require('../queries/putters/putLikeness');
-// helpers
-const deleteComments = require('../helpers/resursiveDeletion/deleteComments');
+// Deleter
+const deleteComments = require('../queries/deleters/deleteComments');
 
 // Get all the comments of either a post or a comment
 // GET /comments
@@ -18,7 +17,7 @@ const getComments = async (req, res) => {
         return res.status(200).send(comments);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        return res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -32,7 +31,7 @@ const get = async (req, res) => {
         return res.status(200).send(contents);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -52,7 +51,7 @@ const getById = async (req, res) => {
         return res.status(200).send(content);
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -84,7 +83,7 @@ const deleteContent = async (req, res) => {
         return res.status(200).send(`${typeName} deleted`);
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -110,7 +109,7 @@ const like = async (req, res) => {
         return res.status(200).send(updatedContent);
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(err.status || 500).send(err.message);
     }
 };
 
@@ -136,7 +135,7 @@ const dislike = async (req, res) => {
         return res.status(200).send(updatedContent);
     }
     catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(err.status || 500).send(err.message);
     }
 };
 

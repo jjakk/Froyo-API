@@ -1,8 +1,9 @@
 // Add author object & like/dislike status to content
-const queryDB = require('../../queries/queryDB');
+const e = require('express');
+const queryDB = require('../../queryDB');
 const formatUser = require('./formatUser');
 
-const formatContent = async (content, user) => {
+const format = async (content, user) => {
     // Get Like & dislike status
     const [ liking ] = await queryDB('likeness', 'get',
         { where: ['user_id', 'content_id', 'like_content'] },
@@ -45,14 +46,17 @@ const formatContent = async (content, user) => {
     };
 }
 
-const formatContents = async (contents, user) => {
-    for (let i = 0; i < contents.length; i++){
-        contents[i] = await formatContent(contents[i], user);
+const formatContent = async (content, user) => {
+    // Iterate if array, otherwise format single content
+    if(Array.isArray(content)){
+        for (let i = 0; i < content.length; i++){
+            content[i] = await format(content[i], user);
+        }
     }
-    return contents;
+    else{
+        content = await format(content, user);
+    }
+    return content;
 };
 
-module.exports = {
-    formatContent,
-    formatContents
-};
+module.exports = formatContent;

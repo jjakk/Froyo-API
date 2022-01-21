@@ -1,10 +1,10 @@
 // Get an object with arrays of followers and followees
-const queryDB = require('../../queries/queryDB');
+const queryDB = require('../queryDB');
 const {
     isFollower,
     isFollowee
-} = require('./followStatus');
-const getUserLetters = require('./getUserLetters');
+} = require('./helpers/followStatus');
+const getUserLetters = require('./helpers/getUserLetters');
 
 const getConnections = async (userId) => {
     const connections = await queryDB('connections', 'get', { where: ['user_a_id', 'user_b_id'], whereCondition: 'OR' }, [userId, userId]);
