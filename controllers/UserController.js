@@ -159,8 +159,8 @@ const put = async (req, res) => {
     }
 }
 
-// Delete a user by id
-// DELETE /:id
+// Delete the current user
+// DELETE /
 const deleteUser = async (req, res) => {
     try{
         // Check that user exists in the database
@@ -177,14 +177,14 @@ const deleteUser = async (req, res) => {
         await pool.query(queries.connections.deleteWithOne, [req.user.id]);
 
         // Delete all of the user's likeness
-        await queryDB('likeness', 'delete', { where: 'user_id' }, [req.user.id]);
+        await queryDB('likeness', 'delete', { where: ['user_id'] }, [req.user.id]);
 
         // Delete their account from the database
         await queryDB('users', 'delete', { where: ['id'] }, [req.user.id]);
         return res.status(200).send('User deleted');
     }
     catch (err) {
-        res.status(err.status || 500).send(err.message);
+    res.status(err.status || 500).send(err.message);
     }
 }
 
