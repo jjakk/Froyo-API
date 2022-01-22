@@ -67,7 +67,7 @@ const post = async (req, res) => {
                 return res.status(400).send('Must provide a password');
         }
 
-        // Validate respective fields
+        // Make sure the email & username aren't taken and are formatted correctly
         await validateParameter('email', email);
         await validateParameter('username', username);
 

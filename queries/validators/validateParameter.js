@@ -1,6 +1,7 @@
 // Check that the given parameter is formatted correctly and/or not already in use
 const queryDB = require('../queryDB');
 const { capitalize } = require('../../helpers/helpers');
+const checkEmailFormatting = require('./checkEmailFormatting');
 
 const validateParameter = async (type, value) => {
     try {
@@ -22,12 +23,6 @@ const validateParameter = async (type, value) => {
     catch (err) {
         throw err;
     }
-}
-
-// Return true is email's format is valid
-const checkEmailFormatting = (email) => {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
 }
 
 module.exports = validateParameter;

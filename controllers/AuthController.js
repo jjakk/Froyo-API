@@ -2,6 +2,7 @@ const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const queryDB = require('../queries/queryDB');
 const validateParameter = require('../queries/validators/validateParameter');
+const checkEmailFormatting = require('../queries/validators/checkEmailFormatting');
 
 // Get a authentication token given email and password
 // POST /login
@@ -17,8 +18,8 @@ const login = async (req, res) => {
                 return res.status(400).send('Must provide password');
         }
 
-        // Check that email is valid
-        if(!validateEmail(email)) return res.status(422).send('Not a valid email');
+        // Check that email is formatted properly
+        if(!checkEmailFormatting(email)) return res.status(422).send('Not a valid email');
         
         // Query the database for the user
         const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
