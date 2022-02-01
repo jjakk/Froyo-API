@@ -6,15 +6,14 @@ const queryDB = require('../queries/queryDB');
 const post = async (req, res) => {
     try {
         const {
-            text,
-            image_url
+            text
         } = req.body;
     
         // Confirm that text isn't empty
         if (!text) return res.status(400).send('Must provide text body');
     
         // Create the new post
-        await queryDB('posts', 'post', { params: ['text', 'image_url', 'author_id']}, [text, image_url, req.user.id]);
+        await queryDB('posts', 'post', { params: ['text', 'author_id']}, [text, req.user.id]);
         return res.status(201).send('Post created');
     }
     catch (err) {
