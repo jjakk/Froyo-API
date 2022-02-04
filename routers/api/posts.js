@@ -1,4 +1,6 @@
 const { Router } = require('express');
+const multer = require('multer');
+const upload = multer({ dest: '../../uploads/' });
 // Controller
 const {
     post,
@@ -7,7 +9,7 @@ const {
 
 const router = Router();
 
-router.post('/', post);
+router.post('/', upload.array('images', 10), post);
 router.put('/:id', put);
 
 module.exports = router;

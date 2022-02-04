@@ -31,7 +31,7 @@ const get = async (req, res) => {
         return res.status(200).send(contents);
     }
     catch (err) {
-        res.status(err.status || 500).send(err.message);
+        res.status(err.status || 500).send(err);
     }
 };
 

@@ -12,7 +12,7 @@ const getContents = async (type, query, user, sort='new') => {
         queryParams,
         queryValues,
         queryMethod
-    } = determineQuery(query);
+    } = determineQuery(query, user);
 
     let contents = await queryDB(type, queryMethod, { where: queryParams }, queryValues);
     // Format contents
@@ -23,7 +23,7 @@ const getContents = async (type, query, user, sort='new') => {
 };
 
 // Determine query parameters and values based on query object
-const determineQuery = (query) => {
+const determineQuery = (query, user) => {
     // Get query parameters & set their default values
     let queryParams = Object.keys(query);
     let queryValues = Object.values(query);
