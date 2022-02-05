@@ -5,7 +5,7 @@ const upload = multer({ dest: 'uploads/' });
 const {
     post,
     put,
-} = require('../../controllers/PostController');
+} = require('../../controllers/PostsController');
 
 const router = Router();
 

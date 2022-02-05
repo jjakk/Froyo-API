@@ -3,7 +3,7 @@ const { Router } = require('express');
 const {
     post,
     put
-} = require('../../controllers/CommentController');
+} = require('../../controllers/CommentsController');
 
 const router = Router();
 

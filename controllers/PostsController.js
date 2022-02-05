@@ -1,5 +1,6 @@
 // CRUD operations for posts
 const queryDB = require('../queries/queryDB');
+const { uploadFile, unlinkFile } = require('../aws/s3');
 
 // Create a new post
 // POST /
@@ -8,12 +9,26 @@ const post = async (req, res) => {
         const {
             text
         } = req.body;
+        const {
+            files
+        } = req;
     
         // Confirm that text isn't empty
         if (!text) return res.status(400).send('Must provide text body');
     
         // Create the new post
-        await queryDB('posts', 'post', { params: ['text', 'author_id']}, [text, req.user.id]);
+        const [ newPost ] = await queryDB('posts', 'post', { params: ['text', 'author_id']}, [text, req.user.id]);
+
+        // Store the posts's images on AWS, and store keys to the database
+        for (let i = 0; i < files.length; i++) {
+            // Get key each uploaded file
+            const { Key } = await uploadFile(files[i]);
+            // Create a new image in the database
+            await queryDB('images', 'post', { params: ['post_id', 'bucket_key']}, [newPost.id, Key]);
+            // Remove temporary file from uploads directory
+            await unlinkFile(files[i].path);
+        }
+
         return res.status(201).send('Post created');
     }
     catch (err) {

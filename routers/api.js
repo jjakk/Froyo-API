@@ -2,6 +2,7 @@ const { Router } = require('express');
 // API routers
 const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
+const imagesRouter = require('./api/images');
 const feedRouter = require('./api/feed');
 const postsRouter = require('./api/posts');
 const commentsRouter = require('./api/comments');
@@ -18,6 +19,7 @@ router.get('/', requireAuth, (req, res) => {
 router.use(getTargetResource);
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
+router.use('/images', imagesRouter);
 router.use('/feed', requireAuth, feedRouter);
 router.use('/posts', requireAuth, contentsRouter, postsRouter);
 router.use('/comments', requireAuth, contentsRouter, commentsRouter);

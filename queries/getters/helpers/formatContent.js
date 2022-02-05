@@ -33,6 +33,16 @@ const format = async (content, user) => {
         };
     }
 
+    // Get all the content's images
+    console.log(content.id);
+    const images = await queryDB('images', 'get', { where: ['post_id'] }, [content.id]);
+    if(images.length > 0) {
+        content = {
+            ...content,
+            images: images.map(image => image.bucket_key)
+        };
+    }
+
     // Replace author_id with author object
     const [ unformattedAuthor ] = await queryDB('users', 'get', { where: ['id'] }, [content.author_id]);
     const author = await formatUser(unformattedAuthor, user);

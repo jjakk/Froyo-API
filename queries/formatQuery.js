@@ -23,7 +23,7 @@ const formatQuery = (table, method, data) => {
                     (_, index) => ('$' + (index+1))
                 ).join(', ')
             ];
-            return `INSERT INTO ${table} (${format[0]}) VALUES (${format[1]})`;
+            return `INSERT INTO ${table} (${format[0]}) VALUES (${format[1]}) RETURNING *`;
 
         case 'put':
             format = [
@@ -34,7 +34,7 @@ const formatQuery = (table, method, data) => {
                     (ele, index) => ele + ' = $' + (params.length + index + 1)
                 ).join(` ${whereCondition} `)
             ];
-            return `UPDATE ${table} SET ${format[0]} WHERE ${format[1]}`;
+            return `UPDATE ${table} SET ${format[0]} WHERE ${format[1]} RETURNING *`;
 
         case 'delete':
             format = [
