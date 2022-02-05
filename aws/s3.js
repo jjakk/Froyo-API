@@ -26,10 +26,6 @@ const uploadFile = (file) => {
     return s3.upload(uploadParams).promise();
 };
 
-// Delete a file from uploads directory
-// (not really s3 related, but this is a convienient place to put it)
-const unlinkFile = util.promisify(fs.unlink);
-
 // retreive file from S3
 const getFileStream = (fileKey) => {
     const downloadParams = {
@@ -40,8 +36,23 @@ const getFileStream = (fileKey) => {
     return s3.getObject(downloadParams).createReadStream();
 };
 
+// Delete file from S3
+const deleteFile = (fileKey) => {
+    const deleteParams = {
+        Bucket: bucketName,
+        Key: fileKey
+    };
+
+    return s3.deleteObject(deleteParams).promise();
+}
+
+// Delete a file from uploads directory
+// (not really s3 related, but this is a convienient place to put it)
+const unlinkFile = util.promisify(fs.unlink);
+
 module.exports = {
     uploadFile,
-    unlinkFile,
-    getFileStream
+    getFileStream,
+    deleteFile,
+    unlinkFile
 };

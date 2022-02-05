@@ -4,8 +4,9 @@ const queryDB = require('../queries/queryDB');
 const getContents = require('../queries/getters/getContents');
 // Putters
 const putLikeness = require('../queries/putters/putLikeness');
-// Deleter
+// Deleters
 const deleteComments = require('../queries/deleters/deleteComments');
+const deleteImages = require('../queries/deleters/deleteImages');
 
 // Get all the comments of either a post or a comment
 // GET /comments
@@ -74,6 +75,9 @@ const deleteContent = async (req, res) => {
 
         // Delete all the content's comments recursively
         await deleteComments(contentId);
+
+        // Delete all the content's images (if any)
+        await deleteImages(contentId);
 
         // Delete all the content's likeness
         await queryDB('likeness', 'delete', { where: ['content_id'] }, [contentId]);
