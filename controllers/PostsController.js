@@ -6,12 +6,8 @@ const { uploadFile, unlinkFile } = require('../aws/s3');
 // POST /
 const post = async (req, res) => {
     try {
-        const {
-            text
-        } = req.body;
-        const {
-            files
-        } = req;
+        const { text } = req.body;
+        const { files } = req;
     
         // Confirm that text isn't empty
         if (!text) return res.status(400).send('Must provide text body');

@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const queries = require('../queries/queries');
 const pool = require('../queries/db');
 const queryDB = require('../queries/queryDB');
+// File functions
+const { uploadFile, unlinkFile, deleteFile } = require('../aws/s3');
 // Helpers
 const getUsers = require('../queries/getters/getUsers');
 const { calculateAge } = require('../helpers/helpers');
@@ -101,9 +103,11 @@ const post = async (req, res) => {
 // PUT /:id
 const put = async (req, res) => {
     try{
+        const { file } = req;
+
         // Check that the user exists in the database
-        const [ userExists ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
-        if(!userExists) return res.status(404).send('User not found');
+        const [ nonUpdatedUser ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
+        if(!nonUpdatedUser) return res.status(404).send('User not found');
 
         // Get the new user data
         const {
@@ -118,8 +122,18 @@ const put = async (req, res) => {
 
         const newPassword = password ? await argon2.hash(password) : null;
 
-        // Set email_verified to false if email is changed
+        // Set email_verified to false if the user changed their email
         const changedEmail = email === req.user.email;
+
+        let newProfilePictureKey = null;
+        if(file) {
+            const { Key } = await uploadFile(file);
+            // Remove temporary file from uploads directory
+            await unlinkFile(file.path);
+            newProfilePictureKey = Key;
+            // Delete the old profile picture from S3
+            await deleteFile(nonUpdatedUser.profile_picture_bucket_key);
+        }
 
         // Update the user with the new information
         await queryDB('users', 'put', {
@@ -131,7 +145,8 @@ const put = async (req, res) => {
                     'last_name',
                     'description',
                     'password',
-                    'email_verified'
+                    'email_verified',
+                    'profile_picture_bucket_key'
                 ],
                 where: ['id'],
         },[
@@ -143,6 +158,7 @@ const put = async (req, res) => {
             description || req.user.description,
             newPassword || req.user.password,
             changedEmail ? false : req.user.email_verified,
+            newProfilePictureKey || req.user.profile_picture_bucket_key,
             req.user.id
         ]);
 
@@ -178,6 +194,9 @@ const deleteUser = async (req, res) => {
 
         // Delete all of the user's likeness
         await queryDB('likeness', 'delete', { where: ['user_id'] }, [req.user.id]);
+
+        // Delete the user's profile picture from S3
+        await deleteFile(req.user.profile_picture_bucket_key);
 
         // Delete their account from the database
         await queryDB('users', 'delete', { where: ['id'] }, [req.user.id]);
