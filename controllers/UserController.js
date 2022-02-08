@@ -100,7 +100,7 @@ const post = async (req, res) => {
 }
 
 // Update a user by id
-// PUT /:id
+// PUT
 const put = async (req, res) => {
     try{
         const { file } = req;
@@ -131,12 +131,14 @@ const put = async (req, res) => {
             // Remove temporary file from uploads directory
             await unlinkFile(file.path);
             newProfilePictureKey = Key;
-            // Delete the old profile picture from S3
-            await deleteFile(nonUpdatedUser.profile_picture_bucket_key);
+            if(nonUpdatedUser.profile_picture_bucket_key) {
+                // Delete the old profile picture from S3
+                await deleteFile(nonUpdatedUser.profile_picture_bucket_key);
+            }
         }
 
         // Update the user with the new information
-        await queryDB('users', 'put', {
+        const [ user ] = await queryDB('users', 'put', {
                 params: [
                     'email',
                     'username',
@@ -155,15 +157,12 @@ const put = async (req, res) => {
             dob || req.user.dob,
             first_name || req.user.first_name,
             last_name || req.user.last_name,
-            description || req.user.description,
+            description !== null ? description : req.user.description,
             newPassword || req.user.password,
             changedEmail ? false : req.user.email_verified,
             newProfilePictureKey || req.user.profile_picture_bucket_key,
             req.user.id
         ]);
-
-        // Return the newly updated user
-        const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
 
         // Generate JWT token and attach to response header
         const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);

@@ -8,7 +8,7 @@ const publicAccessKey = process.env.AWS_BUCKET_PUBLIC_ACCESS_KEY;
 const privateAccessKey = process.env.AWS_BUCKET_PRIVATE_ACCESS_KEY;
 
 const s3 = new S3({
-    region,
+    region: region,
     accessKeyId: publicAccessKey,
     secretAccessKey: privateAccessKey
 });
