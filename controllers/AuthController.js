@@ -1,5 +1,7 @@
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const queryDB = require('../queries/queryDB');
 const validateParameter = require('../queries/validators/validateParameter');
 const checkEmailFormatting = require('../queries/validators/checkEmailFormatting');
@@ -73,8 +75,91 @@ const validUsername = async (req, res) => {
     }
 };
 
+const resetPassword = async (req, res) => {
+    try{
+        const {
+            email
+        } = req.body;
+
+        // Generate a random reset token
+        const buf = crypto.randomBytes(20);
+        const token = buf.toString('hex');
+
+        // Find he user and set the info to the databse
+
+        // Get user by email
+        const user = await queryDB('users', 'get', { where: ['email'] }, [email]);
+        if (!user) {
+            return res.status(400).send('Email not found');
+        }
+
+        // Set user.reset_password_token => token
+        await queryDB('users', 'put', {
+            params: [
+                'reset_password_token',
+                'reset_password_expiration'
+            ],
+            where: ['email']
+        }, [
+            token,
+            new Date(Date.now() + 3600000),
+            email
+        ]);
+
+        let smtpTransport = nodemailer.createTransport({
+            host: process.env.NOREPLY_EMAIL_HOST,
+            port: process.env.NOREPLY_EMAIL_PORT,
+            auth: {
+                user: 'noreply@protosapps.com',
+                pass: process.env.NOREPLY_EMAIL_PASSWORD
+            }
+        });
+
+        let mailOptions = {
+            to: email,
+            from: 'noreply@protosapps.com',
+            subject: 'Password Reset',
+            text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+            'https://' + req.headers.host + '/auth/reset/' + token + '\n\n' +
+            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+        };
+
+        smtpTransport.sendMail(mailOptions, (err, info) => {
+            if (err){
+                return res.status(500).send(err.message);
+            }
+            else{
+                return res.status(200).send('Password reset, email sent');
+            }
+        });
+    }
+    catch (err) {
+        res.status(err.status || 500).send(err.message);
+    }
+};
+
+const getPasswordReset = async (req, res) => {
+    try {
+        const {
+            token
+        } = req.params;
+        const user = await queryDB('users', 'get', { where: ['reset_password_token'] }, [token]);
+
+        if (!user) {
+            return res.send('Password reset token is invalid or has expired.');
+        }
+        return res.send('Password reset page should be here');
+    }
+    catch (err) {
+        res.status(err.status || 500).send(err.message);
+    }
+};
+
 module.exports = {
     login,
     validEmail,
-    validUsername
+    validUsername,
+    resetPassword,
+    getPasswordReset
 };
