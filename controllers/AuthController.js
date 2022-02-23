@@ -5,6 +5,8 @@ const nodemailer = require('nodemailer');
 const queryDB = require('../queries/queryDB');
 const validateParameter = require('../queries/validators/validateParameter');
 const checkEmailFormatting = require('../queries/validators/checkEmailFormatting');
+// Email templates
+const resetPasswordTemplate = require('../emailTemplates/resetPassword');
 
 // Get a authentication token given email and password
 // POST /login
@@ -119,10 +121,7 @@ const resetPassword = async (req, res) => {
             to: email,
             from: 'noreply@protosapps.com',
             subject: 'Password Reset',
-            text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-            'https://' + req.headers.host + '/auth/reset/' + token + '\n\n' +
-            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+            html: resetPasswordTemplate(req.headers.host, token)
         };
 
         smtpTransport.sendMail(mailOptions, (err, info) => {
