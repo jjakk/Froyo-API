@@ -95,7 +95,7 @@ const resetPassword = async (req, res) => {
             return res.status(400).send('Email not found');
         }
 
-        // Set user.reset_password_token => token
+        // Update the user's cell to include reset token & expiration date
         await queryDB('users', 'put', {
             params: [
                 'reset_password_token',
