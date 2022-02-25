@@ -124,6 +124,7 @@ const resetPassword = async (req, res) => {
             html: resetPasswordTemplate(req.headers.host, token)
         };
 
+        // Send automated email to user
         smtpTransport.sendMail(mailOptions, (err, info) => {
             if (err){
                 return res.status(500).send(err.message);
