@@ -125,14 +125,8 @@ const resetPassword = async (req, res) => {
         };
 
         // Send automated email to user with reset button
-        smtpTransport.sendMail(mailOptions, (err, info) => {
-            if (err){
-                return res.status(500).send(err.message);
-            }
-            else{
-                return res.status(200).send('Password reset, email sent');
-            }
-        });
+        await smtpTransport.sendMail(mailOptions);
+        return res.status(200).send('Password reset, email sent');
     }
     catch (err) {
         res.status(err.status || 500).send(err.message);
