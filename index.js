@@ -9,7 +9,8 @@ PORT = process.env.PORT || 8000;
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({
-    extended: true
+    extended: true,
+    limit: '50mb'
 }));
 app.use('/', apiRouter);
 
