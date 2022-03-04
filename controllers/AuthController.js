@@ -143,7 +143,7 @@ const getPasswordReset = async (req, res) => {
         if (!user) {
             return res.send('Password reset token is invalid or has expired.');
         }
-        return res.send('Password reset page should be here');
+        return res.render('passwordReset');
     }
     catch (err) {
         res.status(err.status || 500).send(err.message);
