@@ -3,8 +3,9 @@ const {
     login,
     validEmail,
     validUsername,
+    sendResetPasswordEmail,
     resetPassword,
-    getPasswordReset
+    renderResetPassword
 } = require('../../controllers/AuthController');
 
 const router = Router();
@@ -12,7 +13,8 @@ const router = Router();
 router.post('/login', login);
 router.get('/validEmail/:email', validEmail);
 router.get('/validUsername/:username', validUsername);
-router.post('/resetPassword', resetPassword);
-router.get('/reset/:token', getPasswordReset);
+router.post('/resetPassword', sendResetPasswordEmail);
+router.put('/reset/:token', resetPassword);
+router.get('/reset/:token', renderResetPassword);
 
 module.exports = router;

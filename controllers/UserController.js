@@ -116,11 +116,8 @@ const put = async (req, res) => {
             dob,
             first_name,
             last_name,
-            description,
-            password
+            description
         } = req.body;
-
-        const newPassword = password ? await argon2.hash(password) : null;
 
         // Set email_verified to false if the user changed their email
         const changedEmail = email === req.user.email;
@@ -146,7 +143,6 @@ const put = async (req, res) => {
                     'first_name',
                     'last_name',
                     'description',
-                    'password',
                     'email_verified',
                     'profile_picture_bucket_key'
                 ],
@@ -158,7 +154,6 @@ const put = async (req, res) => {
             first_name || req.user.first_name,
             last_name || req.user.last_name,
             description !== null ? description : req.user.description,
-            newPassword || req.user.password,
             changedEmail ? false : req.user.email_verified,
             newProfilePictureKey || req.user.profile_picture_bucket_key,
             req.user.id

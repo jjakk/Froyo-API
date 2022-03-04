@@ -1,3 +1,5 @@
+const nodemailer = require('nodemailer');
+
 // Capitalize first letter of a string
 // hello world -> Hello world
 const capitalize = (str) => {
@@ -15,8 +17,23 @@ const calculateAge = (birthDate) => {
     return age;
 }
 
+const sendAutomatedEmail = async (mailOptions) => {
+    let smtpTransport = nodemailer.createTransport({
+        host: process.env.NOREPLY_EMAIL_HOST,
+        port: process.env.NOREPLY_EMAIL_PORT,
+        auth: {
+            user: process.env.NOREPLY_EMAIL_ADDRESS,
+            pass: process.env.NOREPLY_EMAIL_PASSWORD
+        }
+    });
+
+    // Send automated email to user
+    await smtpTransport.sendMail(mailOptions);
+};
+
 module.exports = {
     capitalize,
-    calculateAge
+    calculateAge,
+    sendAutomatedEmail
 };
 

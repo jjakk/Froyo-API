@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const resetPasswordTemplate = (host, token) => {
+const resetPasswordConfirmationTemplate = () => {
     const commonStyle = fs.readFileSync(path.resolve(__dirname, './common.css'), 'utf8');
-    const emailStyle = fs.readFileSync(path.resolve(__dirname, './resetPassword.css'), 'utf8');
-
+    const emailStyle = fs.readFileSync(path.resolve(__dirname, './resetPasswordConfirmation.css'), 'utf8');
+    
     return (`
     <head>
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,14 +24,9 @@ const resetPasswordTemplate = (host, token) => {
             </span>
         </header>
         <p>
-            You are recieving this email, becase there was a request to reset your password.
+            Your password has successfully been changed.
         </p>
-        <form method='get' action='https://${host}/auth/reset/${token}'>
-            <button type="submit">Reset password</button>
-        </form>
         <p>
-            If you did not request this, please ignore this email and your password will remain unchanged.
-            <br>
             If you have any questions, please contact us at <a href='mailto: support@protosapps.com'>support@protosapps.com</a>
         </p>
     </body>
@@ -39,4 +34,4 @@ const resetPasswordTemplate = (host, token) => {
     `);
 };
 
-module.exports = resetPasswordTemplate;
+module.exports = resetPasswordConfirmationTemplate;
