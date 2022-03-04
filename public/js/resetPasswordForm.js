@@ -8,6 +8,7 @@ const onSubmit = async (event) => {
     // DOM Elements
     let submitButton = document.querySelector('#passwordResetForm input[type="submit"]');
     let errorMessage = document.querySelector('#error');
+    let form = document.querySelector('#passwordResetForm');
     const password = document.querySelector('input[name="password"]').value;
     const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
     
@@ -31,6 +32,11 @@ const onSubmit = async (event) => {
         });
         const resText = await response.text();
         errorMessage.innerHTML = resText;
+        // Delete form & turn error message into success message
+        if (response.status === 200) {
+            form.innerHTML = null;
+            errorMessage.id = 'success';
+        }
     }
     catch (err) {
         errorMessage.innerHTML = err.message;

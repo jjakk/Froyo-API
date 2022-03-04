@@ -3,7 +3,6 @@ const path = require('path');
 
 const resetPasswordConfirmationTemplate = () => {
     const commonStyle = fs.readFileSync(path.resolve(__dirname, './common.css'), 'utf8');
-    const emailStyle = fs.readFileSync(path.resolve(__dirname, './resetPasswordConfirmation.css'), 'utf8');
     
     return (`
     <head>
@@ -30,7 +29,7 @@ const resetPasswordConfirmationTemplate = () => {
             If you have any questions, please contact us at <a href='mailto: support@protosapps.com'>support@protosapps.com</a>
         </p>
     </body>
-    <style>${emailStyle + commonStyle}</style>
+    <style>${commonStyle}</style>
     `);
 };
 

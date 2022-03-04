@@ -11,12 +11,12 @@ const requireAuth = (req, res, next) => {
         // Get the token from authorization & verify it
         const token = authorization.replace('Bearer ', '');
         jwt.verify(token, process.env.TOKEN_KEY, async (err, payload) => {
-            if (err) return res.status(401).send('Invalid token');
+            if (err) return res.status(401).send('Invalid authentication token');
 
             // Get user ID from token, and retrieve user from database
             const { userId } = payload;
             const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [userId]);
-            if (!user) return res.status(401).send('Invalid token');
+            if (!user) return res.status(401).send('Invalid authentication token');
 
             req.user = user;
             next();
