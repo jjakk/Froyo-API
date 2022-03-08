@@ -189,15 +189,17 @@ const deleteUser = async (req, res) => {
         // Delete all of the user's likeness
         await queryDB('likeness', 'delete', { where: ['user_id'] }, [req.user.id]);
 
-        // Delete the user's profile picture from S3
-        await deleteFile(req.user.profile_picture_bucket_key);
+        // Delete the user's profile picture from S3 if they have one
+        if(req.user.profile_picture_bucket_key) {
+            await deleteFile(req.user.profile_picture_bucket_key);
+        }
 
         // Delete their account from the database
         await queryDB('users', 'delete', { where: ['id'] }, [req.user.id]);
         return res.status(200).send('User deleted');
     }
     catch (err) {
-    res.status(err.status || 500).send(err.message);
+        res.status(err.status || 500).send(err.message);
     }
 }
 
