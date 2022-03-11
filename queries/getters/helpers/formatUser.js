@@ -5,6 +5,8 @@ const formatUser = async (targetUser, user) => {
     // Remove unnecessary information
     delete targetUser.password;
     delete targetUser.timestamp;
+    delete targetUser.reset_password_token;
+    delete targetUser.reset_password_expiration;
 
     // Add follower & followee count
     const {
