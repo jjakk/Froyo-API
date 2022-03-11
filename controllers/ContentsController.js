@@ -2,6 +2,7 @@
 const queryDB = require('../queries/queryDB');
 // Getters
 const getContents = require('../queries/getters/getContents');
+const getCommentsRecursively = require('../queries/getters/getCommentsRecursively');
 // Putters
 const putLikeness = require('../queries/putters/putLikeness');
 // Deleters
@@ -13,7 +14,7 @@ const deleteImages = require('../queries/deleters/deleteImages');
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
-        const comments = await getContents('comments', { parent_id: parentId }, req.user);
+        const comments = await getCommentsRecursively(parentId, req.user);
 
         return res.status(200).send(comments);
     }
