@@ -17,7 +17,10 @@ const validateParameter = require('../queries/validators/validateParameter');
 // GET /
 const get = async (req, res) => {
     try{
-        const users = await getUsers();
+        const {
+            query
+        } = req;
+        const users = await getUsers(query, req.user);
         return res.status(200).send(users);
     }
     catch (err) {
@@ -30,7 +33,7 @@ const get = async (req, res) => {
 const getById = async (req, res) => {
     try{
         const { id: userId } = req.params;
-        const user = await getUsers(userId);
+        const user = await getUsers({ userId }, req.user);
 
         return res.status(200).send(user);
     }
