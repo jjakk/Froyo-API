@@ -9,7 +9,7 @@ const { uploadFile, unlinkFile, deleteFile } = require('../aws/s3');
 // Helpers
 const getUsers = require('../queries/getters/getUsers');
 const { calculateAge } = require('../helpers/helpers');
-const { isFollower } = require('../queries/getters/helpers/followStatus');
+const { isFollower, isFollowee } = require('../queries/getters/helpers/followStatus');
 const followUser = require('../queries/putters/followUser');
 const validateParameter = require('../queries/validators/validateParameter');
 
@@ -27,6 +27,57 @@ const get = async (req, res) => {
         res.status(err.status || 500).send(err.message);
     }
 };
+
+// Get a user's followers and who they're following
+const getConnections = async (req, res) => {
+    try{
+        const { id: userId } = req.params;
+        const { rows: connections } = await pool.query('SELECT * FROM connections WHERE user_a_id = $1 OR user_b_id = $1', [userId]);
+
+        // Get lists of followers and followees by ID
+        let followers = connections.filter(c => isFollower(userId, c));
+        followers = followers.map(follower => follower.user_b_id);
+
+        let following = connections.filter(c => isFollowee(userId, c));
+        following = following.map(followee => followee.user_a_id);
+
+        // Convert user IDs to user objects
+        for(let i = 0; i < followers.length; i++){
+            followers[i] = await getUsers({ userId: followers[i] }, req.user);
+        }
+        
+        for(let i = 0; i < following.length; i++){
+            following[i] = await getUsers({ userId: following[i] }, req.user);
+        }
+
+        return res.status(200).send({
+            followers,
+            following
+        });
+    }
+    catch (err) {
+        res.status(err.status || 500).send(err.message);
+    }
+};
+
+// Get if a user is following another user
+// GET /:follower_id/following/:followee_id
+const getFollowing = async (req, res) => {
+    try {
+        const { follower_id, followee_id } = req.params;
+
+        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
+        if (!connection) return res.status(200).send(false);
+
+       const following = isFollower(follower_id, connection);
+
+        // Return the following status
+        return res.status(200).send(following);
+    }
+    catch (err) {
+        res.status(err.status || 500).send(err.message);
+    }
+}
 
 // Get a user by id
 // GET /:id
@@ -225,31 +276,13 @@ const follow = async (req, res) => {
     }
 }
 
-// Get if a user is following another user
-// GET /:follower_id/following/:followee_id
-const getFollowing = async (req, res) => {
-    try {
-        const { follower_id, followee_id } = req.params;
-
-        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
-        if (!connection) return res.status(200).send(false);
-
-       const following = isFollower(follower_id, connection);
-
-        // Return the following status
-        return res.status(200).send(following);
-    }
-    catch (err) {
-        res.status(err.status || 500).send(err.message);
-    }
-}
-
 module.exports = {
     get,
     getById,
+    getConnections,
+    getFollowing,
     post,
     put,
     deleteUser,
-    follow,
-    getFollowing
+    follow
 };

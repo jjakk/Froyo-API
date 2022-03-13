@@ -8,6 +8,7 @@ const requireAuth = require('../../middleware/requireAuth');
 const {
     get,
     getById,
+    getConnections,
     getFollowing,
     post,
     put,
@@ -17,6 +18,7 @@ const {
 
 router.get('/', requireAuth, get);
 router.get('/:id', requireAuth, getById);
+router.get('/:id/connections', requireAuth, getConnections)
 router.get('/:follower_id/following/:followee_id', requireAuth, getFollowing);
 router.post('/', post);
 router.put('/', requireAuth, upload.single('image'), put);
