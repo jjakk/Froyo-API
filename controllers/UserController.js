@@ -41,6 +41,10 @@ const getConnections = async (req, res) => {
         let following = connections.filter(c => isFollowee(userId, c));
         following = following.map(followee => followee.user_a_id);
 
+        // Filter the current user from any lists
+        followers = followers.filter(follower => follower !== userId);
+        following = following.filter(followee => followee !== userId);
+
         // Convert user IDs to user objects
         for(let i = 0; i < followers.length; i++){
             followers[i] = await getUsers({ userId: followers[i] }, req.user);
