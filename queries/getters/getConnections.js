@@ -25,6 +25,11 @@ const getConnections = async (userId) => {
             );
         }
     }
+
+    // Filter self from lists
+    followers = followers.filter(follower => follower !== userId);
+    followees = followees.filter(followee => followee !== userId);
+
     return {
         followers,
         followees

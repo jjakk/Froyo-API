@@ -12,6 +12,7 @@ const { calculateAge } = require('../helpers/helpers');
 const { isFollower, isFollowee } = require('../queries/getters/helpers/followStatus');
 const followUser = require('../queries/putters/followUser');
 const validateParameter = require('../queries/validators/validateParameter');
+const getUserConnections = require('../queries/getters/getConnections');
 
 // Get all users' IDs
 // GET /
@@ -32,18 +33,10 @@ const get = async (req, res) => {
 const getConnections = async (req, res) => {
     try{
         const { id: userId } = req.params;
-        const { rows: connections } = await pool.query('SELECT * FROM connections WHERE user_a_id = $1 OR user_b_id = $1', [userId]);
-
-        // Get lists of followers and followees by ID
-        let followers = connections.filter(c => isFollower(userId, c));
-        followers = followers.map(follower => follower.user_b_id);
-
-        let following = connections.filter(c => isFollowee(userId, c));
-        following = following.map(followee => followee.user_a_id);
-
-        // Filter the current user from any lists
-        followers = followers.filter(follower => follower !== userId);
-        following = following.filter(followee => followee !== userId);
+        let {
+            followers,
+            followees: following
+        } = await getUserConnections(userId);
 
         // Convert user IDs to user objects
         for(let i = 0; i < followers.length; i++){
