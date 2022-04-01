@@ -103,6 +103,22 @@ const post = async (req, res) => {
             password
         } = req.body;
 
+        // Check that all required fields are present
+        switch (undefined) {
+            case email:
+                return 'Must provide an email';
+            case username:
+                return 'Must provide a username';
+            case dob:
+                return 'Must provide a date of birth';
+            case first_name:
+                return 'Must provide a first name';
+            case last_name:
+                return 'Must provide a last name';
+            case password:
+                return 'Must provide a password';
+        }
+
         // Check that all the user's information is formatted correctly
         const invalidUserError = invalidUser(req.body);
         if(invalidUserError) return res.status(400).send(invalidUserError);

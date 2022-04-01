@@ -19,27 +19,8 @@ const invalidUser = (user) => {
     const {
         email,
         username,
-        dob,
-        first_name,
-        last_name,
-        password
+        dob
     } = user;
-
-    // Check that all required fields are present
-    switch (undefined) {
-        case email:
-            return 'Must provide an email';
-        case username:
-            return 'Must provide a username';
-        case dob:
-            return 'Must provide a date of birth';
-        case first_name:
-            return 'Must provide a first name';
-        case last_name:
-            return 'Must provide a last name';
-        case password:
-            return 'Must provide a password';
-    }
 
     // EMAIL
     // Check that email is formatted properly
