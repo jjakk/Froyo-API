@@ -10,7 +10,7 @@ const validEmail = (email) => {
 
 // Check that username is formatted correctly
 const validUsername = (username) => {
-    const reg = /^[a-zA-Z0-9_]{3,20}$/;
+    const reg = /^(?=[a-zA-Z0-9._]{2,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
     return reg.test(String(username).toLowerCase());
 };
 
