@@ -15,7 +15,7 @@ const validUsername = (username) => {
 };
 
 // Takes in a user object and checks that all fields are valid
-const validUser = (user) => {
+const invalidUser = (user) => {
     const {
         email,
         username,
@@ -59,5 +59,5 @@ const validUser = (user) => {
 module.exports = {
     validEmail,
     validUsername,
-    validUser
+    invalidUser
 };

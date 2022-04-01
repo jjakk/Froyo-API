@@ -8,7 +8,7 @@ const queryDB = require('../queries/queryDB');
 const { uploadFile, unlinkFile, deleteFile } = require('../aws/s3');
 // Helpers
 const getUsers = require('../queries/getters/getUsers');
-const { validUser } = require('../helpers/validators');
+const { invalidUser } = require('../helpers/validators');
 const { isFollower, isFollowee } = require('../queries/getters/helpers/followStatus');
 const followUser = require('../queries/putters/followUser');
 const getUserConnections = require('../queries/getters/getConnections');
@@ -104,7 +104,7 @@ const post = async (req, res) => {
         } = req.body;
 
         // Check that all the user's information is formatted correctly
-        const invalidUserError = validUser(req.body);
+        const invalidUserError = invalidUser(req.body);
         if(invalidUserError) return res.status(400).send(invalidUserError);
 
         // Check that email isn't already in use
@@ -160,11 +160,11 @@ const put = async (req, res) => {
 
         // Set email_verified to false if the user changed their email
         const changedEmail = email === req.user.email;
-        const changedUsername = username = req.user.username;
+        const changedUsername = username === req.user.username;
 
         // Checks that the user's information is valid
-        const invalid = checkUser(req.body);
-        if(invalid) return res.status(400).send(invalid);
+        const invalidUserError = invalidUser(req.body);
+        if(invalidUserError) return res.status(400).send(invalidUserError);
 
         // If the user changed their email or username, check that the new one's not already in use
         switch(false) {
@@ -174,7 +174,8 @@ const put = async (req, res) => {
                 if(emailTaken) return res.status(400).send('Email already in use');
             case changedUsername:
                 // Check that the new username isn't already in use
-                const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [email]);
+                const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
+                console.log(usernameTaken);
                 if(usernameTaken) return res.status(400).send('Username already in use');
         }
 
