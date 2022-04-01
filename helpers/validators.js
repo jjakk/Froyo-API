@@ -23,16 +23,16 @@ const invalidUser = (user) => {
     } = user;
 
     // EMAIL
-    // Check that email is formatted properly
-    if(!validEmail(email)) return 'Not a valid email';
+    // Check that email is formatted properly if an email is given
+    if(email && !validEmail(email)) return 'Not a valid email';
 
     // USERNAME
-    // Check that username is formatted properly
-    if(!validUsername(username)) return 'Not a valid username';
+    // Check that username is formatted properly if a username is given
+    if(username && !validUsername(username)) return 'Not a valid username';
 
     // DATE OF BIRTH
-    // Confirm that the user is at least 13 years old
-    if (calculateAge(new Date(dob)) < 13) return 'Must be at least 13 years old to create an account';
+    // Confirm that the user is at least 13 years old if a date of birth is given
+    if (dob && calculateAge(new Date(dob)) < 13) return 'Must be at least 13 years old to create an account';
 
     return null;
 };
