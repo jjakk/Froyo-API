@@ -1,4 +1,5 @@
 // The purpose of this file is to validate that certain fields are formatted correctly
+const { calculateAge } = require('./calculations');
 
 // Check that email is formatted correctly
 const validEmail = (email) => {
@@ -13,7 +14,50 @@ const validUsername = (username) => {
     return reg.test(String(username).toLowerCase());
 };
 
+// Takes in a user object and checks that all fields are valid
+const validUser = (user) => {
+    const {
+        email,
+        username,
+        dob,
+        first_name,
+        last_name,
+        password
+    } = user;
+
+    // Check that all required fields are present
+    switch (undefined) {
+        case email:
+            return 'Must provide an email';
+        case username:
+            return 'Must provide a username';
+        case dob:
+            return 'Must provide a date of birth';
+        case first_name:
+            return 'Must provide a first name';
+        case last_name:
+            return 'Must provide a last name';
+        case password:
+            return 'Must provide a password';
+    }
+
+    // EMAIL
+    // Check that email is formatted properly
+    if(!validEmail(email)) return 'Not a valid email';
+
+    // USERNAME
+    // Check that username is formatted properly
+    if(!validUsername(username)) return 'Not a valid username';
+
+    // DATE OF BIRTH
+    // Confirm that the user is at least 13 years old
+    if (calculateAge(new Date(dob)) < 13) return 'Must be at least 13 years old to create an account';
+
+    return null;
+};
+
 module.exports = {
     validEmail,
-    validUsername
+    validUsername,
+    validUser
 };

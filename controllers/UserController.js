@@ -8,8 +8,7 @@ const queryDB = require('../queries/queryDB');
 const { uploadFile, unlinkFile, deleteFile } = require('../aws/s3');
 // Helpers
 const getUsers = require('../queries/getters/getUsers');
-const { calculateAge } = require('../helpers/calculations');
-const { validEmail, validUsername } = require('../helpers/validators');
+const { validUser } = require('../helpers/validators');
 const { isFollower, isFollowee } = require('../queries/getters/helpers/followStatus');
 const followUser = require('../queries/putters/followUser');
 const getUserConnections = require('../queries/getters/getConnections');
@@ -103,39 +102,18 @@ const post = async (req, res) => {
             last_name,
             password
         } = req.body;
-    
-        // Check that all required fields are present
-        switch (undefined) {
-            case email:
-                return res.status(400).send('Must provide an email');
-            case username:
-                return res.status(400).send('Must provide a username');
-            case dob:
-                return res.status(400).send('Must provide a date of birth');
-            case first_name:
-                return res.status(400).send('Must provide a first name');
-            case last_name:
-                return res.status(400).send('Must provide a last name');
-            case password:
-                return res.status(400).send('Must provide a password');
-        }
 
-        // Check that email is formatted properly
-        if(!validEmail(email)) return res.status(400).send('Not a valid email');
+        // Check that all the user's information is formatted correctly
+        const invalidUserError = validUser(req.body);
+        if(invalidUserError) return res.status(400).send(invalidUserError);
 
-        // Check that email is not already in use
+        // Check that email isn't already in use
         const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
         if(emailTaken) return res.status(400).send('Email already in use');
 
-        // Check that username is formatted properly
-        if(!validUsername(username)) return res.status(400).send('Not a valid username');
-
-        // Check that username is not already in use
+        // Check that username isn't already in use
         const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [email]);
         if(usernameTaken) return res.status(400).send('Username already in use');
-
-        // Confirm that the user is at least 13 years old
-        if (calculateAge(new Date(dob)) < 13) return res.status(400).send('Must be at least 13 years old to create an account');
 
         // Hash the given password before inserting it into the database
         const hashedPassword = await argon2.hash(password);
@@ -182,6 +160,23 @@ const put = async (req, res) => {
 
         // Set email_verified to false if the user changed their email
         const changedEmail = email === req.user.email;
+        const changedUsername = username = req.user.username;
+
+        // Checks that the user's information is valid
+        const invalid = checkUser(req.body);
+        if(invalid) return res.status(400).send(invalid);
+
+        // If the user changed their email or username, check that the new one's not already in use
+        switch(false) {
+            case changedEmail:
+                // Check that the new email isn't already in use
+                const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
+                if(emailTaken) return res.status(400).send('Email already in use');
+            case changedUsername:
+                // Check that the new username isn't already in use
+                const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [email]);
+                if(usernameTaken) return res.status(400).send('Username already in use');
+        }
 
         let newProfilePictureKey = null;
         if(file) {
