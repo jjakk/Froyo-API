@@ -3,10 +3,9 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const queryDB = require('../queries/queryDB');
 const pool = require('../queries/db');
-const validateParameter = require('../queries/validators/validateParameter');
-const checkEmailFormatting = require('../queries/validators/checkEmailFormatting');
+const { validEmail, validUsername } = require('../helpers/validators');
 // Email Automation
-const { sendAutomatedEmail } = require('../helpers/helpers');
+const { sendAutomatedEmail } = require('../helpers/email');
 // Email Templates
 const resetPasswordTemplate = require('../emailTemplates/resetPassword');
 const resetPasswordConfirmationTemplate = require('../emailTemplates/resetPasswordConfirmation');
@@ -26,7 +25,7 @@ const login = async (req, res) => {
         }
 
         // Check that email is formatted properly
-        if(!checkEmailFormatting(email)) return res.status(422).send('Not a valid email');
+        if(!validEmail(email)) return res.status(422).send('Not a valid email');
         
         // Query the database for the user
         const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
@@ -54,26 +53,34 @@ const login = async (req, res) => {
     }
 };
 
-// Check if the email is already associated with an account
-// GET /validEmail/:email
-const validEmail = async (req, res) => {
+// Check if the given parameter is valid
+// GET /validateParameter/:parameter/:value
+const validateParameter = async (req, res) => {
     try {
-        const { email } = req.params;
-        await validateParameter('email', email);
-        return res.status(200).send('Valid email');
-    }
-    catch (err) {
-        res.status(err.status || 500).send(err.message);
-    }
-};
+        const {
+            parameter,
+            value
+        } = req.params;
 
-// Check if the username is already associated with an account
-// GET /validUsername/:username
-const validUsername = async (req, res) => {
-    try {
-        const { username } = req.params;
-        await validateParameter('username', username);
-        return res.status(200).send('Valid username');
+        switch(parameter) {
+            case 'email':
+                // Check that email is formatted properly
+                if(!validEmail(value)) return res.status(400).send('Not a valid email');
+                
+                // Check that email is not already in use
+                const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [value]);
+                if(emailTaken) return res.status(400).send('Email already in use');
+                break;
+            case 'username':
+                // Check that username is formatted properly
+                if(!validUsername(value)) return res.status(400).send('Not a valid username');
+
+                // Check that username is not already in use
+                const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [value]);
+                if(usernameTaken) return res.status(400).send('Username already in use');
+                break;
+        };
+        return res.status(200).send('Valid parameter');
     }
     catch (err) {
         res.status(err.status || 500).send(err.message);
@@ -205,8 +212,7 @@ const renderResetPassword = async (req, res) => {
 
 module.exports = {
     login,
-    validEmail,
-    validUsername,
+    validateParameter,
     sendResetPasswordEmail,
     resetPassword,
     renderResetPassword
