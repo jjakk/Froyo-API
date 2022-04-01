@@ -14,6 +14,4 @@ const pool = new Pool(process.env.production ? {
     port: 5432,
 });
 
-console.log(pool.options)
-
 module.exports = pool;
