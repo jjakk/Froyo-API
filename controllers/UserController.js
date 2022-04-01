@@ -8,10 +8,10 @@ const queryDB = require('../queries/queryDB');
 const { uploadFile, unlinkFile, deleteFile } = require('../aws/s3');
 // Helpers
 const getUsers = require('../queries/getters/getUsers');
-const { calculateAge } = require('../helpers/calculations');
-const { validEmail, validUsername } = require('../helpers/validators');
+const { calculateAge } = require('../helpers/helpers');
 const { isFollower, isFollowee } = require('../queries/getters/helpers/followStatus');
 const followUser = require('../queries/putters/followUser');
+const validateParameter = require('../queries/validators/validateParameter');
 const getUserConnections = require('../queries/getters/getConnections');
 
 // Get all users' IDs
@@ -120,19 +120,9 @@ const post = async (req, res) => {
                 return res.status(400).send('Must provide a password');
         }
 
-        // Check that email is formatted properly
-        if(!validEmail(email)) return res.status(400).send('Not a valid email');
-
-        // Check that email is not already in use
-        const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
-        if(emailTaken) return res.status(400).send('Email already in use');
-
-        // Check that username is formatted properly
-        if(!validUsername(username)) return res.status(400).send('Not a valid username');
-
-        // Check that username is not already in use
-        const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [email]);
-        if(usernameTaken) return res.status(400).send('Username already in use');
+        // Make sure the email & username aren't taken and are formatted correctly
+        await validateParameter('email', email);
+        await validateParameter('username', username);
 
         // Confirm that the user is at least 13 years old
         if (calculateAge(new Date(dob)) < 13) return res.status(400).send('Must be at least 13 years old to create an account');

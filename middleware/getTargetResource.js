@@ -7,7 +7,7 @@ The typeName is the formatted name of the resource
 Ex: posts -> Post, comments -> Comment
 */
 
-const { capitalize } = require('../helpers/formatters');
+const { capitalize } = require('../helpers/helpers');
 
 const getTargetResource = (req, res, next) => {
     const resource = req.path.split('/')[1] || '';

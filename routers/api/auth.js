@@ -1,7 +1,8 @@
 const { Router } = require('express');
 const {
     login,
-    validateParameter,
+    validEmail,
+    validUsername,
     sendResetPasswordEmail,
     resetPassword,
     renderResetPassword
@@ -10,7 +11,8 @@ const {
 const router = Router();
 
 router.post('/login', login);
-router.get('/validateParameter/:parameter/:value', validateParameter);
+router.get('/validEmail/:email', validEmail);
+router.get('/validUsername/:username', validUsername);
 router.put('/resetPassword', sendResetPasswordEmail);
 router.put('/reset/:token', resetPassword);
 router.get('/reset/:token', renderResetPassword);
