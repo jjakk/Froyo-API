@@ -15,8 +15,10 @@ const getContents = async (type, query, user, sort='new') => {
     } = determineQuery(query, user);
 
     let contents = await queryDB(type, queryMethod, { where: queryParams }, queryValues);
+
     // Format contents
     contents = await formatContent(contents, user);
+    
     // Sort contents
     contents = sortContents(contents, sort);
     return contents;
