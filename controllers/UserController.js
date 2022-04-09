@@ -191,7 +191,6 @@ const put = async (req, res) => {
             case changedUsername:
                 // Check that the new username isn't already in use
                 const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
-                console.log(usernameTaken);
                 if(usernameTaken) return res.status(400).send('Username already in use');
         }
 

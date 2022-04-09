@@ -14,7 +14,10 @@ const resetPasswordConfirmationTemplate = require('../emailTemplates/resetPasswo
 // POST /login
 const login = async (req, res) => {
     try {
-        const { email, password: passwordAttempt } = req.body;
+        const {
+            email,
+            password: passwordAttempt
+        } = req.body;
 
         // Confirm that email and password aren't empty
         switch (''){

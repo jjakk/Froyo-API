@@ -8,7 +8,6 @@ const post = async (req, res) => {
     try {
         const { text } = req.body;
         const { files } = req;
-        console.log(files);
     
         // Confirm that text isn't empty
         if (!text) return res.status(400).send('Must provide text body');
@@ -29,7 +28,6 @@ const post = async (req, res) => {
         return res.status(201).send('Post created');
     }
     catch (err) {
-        console.log(err.message);
         return res.status(err.status || 500).send(err.message);
     }
 }
