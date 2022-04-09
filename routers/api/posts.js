@@ -10,6 +10,6 @@ const {
 const router = Router();
 
 router.post('/', upload.array('images', 10), post);
-router.put('/:id', put);
+router.put('/:id', upload.array('images', 10), put);
 
 module.exports = router;
