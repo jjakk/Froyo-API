@@ -6,34 +6,33 @@ const {
 } = require('./helpers/followStatus');
 const getUserLetters = require('./helpers/getUserLetters');
 
-// Get a user's connections given their ID
 const getConnections = async (userId) => {
     const connections = await queryDB('connections', 'get', { where: ['user_a_id', 'user_b_id'], whereCondition: 'OR' }, [userId, userId]);
-    let followerIds = [];
-    let followeeIds = [];
+    let followers = [];
+    let followees = [];
     for (let i = 0; i < connections.length; i++) {
         const userLetters = getUserLetters(userId, connections[i]);
         // Check if they're following the other
         if (isFollower(userId, connections[i])) {
-            followeeIds.push(
+            followees.push(
                 connections[i][`user_${userLetters[1]}_id`]
             );
         }
         // Check if they're followed by the other
         if (isFollowee(userId, connections[i])){
-            followerIds.push(
+            followers.push(
                 connections[i][`user_${userLetters[1]}_id`]
             );
         }
     }
 
     // Filter self from lists
-    followerIds = followerIds.filter(followerId => followerId !== userId);
-    followeeIds = followeeIds.filter(followeeId => followeeId !== userId);
+    followers = followers.filter(follower => follower !== userId);
+    followees = followees.filter(followee => followee !== userId);
 
     return {
-        followerIds,
-        followeeIds
+        followers,
+        followees
     };
 };
 
