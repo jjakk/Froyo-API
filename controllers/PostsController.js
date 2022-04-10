@@ -1,6 +1,7 @@
 // CRUD operations for posts
 const queryDB = require('../queries/queryDB');
 const uploadImages = require('../aws/uploadImages');
+const deleteImages = require('../queries/deleters/deleteImages');
 
 // Create a new post
 // POST /
@@ -30,13 +31,7 @@ const post = async (req, res) => {
 const put = async (req, res) => {
     try {
         const { id: postId } = req.params;
-
-        // imageKeysToDelete are a list of S3 keys of images to delete
-        const {
-            text,
-            imageKeysToDelete
-        } = req.body;
-        console.log(imageKeysToDelete);
+        const { text } = req.body;
         
         // Files represent the new post images
         const {
@@ -56,12 +51,8 @@ const put = async (req, res) => {
         // Update the post text
         await queryDB('posts', 'put', { params: ['text'], where: ['id'] }, [text, postId]);
 
-        // Remove images from the post if necessary
-        if (imageKeysToDelete) {
-            for(let i = 0; i < imageKeysToDelete.length; i++){
-                await queryDB('images', 'delete', { where: ['bucket_key'] }, [imageKeysToDelete[i]]);
-            }
-        }
+        // Remove all the old images from the post
+        await deleteImages(postId);
 
         // Upload new images to AWS & store keys to the database associated with this post
         await uploadImages(files, post);
