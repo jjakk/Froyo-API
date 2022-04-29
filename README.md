@@ -27,8 +27,9 @@ So, for example `/users` would refer to `https://froyo.social/users`
 Because posts and comments are mostly similar you can request both at the same time using `/content` instead of `/posts` or `/comments`. Any command that starts with `/content` can be replaced with `/posts` or `/comments` to target that specific content type.
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
-| Query content | `/content` | GET | {} | Post or Comment |
-|  |  |  |  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
+| Query content | `/content` | GET | {} | Content |
+| Get content by ID | `/content/<content_ID>` | GET | {} | Content |
+| Get content's comments | `/content/<content_ID>/comments` | GET | {} | Array of Comments |
+| Like content by ID | `/content/<content_ID>/like` | PUT | {} | Content |
+| Dislike content by ID | `/content/<content_ID>/dislike` | PUT | {} | Content |
+| Delete content by ID | `/content/<content_ID>` | DELETE | {} | message |
