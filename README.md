@@ -8,7 +8,7 @@ So, for example `/users` would refer to `https://froyo.social/users`
 The User is designed at follows
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
-| Query users | `/users` | GET |  | User |
+| Query users | `/users` | GET | { query: { userId (optional), text (optional) }  } | User |
 | Get user by id | `/users/<user_ID>` | GET |  | User |
 | Get user's followers and who their following | `/users/<user_ID>/connections` | GET |  | {<br>followers,<br>followees<br>} |
 | Get if a user is following another user by ID | `/<follower_ID>/following/<followee_ID>` | GET |  | boolean |
