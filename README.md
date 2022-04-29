@@ -33,3 +33,11 @@ Because posts and comments are mostly similar you can request both at the same t
 | Like content by ID | `/content/<content_ID>/like` | PUT | None | Content |
 | Dislike content by ID | `/content/<content_ID>/dislike` | PUT | None | Content |
 | Delete content by ID | `/content/<content_ID>` | DELETE | None | message |
+### Posts
+| Operation | URL | Method | Request Body | Returns |
+|--|--|--|--|--|
+| Create a new post | `/posts` | POST | { text } | message |
+| Edit a post | `/posts/<post_ID>` | PUT | { text } | message |
+### Comments
+### Images
+### Feed
