@@ -22,5 +22,12 @@ So, for example `/users` would refer to `https://froyo.social/users`
 | Login | `/auth/login` | POST | { email, password } | Authentication Token |
 | Request password reset email | `/resetPassword` | PUT | { email } | message |
 | Reset password with token | `/resetPassword/<reset_token>` | PUT | { password, confirmPassword } | message |
-## Posts
-## Comments
+## Content (Posts & Comments)
+Because posts and comments are mostly similar you can request both at the same time using `/content` instead of `/posts` or `/comments`. Any command that starts with `/content` can be replaced with `/posts` or `/comments` to target that specific content type.
+| Operation | URL | Method | Request Body | Returns |
+|--|--|--|--|--|
+|  |  |  |   |  |
+|  |  |  |   |  |
+|  |  |  |   |  |
+|  |  |  |   |  |
+|  |  |  |   |  |
