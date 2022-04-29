@@ -17,10 +17,10 @@ So, for example `/users` would refer to `https://froyo.social/users`
 ## Authentication
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
-| Login | `/auth/login` | POST | { email, password } | Authentication Token |
 | Check if a parameter (username, or email) is valid | `/auth/validateParameter/<parameter_type>/<value>` | GET | {} | message |
-|  |  |  |  |  |
-|  |  |  |  |  |
-|  |  |  |  |  |
+| Get reset password page with token | `/reset/:token` | GET | {} | HTML |
+| Login | `/auth/login` | POST | { email, password } | Authentication Token |
+| Request password reset email | `/resetPassword` | PUT | { email } | message |
+| Reset password with token | `/resetPassword/<reset_token>` | PUT | { password, confirmPassword } | message |
 ## Posts
 ## Comments
