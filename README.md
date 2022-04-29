@@ -5,7 +5,6 @@ All request are relative to the URL `https://froyo.social`
 <br>
 So, for example `/users` would refer to `https://froyo.social/users`
 ## Users
-The User is designed at follows
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 | Query users | `/users` | GET | { query: { userId (optional), text (optional) } } | User |
@@ -16,5 +15,8 @@ The User is designed at follows
 | Update your account information | `/users` | PUT | { email, username, dob, first_name, last_name, description } |  message |
 | Delete your account | `/users` | DELETE | {} | message |
 ## Authentication
+| Operation | URL | Method | Request Body | Returns |
+|--|--|--|--|--|
+| Login | `/auth/login` | POST | { email, password } | Authentication Token |
 ## Posts
 ## Comments
