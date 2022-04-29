@@ -4,7 +4,8 @@ This is the official API for Froyo. The API can be used to automate any interact
 All request are relative to the URL `https://froyo.social`
 <br>
 So, for example `/users` would refer to `https://froyo.social/users`
-## Users
+## Requests
+### Users
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 | Query users | `/users` | GET | { query: { userId (optional), text (optional) } } | User |
@@ -14,7 +15,7 @@ So, for example `/users` would refer to `https://froyo.social/users`
 | Create an account | `/users` | POST | { email, username, dob, first_name, last_name, password } | message |
 | Update your account information | `/users` | PUT | { email, username, dob, first_name, last_name, description } |  message |
 | Delete your account | `/users` | DELETE | {} | message |
-## Authentication
+### Authentication
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 | Check if a parameter (username, or email) is valid | `/auth/validateParameter/<parameter_type>/<value>` | GET | {} | message |
@@ -22,18 +23,12 @@ So, for example `/users` would refer to `https://froyo.social/users`
 | Login | `/auth/login` | POST | { email, password } | Authentication Token |
 | Request password reset email | `/resetPassword` | PUT | { email } | message |
 | Reset password with token | `/resetPassword/<reset_token>` | PUT | { password, confirmPassword } | message |
-## Content (Posts & Comments)
+### Content (Posts & Comments)
 Because posts and comments are mostly similar you can request both at the same time using `/content` instead of `/posts` or `/comments`. Any command that starts with `/content` can be replaced with `/posts` or `/comments` to target that specific content type.
-<br>
-<br>
-For example, if I want to access a post or comment with ID `309ee3fd-3014-426c-a638-cbd9f55733f2` I could query
-<br>
-GET `/content/309ee3fd-3014-426c-a638-cbd9f55733f2`
-to search all posts and comments for one with that ID
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
-|  |  |  |   |  |
-|  |  |  |   |  |
-|  |  |  |   |  |
-|  |  |  |   |  |
-|  |  |  |   |  |
+| Query content | `/content` | GET | {} | Post or Comment |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
