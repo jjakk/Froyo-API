@@ -55,7 +55,7 @@ Because posts and comments are mostly similar you can request both at the same t
 ### Users
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-| id | UUID | Required | Unique indentifier (UUID) for each user |
+| id | UUID | Required | Unique indentifier for each user |
 | first_name | Citext | Required | User's first name |
 | last_name | Citext | Required | User's last name |
 | email | Citext | Required | User's email |
@@ -71,39 +71,39 @@ Because posts and comments are mostly similar you can request both at the same t
 ### Posts
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-| id |  |  |  |
-| text |  |  |  |
-| author_id |  |  |  |
-| timestamp |  |  |  |
+| id | UUID | Required | Unique indentifier for each post |
+| text | Citext | Required | The post's text body |
+| author_id | UUID (Users.id) | Required | References the User id of the author of the post |
+| timestamp | Date | Required | Date of when the post was created |
 ### Comments
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-| id |  |  |  |
-| text |  |  |  |
-| parent_id |  |  |  |
-| author_id |  |  |  |
-| timestamp |  |  |  |
+| id | UUID | Required | Unique indentifier for each comment |
+| text | Citext | Required | The comment's text body |
+| parent_id | UUID (Posts.id or Comments.id) | Required | References the parent content's id |
+| author_id | UUID (User.id) | Required | References the User id of the author of the comment |
+| timestamp | Date | Required | Date of when the comment was created |
 ### Connections
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-| id |  |  |  |
-| user_a_id |  |  |  |
-| user_b_id |  |  |  |
-| a_following_b |  |  |  |
-| b_following_a |  |  |  |
-| timestamp |  |  |  |
+| id | UUID | Required | Unique indentifier for each connection |
+| user_a_id | UUID (Users.id) | Required | References the first user in the connection known as user A |
+| user_b_id | UUID (Users.id) | Required | References the second user in the connection known as user B |
+| a_following_b | Boolean | Required | Whether user A is following user B |
+| b_following_a | Boolean | Required | Whether user B is following user A |
+| timestamp | Date | Required | Date of when the connection was created |
 ### Likeness
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-| id |  |  |  |
+| id | UUID | Required | Unique indentifier for each likeness |
 | content_id |  |  |  |
 | like_content |  |  |  |
 | user_id |  |  |  |
-| timestamp |  |  |  |
+| timestamp | Date | Required | Date of when the likeness was created |
 ### Images
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-| id |  |  |  |
+| id | UUID | Required | Unique indentifier for each image |
 | post_id |  |  |  |
 | bucket_key |  |  |  |
-| timestamp |  |  |  |
+| timestamp | Date | Required | Date of when the image was created |
