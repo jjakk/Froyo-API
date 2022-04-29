@@ -51,3 +51,20 @@ Because posts and comments are mostly similar you can request both at the same t
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 | Get your account's personal feed | `/feed` | GET | None | Array of Posts |
+## PostgreSQL Tables
+### Users
+| Column | Type | Requirement | Description |
+|--|--|--|--|
+| id | UUID | Required | Unique indentifier (UUID) for each user |
+| first_name | String | Required | User's first name |
+| last_name | String | Required | User's last name |
+| email | String | Required | User's email |
+| username | String | Require | User's username |
+| description | String | Optional | User description |
+| password | String | Required | Hash of user's password |
+| dob | Date | Required | User's date of birth |
+| email_verified | Boolean | Required | Whether the user's email is verified |
+| timestamp | Date | Required | Timestamp of when the user was created |
+| profile_picture_bucket_key | String | Optional | S3 bucket key of the User's profile picture |
+| reset_password_token | String | Optional | Temporary storage of user's reset password token |
+| reset_password_expiration | Date | Optional | Date of when user's reset password token expires |
