@@ -1,4 +1,5 @@
 # Froyo API
+This is the official API for Froyo. The API can be used to automate any interactions with the social network that you would traditionally make in the app.
 ## Users
 ### Query users
 GET `/users`
