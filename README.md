@@ -96,14 +96,14 @@ Because posts and comments are mostly similar you can request both at the same t
 | Column | Type | Requirement | Description |
 |--|--|--|--|
 | id | UUID | Required | Unique indentifier for each likeness |
-| content_id |  |  |  |
-| like_content |  |  |  |
-| user_id |  |  |  |
+| content_id | UUID (Posts.id or Comments.id) | Required | References the content with likeness |
+| like_content | Boolean | Require | Boolean to determine likeness. If true, this likeness represents a like. If false, this likeness represents a dislike |
+| user_id | UUID (Users.id) | Required | References the user associated with this likeness |
 | timestamp | Date | Required | Date of when the likeness was created |
 ### Images
 | Column | Type | Requirement | Description |
 |--|--|--|--|
 | id | UUID | Required | Unique indentifier for each image |
-| post_id |  |  |  |
-| bucket_key |  |  |  |
+| post_id | UUID (Posts.id) | Required | References the post that this image is for |
+| bucket_key | Text | Required | S3 bucket key for this image |
 | timestamp | Date | Required | Date of when the image was created |
