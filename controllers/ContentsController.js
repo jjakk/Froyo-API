@@ -10,7 +10,7 @@ const deleteComments = require('../queries/deleters/deleteComments');
 const deleteImages = require('../queries/deleters/deleteImages');
 
 // Get all the comments of either a post or a comment
-// GET /comments
+// GET /:id/comments
 const getComments = async (req, res) => {
     try {
         const { id: parentId } = req.params;
