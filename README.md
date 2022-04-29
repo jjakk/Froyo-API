@@ -3,7 +3,7 @@ This is the official API for Froyo. The API can be used to automate any interact
 ## Users
 The User is designed at follows
 | Operation | URL | Method | Returns | Request Body |
-|--|--|--|--|
+|--|--|--|--|--|
 | Query users | `/users` | GET | User |  |
 | Get user by id | `/users/<user_ID>` | GET | User |  |
 | Get user's followers and who their following | `/users/<user_ID>/connections` | GET | { followers, followees } |  |
