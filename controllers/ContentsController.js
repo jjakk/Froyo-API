@@ -58,7 +58,7 @@ const getById = async (req, res) => {
 };
 
 // Delete a post or comment by ID
-// DELETE /
+// DELETE /:id
 const deleteContent = async (req, res) => {
     try {
         const {
