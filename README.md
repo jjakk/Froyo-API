@@ -24,6 +24,11 @@ So, for example `/users` would refer to `https://froyo.social/users`
 | Reset password with token | `/resetPassword/<reset_token>` | PUT | { password, confirmPassword } | message |
 ## Content (Posts & Comments)
 Because posts and comments are mostly similar you can request both at the same time using `/content` instead of `/posts` or `/comments`. Any command that starts with `/content` can be replaced with `/posts` or `/comments` to target that specific content type.
+<br>
+For example, if I want to access a post or comment with ID `309ee3fd-3014-426c-a638-cbd9f55733f2` I could query
+<br>
+GET `/content/309ee3fd-3014-426c-a638-cbd9f55733f2`
+to search all posts and comments for one with that ID
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 |  |  |  |   |  |
