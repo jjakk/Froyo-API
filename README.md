@@ -1,16 +1,16 @@
 # Froyo API
 This is the official API for Froyo. The API can be used to automate any interactions with the social network that you would traditionally make through Froyo's mobile the app.
-## `/users`
+## Users
 ### Query users
-GET `/`
+GET `/users`
 ### Get a user by ID
-GET `/<user_ID>`
+GET `/users/<user_ID>`
 ### Create an account
-POST `/`
+POST `/users`
 ### Update your account information
-PUT `/`
+PUT `/users`
 ### Delete your account
-DELETE `/`
+DELETE `/users`
 ### Update your 
 ## Authentication
 ## Posts
