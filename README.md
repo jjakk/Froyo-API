@@ -1,5 +1,5 @@
 # Froyo API
-This is the official API for Froyo. The API can be used to automate any interactions with the social network that you would traditionally make through Froyo's mobile the app.
+This is the official API for Froyo. This API can be used to automate any interactions with the social network that you would traditionally make through the mobile the app.
 ## API Endpoint
 All request are relative to the URL `https://froyo.social`
 <br>
