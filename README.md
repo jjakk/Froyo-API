@@ -39,5 +39,15 @@ Because posts and comments are mostly similar you can request both at the same t
 | Create a new post | `/posts` | POST | { text } | message |
 | Edit a post | `/posts/<post_ID>` | PUT | { text } | message |
 ### Comments
+| Operation | URL | Method | Request Body | Returns |
+|--|--|--|--|--|
+| Create a new comment | `/comments` | POST | { text, parent_id } | message |
+| Edit a comment | `/comments/<comment_ID>` | PUT | { text } | message |
 ### Images
+| Operation | URL | Method | Request Body | Returns |
+|--|--|--|--|--|
+| Get an image by S3 bucket key | `/images/<bucket_key>` | GET | None | Image |
 ### Feed
+| Operation | URL | Method | Request Body | Returns |
+|--|--|--|--|--|
+| Get your account's personal feed | `/feed` | GET | None | Array of Posts |
