@@ -18,5 +18,9 @@ So, for example `/users` would refer to `https://froyo.social/users`
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 | Login | `/auth/login` | POST | { email, password } | Authentication Token |
+| Check if a parameter (username, or email) is valid | `/auth/validateParameter/<parameter_type>/<value>` | GET | {} | message |
+|  |  |  |  |  |
+|  |  |  |  |  |
+|  |  |  |  |  |
 ## Posts
 ## Comments
