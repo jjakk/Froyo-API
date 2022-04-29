@@ -11,6 +11,10 @@ The User is designed at follows
 | Create an account | `/users` | POST | message |
 | Update your account information | `/users` | PUT | message |
 | Delete your account | `/users` | DELETE | message |
+### Messages
+#### Create an account
+#### Update your account
+#### Delete your account
 ## Authentication
 ## Posts
 ## Comments
