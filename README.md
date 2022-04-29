@@ -10,7 +10,7 @@ The User is designed at follows
 |--|--|--|--|--|
 | Query users | `/users` | GET |  | User |
 | Get user by id | `/users/<user_ID>` | GET |  | User |
-| Get user's followers and who their following | `/users/<user_ID>/connections` | GET |  | { followers, followees } |
+| Get user's followers and who their following | `/users/<user_ID>/connections` | GET |  | {<br>  followers,<br>  followees<br>} |
 | Get if a user is following another user by ID | `/<follower_ID>/following/<followee_ID>` | GET |  | boolean |
 | Create an account | `/users` | POST |  | message |
 | Update your account information | `/users` | PUT |  |  message |
