@@ -9,17 +9,17 @@ So, for example `/users` would refer to `https://froyo.social/users`
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 | Query users | `/users` | GET | { query: { userId (optional), text (optional) } } | User |
-| Get user by id | `/users/<user_ID>` | GET | {} | User |
-| Get user's followers and who their following | `/users/<user_ID>/connections` | GET | {} | { followers, followees } |
-| Get if a user is following another user by ID | `/<follower_ID>/following/<followee_ID>` | GET | {} | boolean |
+| Get user by id | `/users/<user_ID>` | GET | None | User |
+| Get user's followers and who their following | `/users/<user_ID>/connections` | GET | None | { followers, followees } |
+| Get if a user is following another user by ID | `/<follower_ID>/following/<followee_ID>` | GET | None | boolean |
 | Create an account | `/users` | POST | { email, username, dob, first_name, last_name, password } | message |
 | Update your account information | `/users` | PUT | { email, username, dob, first_name, last_name, description } |  message |
-| Delete your account | `/users` | DELETE | {} | message |
+| Delete your account | `/users` | DELETE | None | message |
 ### Authentication
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
-| Check if a parameter (username, or email) is valid | `/auth/validateParameter/<parameter_type>/<value>` | GET | {} | message |
-| Get reset password page with token | `/reset/:token` | GET | {} | HTML |
+| Check if a parameter (username, or email) is valid | `/auth/validateParameter/<parameter_type>/<value>` | GET | None | message |
+| Get reset password page with token | `/reset/:token` | GET | None | HTML |
 | Login | `/auth/login` | POST | { email, password } | Authentication Token |
 | Request password reset email | `/resetPassword` | PUT | { email } | message |
 | Reset password with token | `/resetPassword/<reset_token>` | PUT | { password, confirmPassword } | message |
@@ -27,9 +27,9 @@ So, for example `/users` would refer to `https://froyo.social/users`
 Because posts and comments are mostly similar you can request both at the same time using `/content` instead of `/posts` or `/comments`. Any command that starts with `/content` can be replaced with `/posts` or `/comments` to target that specific content type.
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
-| Query content | `/content` | GET | {} | Content |
-| Get content by ID | `/content/<content_ID>` | GET | {} | Content |
-| Get content's comments | `/content/<content_ID>/comments` | GET | {} | Array of Comments |
-| Like content by ID | `/content/<content_ID>/like` | PUT | {} | Content |
-| Dislike content by ID | `/content/<content_ID>/dislike` | PUT | {} | Content |
-| Delete content by ID | `/content/<content_ID>` | DELETE | {} | message |
+| Query content | `/content` | GET | None | Content |
+| Get content by ID | `/content/<content_ID>` | GET | None | Content |
+| Get content's comments | `/content/<content_ID>/comments` | GET | None | Array of Comments |
+| Like content by ID | `/content/<content_ID>/like` | PUT | None | Content |
+| Dislike content by ID | `/content/<content_ID>/dislike` | PUT | None | Content |
+| Delete content by ID | `/content/<content_ID>` | DELETE | None | message |
