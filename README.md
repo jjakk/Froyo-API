@@ -56,65 +56,54 @@ Because posts and comments are mostly similar you can request both at the same t
 | Column | Type | Requirement | Description |
 |--|--|--|--|
 | id | UUID | Required | Unique indentifier (UUID) for each user |
-| first_name | String | Required | User's first name |
-| last_name | String | Required | User's last name |
-| email | String | Required | User's email |
-| username | String | Require | User's username |
-| description | String | Optional | User description |
-| password | String | Required | Hash of user's password |
+| first_name | Citext | Required | User's first name |
+| last_name | Citext | Required | User's last name |
+| email | Citext | Required | User's email |
+| username | Citext | Require | User's username |
+| description | Character varying (1000) | Optional | User description |
+| password | Citext | Required | Hash of user's password |
 | dob | Date | Required | User's date of birth |
 | email_verified | Boolean | Required | Whether the user's email is verified |
 | timestamp | Date | Required | Timestamp of when the user was created |
-| profile_picture_bucket_key | String | Optional | S3 bucket key of the User's profile picture |
-| reset_password_token | String | Optional | Temporary storage of user's reset password token |
+| profile_picture_bucket_key | Text | Optional | S3 bucket key of the User's profile picture |
+| reset_password_token | Text | Optional | Temporary storage of user's reset password token |
 | reset_password_expiration | Date | Optional | Date of when user's reset password token expires |
 ### Posts
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| id |  |  |  |
+| text |  |  |  |
+| author_id |  |  |  |
+| timestamp |  |  |  |
 ### Comments
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| id |  |  |  |
+| text |  |  |  |
+| parent_id |  |  |  |
+| author_id |  |  |  |
+| timestamp |  |  |  |
 ### Connections
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| id |  |  |  |
+| user_a_id |  |  |  |
+| user_b_id |  |  |  |
+| a_following_b |  |  |  |
+| b_following_a |  |  |  |
+| timestamp |  |  |  |
 ### Likeness
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| id |  |  |  |
+| content_id |  |  |  |
+| like_content |  |  |  |
+| user_id |  |  |  |
+| timestamp |  |  |  |
 ### Images
 | Column | Type | Requirement | Description |
 |--|--|--|--|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| id |  |  |  |
+| post_id |  |  |  |
+| bucket_key |  |  |  |
+| timestamp |  |  |  |
