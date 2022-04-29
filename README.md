@@ -68,3 +68,53 @@ Because posts and comments are mostly similar you can request both at the same t
 | profile_picture_bucket_key | String | Optional | S3 bucket key of the User's profile picture |
 | reset_password_token | String | Optional | Temporary storage of user's reset password token |
 | reset_password_expiration | Date | Optional | Date of when user's reset password token expires |
+### Posts
+| Column | Type | Requirement | Description |
+|--|--|--|--|
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+### Comments
+| Column | Type | Requirement | Description |
+|--|--|--|--|
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+### Connections
+| Column | Type | Requirement | Description |
+|--|--|--|--|
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+### Likeness
+| Column | Type | Requirement | Description |
+|--|--|--|--|
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+### Images
+| Column | Type | Requirement | Description |
+|--|--|--|--|
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
