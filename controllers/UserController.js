@@ -175,8 +175,8 @@ const put = async (req, res) => {
         } = req.body;
 
         // Set email_verified to false if the user changed their email
-        const changedEmail = email === req.user.email;
-        const changedUsername = username === req.user.username;
+        const changedEmail = email !== req.user.email;
+        const changedUsername = username !== req.user.username;
 
         // Checks that the user's information is valid
         const invalidUserError = invalidUser(req.body);
