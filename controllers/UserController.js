@@ -183,7 +183,7 @@ const put = async (req, res) => {
         if(invalidUserError) return res.status(400).send(invalidUserError);
 
         // If the user changed their email or username, check that the new one's not already in use
-        switch(false) {
+        switch(true) {
             case changedEmail:
                 // Check that the new email isn't already in use
                 const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
