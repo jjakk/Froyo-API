@@ -166,12 +166,12 @@ const put = async (req, res) => {
 
         // Get the new user data
         const {
-            email,
-            username,
-            dob,
-            first_name,
-            last_name,
-            description
+            email=req.user.email,
+            username=req.user.username,
+            dob=req.user.dob,
+            first_name=req.user.first_name,
+            last_name=req.user.last_name,
+            description=req.user.description
         } = req.body;
 
         // Set email_verified to false if the user changed their email
