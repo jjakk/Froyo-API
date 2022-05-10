@@ -95,41 +95,41 @@ const post = async (req, res) => {
     try{
         // Get user information
         const {
-            email,
-            username,
-            dob,
-            first_name,
-            last_name,
-            password
+            email=null,
+            username=null,
+            dob=null,
+            first_name=null,
+            last_name=null,
+            password=null
         } = req.body;
 
         // Check that all required fields are present
-        switch (undefined) {
+        switch (null) {
             case email:
-                return 'Must provide an email';
+                return res.status(422).send('Must provide an email');
             case username:
-                return 'Must provide a username';
+                return res.status(422).send('Must provide a username');
             case dob:
-                return 'Must provide a date of birth';
+                return res.status(422).send('Must provide a date of birth');
             case first_name:
-                return 'Must provide a first name';
+                return res.status(422).send('Must provide a first name');
             case last_name:
-                return 'Must provide a last name';
+                return res.status(422).send('Must provide a last name');
             case password:
-                return 'Must provide a password';
+                return res.status(422).send('Must provide a password');
         }
 
         // Check that all the user's information is formatted correctly
         const invalidUserError = invalidUser(req.body);
-        if(invalidUserError) return res.status(400).send(invalidUserError);
+        if(invalidUserError) return res.status(422).send(invalidUserError);
 
         // Check that email isn't already in use
         const [ emailTaken ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
-        if(emailTaken) return res.status(400).send('Email already in use');
+        if(emailTaken) return res.status(422).send('Email already in use');
 
         // Check that username isn't already in use
         const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [email]);
-        if(usernameTaken) return res.status(400).send('Username already in use');
+        if(usernameTaken) return res.status(422).send('Username already in use');
 
         // Hash the given password before inserting it into the database
         const hashedPassword = await argon2.hash(password);

@@ -15,16 +15,16 @@ const resetPasswordConfirmationTemplate = require('../emailTemplates/resetPasswo
 const login = async (req, res) => {
     try {
         const {
-            email,
-            password: passwordAttempt
+            email=null,
+            password: passwordAttempt=null
         } = req.body;
 
         // Confirm that email and password aren't empty
-        switch (''){
+        switch (null){
             case email:
-                return res.status(400).send('Must provide email');
+                return res.status(422).send('Must provide email');
             case passwordAttempt:
-                return res.status(400).send('Must provide password');
+                return res.status(422).send('Must provide password');
         }
 
         // Check that email is formatted properly
@@ -32,11 +32,11 @@ const login = async (req, res) => {
         
         // Query the database for the user
         const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
-        if(!user) return res.status(400).send('Email not found');
+        if(!user) return res.status(422).send('Email not found');
 
         // Verify the attempted password
         const validPassword = await argon2.verify(user.password, passwordAttempt);
-        if(!validPassword) return res.status(400).send('Invalid password');
+        if(!validPassword) return res.status(422).send('Invalid password');
 
         // Generate JWT token and attach to response header
         const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
