@@ -11,7 +11,7 @@ const DUMMY_FORM_DATA = {
 };
 
 describe("/users", () => {
-    describe("POST /user", () => {
+    describe("POST /users", () => {
         test("empty request body", async () => {
             const response = await request(app).post("/users").send({});
             expect(response.statusCode).toBe(422);
@@ -38,5 +38,17 @@ describe("/users", () => {
             console.log(response.text);
             expect(response.statusCode).toBe(200);
         });*/
+    });
+
+    describe("PUT /users", () => {
+
+    });
+
+    describe("GET /users", () => {
+
+    });
+
+    describe("DELETE /users", () => {
+
     });
 });
