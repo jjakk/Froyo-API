@@ -10,7 +10,7 @@ describe("/auth", () => {
                 password: "BobsPassword",
                 username: "bobbyboi",
                 first_name: "bobby",
-                last_name: "hill",,
+                last_name: "hill",
                 dob: "01/01/2000",
             });
         });*/
