@@ -25,6 +25,6 @@ router.use('/feed', requireAuth, feedRouter);
 router.use('/posts', requireAuth, contentsRouter, postsRouter);
 router.use('/comments', requireAuth, contentsRouter, commentsRouter);
 router.use('/contents', requireAuth, contentsRouter);
-router.use('/chats', requireAuth, chatsRouter);
+//router.use('/chats', requireAuth, chatsRouter);
 
 module.exports = router;
