@@ -42,6 +42,15 @@ Because posts and comments are mostly similar you can request both at the same t
 |--|--|--|--|--|
 | Create a new comment | `/comments` | POST | { text, parent_id } | Message |
 | Edit a comment | `/comments/<comment_ID>` | PUT | { text } | Message |
+### Chats (In Development)
+| Operation | URL | Method | Request Body | Returns |
+|--|--|--|--|--|
+| Create a new chat | `/chats` | POST | { title (optional), members, expiration (optional) } | Chat |
+| Update a chat | `/chats/<chat_ID>` | PUT | { title (optional), members } | Chat |
+| Get a chat | `/chats/<chat_ID>` | GET | None | Chat |
+| Send a message in a chat | `/chats/<chat_ID>/messages` | POST | { text } | ChatMessage |
+| Update a message in a chat | `/chats/<chat_ID>/messages/<message_ID>` | PUT | { text } | ChatMessage |
+| Get a message in a chat | `/chats/<chat_ID>/messages/<message_ID>` | GET | None | ChatMessage |
 ### Images
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
