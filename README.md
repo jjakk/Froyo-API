@@ -42,7 +42,7 @@ Because posts and comments are mostly similar you can request both at the same t
 |--|--|--|--|--|
 | Create a new comment | `/comments` | POST | { text, parent_id } | Message |
 | Edit a comment | `/comments/<comment_ID>` | PUT | { text } | Message |
-### Chats (In Development)
+### Chats
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
 | Create a new chat | `/chats` | POST | { title (optional), members, expiration (optional) } | Chat |
