@@ -1,4 +1,5 @@
 const DB = require('./DB');
+const Formatter = require('./Formatter');
 
 class ChatDB extends DB{
     constructor(req, res) {
@@ -15,6 +16,7 @@ class ChatDB extends DB{
         this.title = title;
         this.expiration = expiration;
         this.text = text;
+        this.formatter = new Formatter();
     }
 
     validateCreateChat(){
@@ -99,15 +101,15 @@ class ChatDB extends DB{
             let chat = await this.getChatById(chat_memberships[i].chat_id);
             chats.push(chat);
         }
+        
+        chats = this.formatter.formatChats(chats);
 
         return chats;
     }
 
     async getChatById(chat_id){
         let [chat] = await this.queryDB('chats', 'get', { where: ['id'] }, [chat_id]);
-        let members = await this.queryDB('chat_membership', 'get', { where: ['chat_id'] }, [chat_id]);
-        
-        chat.members = members.map(membership=>membership.user_id);
+        chat = await this.formatter.formatChat(chat);
         return chat;
     }
 
@@ -118,12 +120,14 @@ class ChatDB extends DB{
     }
 
     async getMessage(message_id){
-        const [message] = await this.queryDB('messages', 'get', { where: ['id'] }, [message_id]);
+        let [message] = await this.queryDB('messages', 'get', { where: ['id'] }, [message_id]);
+        message = this.formatter.formatMessage(message);
         return message;
     }
 
     async getChatMessages(chat_id){
-        const [messages] = await this.queryDB('messages', 'get', { where: ['chat_id'] }, [chat_id]);
+        let messages = await this.queryDB('messages', 'get', { where: ['chat_id'] }, [chat_id]);
+        messages = this.formatter.formatMessages(messages);
         return messages;
     }
 
