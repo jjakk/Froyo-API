@@ -1,11 +1,11 @@
 const { Router } = require('express');
 // Controller
 const {
-    get
+    getFeed
 } = require('../../controllers/FeedController');
 
 const router = Router();
 
-router.get('/', get);
+router.get('/', getFeed);
 
 module.exports = router;

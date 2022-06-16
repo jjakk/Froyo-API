@@ -7,6 +7,7 @@ const feedRouter = require('./api/feed');
 const postsRouter = require('./api/posts');
 const commentsRouter = require('./api/comments');
 const contentsRouter = require('./api/contents');
+const chatsRouter = require('./api/chats');
 // Middleware
 const requireAuth = require('../middleware/requireAuth');
 const getTargetResource = require('../middleware/getTargetResource');
@@ -24,5 +25,6 @@ router.use('/feed', requireAuth, feedRouter);
 router.use('/posts', requireAuth, contentsRouter, postsRouter);
 router.use('/comments', requireAuth, contentsRouter, commentsRouter);
 router.use('/contents', requireAuth, contentsRouter);
+router.use('/chats', requireAuth, chatsRouter);
 
 module.exports = router;

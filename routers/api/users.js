@@ -6,23 +6,23 @@ const upload = multer({ dest: 'uploads/' });
 const requireAuth = require('../../middleware/requireAuth');
 // Controller
 const {
-    get,
-    getById,
+    queryUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser,
     getConnections,
     getFollowing,
-    post,
-    put,
-    follow,
-    deleteUser
+    followUserById
 } = require('../../controllers/UserController');
 
-router.get('/', requireAuth, get);
-router.get('/:id', requireAuth, getById);
+router.get('/', requireAuth, queryUsers);
+router.get('/:id', requireAuth, getUserById);
+router.post('/', createUser);
+router.put('/', requireAuth, upload.single('image'), updateUser);
+router.delete('/', requireAuth, deleteUser);
 router.get('/:id/connections', requireAuth, getConnections)
 router.get('/:follower_id/following/:followee_id', requireAuth, getFollowing);
-router.post('/', post);
-router.put('/', requireAuth, upload.single('image'), put);
-router.put('/:id/follow', requireAuth, follow);
-router.delete('/', requireAuth, deleteUser);
+router.put('/:id/follow', requireAuth, followUserById);
 
 module.exports = router;

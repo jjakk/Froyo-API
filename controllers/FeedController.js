@@ -1,12 +1,8 @@
-const queryDB = require('../queries/queryDB');
-// Helpers
 const getConnections = require('../queries/getters/getConnections');
 const sortContents = require('../queries/getters/helpers/sortContents');
 const getContents = require('../queries/getters/getContents');
 
-// Generate the current's feed
-// GET /
-const get = async (req, res) => {
+const getFeed = async (req, res) => {
     try{
         // Get all the users the current user's following
         const { followees } = await getConnections(req.user.id);
@@ -31,5 +27,5 @@ const get = async (req, res) => {
 };
 
 module.exports = {
-    get
+    getFeed
 };
