@@ -13,9 +13,7 @@ const { isFollower, isFollowee } = require('../queries/getters/helpers/followSta
 const followUser = require('../queries/putters/followUser');
 const getUserConnections = require('../queries/getters/getConnections');
 
-// Get all users' IDs
-// GET /
-const get = async (req, res) => {
+const queryUsers = async (req, res) => {
     try{
         const {
             query
@@ -28,56 +26,7 @@ const get = async (req, res) => {
     }
 };
 
-// Get a user's followers and who they're following
-const getConnections = async (req, res) => {
-    try{
-        const { id: userId } = req.params;
-        let {
-            followers,
-            followees: following
-        } = await getUserConnections(userId);
-
-        // Convert user IDs to user objects
-        for(let i = 0; i < followers.length; i++){
-            followers[i] = await getUsers({ userId: followers[i] }, req.user);
-        }
-        
-        for(let i = 0; i < following.length; i++){
-            following[i] = await getUsers({ userId: following[i] }, req.user);
-        }
-
-        return res.status(200).send({
-            followers,
-            following
-        });
-    }
-    catch (err) {
-        res.status(err.status || 500).send(err.message);
-    }
-};
-
-// Get if a user is following another user
-// GET /:follower_id/following/:followee_id
-const getFollowing = async (req, res) => {
-    try {
-        const { follower_id, followee_id } = req.params;
-
-        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
-        if (!connection) return res.status(200).send(false);
-
-       const following = isFollower(follower_id, connection);
-
-        // Return the following status
-        return res.status(200).send(following);
-    }
-    catch (err) {
-        res.status(err.status || 500).send(err.message);
-    }
-}
-
-// Get a user by id
-// GET /:id
-const getById = async (req, res) => {
+const getUserById = async (req, res) => {
     try{
         const { id: userId } = req.params;
         const user = await getUsers({ userId }, req.user);
@@ -89,9 +38,7 @@ const getById = async (req, res) => {
     }
 }
 
-// Create a new user
-// POST /
-const post = async (req, res) => {
+const createUser = async (req, res) => {
     try{
         // Get user information
         const {
@@ -154,9 +101,7 @@ const post = async (req, res) => {
     }
 }
 
-// Update a user by id
-// PUT
-const put = async (req, res) => {
+const updateUser = async (req, res) => {
     try{
         const { file } = req;
 
@@ -241,8 +186,6 @@ const put = async (req, res) => {
     }
 }
 
-// Delete the current user
-// DELETE /
 const deleteUser = async (req, res) => {
     try{
         // Check that user exists in the database
@@ -275,9 +218,51 @@ const deleteUser = async (req, res) => {
     }
 }
 
-// Follow a user. Works as a toggle, so if the user is already following the other user, they will unfollow them
-// PUT /:id/follow
-const follow = async (req, res) => {
+const getConnections = async (req, res) => {
+    try{
+        const { id: userId } = req.params;
+        let {
+            followers,
+            followees: following
+        } = await getUserConnections(userId);
+
+        // Convert user IDs to user objects
+        for(let i = 0; i < followers.length; i++){
+            followers[i] = await getUsers({ userId: followers[i] }, req.user);
+        }
+        
+        for(let i = 0; i < following.length; i++){
+            following[i] = await getUsers({ userId: following[i] }, req.user);
+        }
+
+        return res.status(200).send({
+            followers,
+            following
+        });
+    }
+    catch (err) {
+        res.status(err.status || 500).send(err.message);
+    }
+};
+
+const getFollowing = async (req, res) => {
+    try {
+        const { follower_id, followee_id } = req.params;
+
+        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
+        if (!connection) return res.status(200).send(false);
+
+       const following = isFollower(follower_id, connection);
+
+        // Return the following status
+        return res.status(200).send(following);
+    }
+    catch (err) {
+        res.status(err.status || 500).send(err.message);
+    }
+}
+
+const followUserById = async (req, res) => {
     try {
         const { id: follower_id } = req.user;
         const { id: followee_id } = req.params;
@@ -295,12 +280,12 @@ const follow = async (req, res) => {
 }
 
 module.exports = {
-    get,
-    getById,
+    queryUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser,
     getConnections,
     getFollowing,
-    post,
-    put,
-    deleteUser,
-    follow
+    followUserById
 };

@@ -1,13 +1,13 @@
 const { Router } = require('express');
 // Controller
 const {
-    post,
-    put
+    createComment,
+    updateComment
 } = require('../../controllers/CommentsController');
 
 const router = Router();
 
-router.post('/', post);
-router.put('/:id', put);
+router.post('/', createComment);
+router.put('/:id', updateComment);
 
 module.exports = router;

@@ -2,11 +2,11 @@ const { Router } = require('express');
 
 // Controller
 const {
-    get
+    getImage
 } = require('../../controllers/ImagesController');
 
 const router = Router();
 
-router.get('/:key', get);
+router.get('/:key', getImage);
 
 module.exports = router;

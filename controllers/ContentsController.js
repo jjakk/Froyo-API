@@ -9,23 +9,8 @@ const putLikeness = require('../queries/putters/putLikeness');
 const deleteComments = require('../queries/deleters/deleteComments');
 const deleteImages = require('../queries/deleters/deleteImages');
 
-// Get all the comments of either a post or a comment
-// GET /:id/comments
-const getComments = async (req, res) => {
-    try {
-        const { id: parentId } = req.params;
-        const comments = await getCommentsRecursively(parentId, req.user);
 
-        return res.status(200).send(comments);
-    }
-    catch (err) {
-        return res.status(err.status || 500).send(err.message);
-    }
-};
-
-// Search posts & comments by query
-// GET /
-const get = async (req, res) => {
+const queryContents = async (req, res) => {
     try {
         const { type } = req.resource;
         const contents = await getContents(type, req.query, req.user);
@@ -37,9 +22,7 @@ const get = async (req, res) => {
     }
 };
 
-// Get either a post or comment by ID
-// GET /:id
-const getById = async (req, res) => {
+const getContentById = async (req, res) => {
     try {
         const {
             type,
@@ -57,8 +40,66 @@ const getById = async (req, res) => {
     }
 };
 
-// Delete a post or comment by ID
-// DELETE /:id
+const getContentsComments = async (req, res) => {
+    try {
+        const { id: parentId } = req.params;
+        const comments = await getCommentsRecursively(parentId, req.user);
+
+        return res.status(200).send(comments);
+    }
+    catch (err) {
+        return res.status(err.status || 500).send(err.message);
+    }
+};
+
+const likeContent = async (req, res) => {
+    try {
+        const {
+            type,
+            typeName
+        } = req.resource;
+        const { id: contentId } = req.params;
+
+        // Check that the content exists in the database
+        const [ content ] = await getContents(type, { id: contentId }, req.user);
+        if (!content) return res.status(404).send(`${typeName} not found`);
+        
+        // Change the likeness accordingly
+        await putLikeness(contentId, req.user, true);
+
+        // Get and return updated content
+        let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
+        return res.status(200).send(updatedContent);
+    }
+    catch (err) {
+        return res.status(err.status || 500).send(err.message);
+    }
+};
+
+const dislikeContent = async (req, res) => {
+    try {
+        const {
+            type,
+            typeName
+        } = req.resource;
+        const { id: contentId } = req.params;
+
+        // Check that the content exists in the database
+        const [ content ] = await getContents(type, { id: contentId }, req.user);
+        if (!content) return res.status(404).send(`${typeName} not found`);
+        
+        // Change the likeness accordingly
+        await putLikeness(contentId, req.user, false);
+
+        // Get and return updated content
+        let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
+        return res.status(200).send(updatedContent);
+    }
+    catch (err) {
+        return res.status(err.status || 500).send(err.message);
+    }
+};
+
 const deleteContent = async (req, res) => {
     try {
         const {
@@ -92,63 +133,11 @@ const deleteContent = async (req, res) => {
     }
 };
 
-// Like a post or comment by ID
-// PUT /:id/like
-const like = async (req, res) => {
-    try {
-        const {
-            type,
-            typeName
-        } = req.resource;
-        const { id: contentId } = req.params;
-
-        // Check that the content exists in the database
-        const [ content ] = await getContents(type, { id: contentId }, req.user);
-        if (!content) return res.status(404).send(`${typeName} not found`);
-        
-        // Change the likeness accordingly
-        await putLikeness(contentId, req.user, true);
-
-        // Get and return updated content
-        let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
-        return res.status(200).send(updatedContent);
-    }
-    catch (err) {
-        return res.status(err.status || 500).send(err.message);
-    }
-};
-
-// Dislike a post or comment by ID
-// PUT /:id/dislike
-const dislike = async (req, res) => {
-    try {
-        const {
-            type,
-            typeName
-        } = req.resource;
-        const { id: contentId } = req.params;
-
-        // Check that the content exists in the database
-        const [ content ] = await getContents(type, { id: contentId }, req.user);
-        if (!content) return res.status(404).send(`${typeName} not found`);
-        
-        // Change the likeness accordingly
-        await putLikeness(contentId, req.user, false);
-
-        // Get and return updated content
-        let [ updatedContent ] = await getContents(type, { id: contentId }, req.user);
-        return res.status(200).send(updatedContent);
-    }
-    catch (err) {
-        return res.status(err.status || 500).send(err.message);
-    }
-};
-
-module.exports = {
-    get,
-    getById,
-    getComments,
-    deleteContent,
-    like,
-    dislike,
+module.exports =  {
+    queryContents,
+    getContentById,
+    getContentsComments,
+    likeContent,
+    dislikeContent,
+    deleteContent
 };

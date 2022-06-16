@@ -3,13 +3,13 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 // Controller
 const {
-    post,
-    put,
+    createPost,
+    updatePost,
 } = require('../../controllers/PostsController');
 
 const router = Router();
 
-router.post('/', upload.array('images', 10), post);
-router.put('/:id', upload.array('images', 10), put);
+router.post('/', upload.array('images', 10), createPost);
+router.put('/:id', upload.array('images', 10), updatePost);
 
 module.exports = router;

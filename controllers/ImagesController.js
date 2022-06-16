@@ -1,6 +1,6 @@
 const { getFileStream } = require('../aws/s3');
 
-const get = (req, res) => {
+const getImage = (req, res) => {
     const { key } = req.params;
     // To Do
     const readStream = getFileStream(key);
@@ -9,5 +9,5 @@ const get = (req, res) => {
 };
 
 module.exports = {
-    get
+    getImage
 };

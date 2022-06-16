@@ -3,9 +3,7 @@ const queryDB = require('../queries/queryDB');
 const uploadImages = require('../aws/uploadImages');
 const deleteImages = require('../queries/deleters/deleteImages');
 
-// Create a new post
-// POST /
-const post = async (req, res) => {
+const createPost = async (req, res) => {
     try {
         const { text } = req.body;
         const { files } = req;
@@ -26,9 +24,7 @@ const post = async (req, res) => {
     }
 }
 
-// Update a post by ID
-// PUT /:id
-const put = async (req, res) => {
+const updatePost = async (req, res) => {
     try {
         const { id: postId } = req.params;
         const { text } = req.body;
@@ -65,6 +61,6 @@ const put = async (req, res) => {
 }
 
 module.exports = {
-    post,
-    put
+    createPost,
+    updatePost,
 };

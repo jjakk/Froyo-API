@@ -1,21 +1,21 @@
 const { Router } = require('express');
 // Controllers
 const {
-    get,
-    getById,
-    getComments,
-    deleteContent,
-    like,
-    dislike
+    queryContents,
+    getContentById,
+    getContentsComments,
+    likeContent,
+    dislikeContent,
+    deleteContent
 } = require('../../controllers/ContentsController');
 
 const router = Router();
 
-router.get('/', get);
-router.get('/:id', getById);
-router.get('/:id/comments', getComments);
-router.put('/:id/like', like);
-router.put('/:id/dislike', dislike);
+router.get('/', queryContents);
+router.get('/:id', getContentById);
+router.get('/:id/comments', getContentsComments);
+router.put('/:id/like', likeContent);
+router.put('/:id/dislike', dislikeContent);
 router.delete('/:id', deleteContent);
 
 module.exports = router;
