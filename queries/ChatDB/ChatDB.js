@@ -115,6 +115,7 @@ class ChatDB extends DB{
 
     async deleteChat(chat_id){
         await this.queryDB('chat_membership', 'delete', { where: ['chat_id'] }, [chat_id]);
+        await this.queryDB('messages', 'delete', { where: ['chat_id'] }, [chat_id]);
         await this.queryDB('chats', 'delete', { where: ['id'] }, [chat_id]);
         return 'Chat deleted';
     }
