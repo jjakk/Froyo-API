@@ -17,6 +17,9 @@ const router = Router();
 router.get('/', requireAuth, (req, res) => {
     res.status(200).send(req.user.id);
 });
+router.get('/takeout', requireAuth, async (req, res) => {
+    res.send("In development");
+});
 router.use(getTargetResource);
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
