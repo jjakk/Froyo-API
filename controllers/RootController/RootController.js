@@ -19,8 +19,8 @@ const getTakeout = async (req, res) => {
         'likeness'
     ]);*/
 
-    /*await takeout.downloadProfilePicture();
-    takeout.downloadImages();*/
+    //await takeout.downloadProfilePicture();
+    //takeout.downloadImages();
 
     //const zip = takeout.zip();
 
