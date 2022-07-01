@@ -13,9 +13,9 @@ class Takeout{
     zip(){}
 
     async downloadProfilePicture(){
-        /*const [{
+        const [{
             profile_picture_bucket_key
-        }] = await queryDB('users', { where: ['id'] }, [this.userId]);*/
+        }] = await queryDB('users', { where: ['id'] }, [this.userId]);
 
     }
 
@@ -105,12 +105,12 @@ class Takeout{
     }
 
     writeCSV(name, cells){
-        let takeoutDirectory = path.resolve(path.join(__dirname, '../../../takeouts'));
+        let takeoutDirectory = getTakeoutDirectory();
         if (!fs.existsSync(takeoutDirectory)) fs.mkdirSync(takeoutDirectory);
 
         if(cells.length > 0){
 
-            takeoutDirectory = path.resolve(path.join(__dirname, `../../../takeouts/${this.userId}`));
+            takeoutDirectory = `${getTakeoutDirectory()}/${this.userId}`;
             if (!fs.existsSync(takeoutDirectory)) fs.mkdirSync(takeoutDirectory);
 
             const writeStream = fs.createWriteStream(`${takeoutDirectory}/${name}.csv`);
