@@ -3,165 +3,115 @@ const queryDB = require('../queries/queryDB');
 const ChatDB = require('../queries/ChatDB/ChatDB');
 
 const createChat = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
+    const chatDB = new ChatDB(req, res);
 
-        const validationError = chatDB.validateCreateChat();
-        if(validationError) return res.status(400).send(validationError);
-    
-        const chat = await chatDB.createChat();
-        return res.status(201).send(chat);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = chatDB.validateCreateChat();
+    if(validationError) return res.status(400).send(validationError);
+
+    const chat = await chatDB.createChat();
+    return res.status(201).send(chat);
 }
 
 const updateChat = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
+    const chatDB = new ChatDB(req, res);
 
-        const validationError = await chatDB.validateUpdateChat(req.params.chat_id);
-        if(validationError) return res.status(400).send(validationError);
-    
-        const chat = await chatDB.updateChat(req.params.chat_id);
-        return res.status(201).send(chat);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateUpdateChat(req.params.chat_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const chat = await chatDB.updateChat(req.params.chat_id);
+    return res.status(201).send(chat);
 }
 
 const getPersonalChats = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
-    
-        const chats = await chatDB.getPersonalChats();
-        return res.status(201).send(chats);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const chatDB = new ChatDB(req, res);
+
+    const chats = await chatDB.getPersonalChats();
+    return res.status(201).send(chats);
 };
 
 const getChatById = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
-        
-        const validationError = await chatDB.validateGetChatById(req.params.chat_id);
-        if(validationError) return res.status(400).send(validationError);
+    const chatDB = new ChatDB(req, res);
     
-        const chat = await chatDB.getChatById(req.params.chat_id);
-        return res.status(201).send(chat);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateGetChatById(req.params.chat_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const chat = await chatDB.getChatById(req.params.chat_id);
+    return res.status(201).send(chat);
 };
 
 const deleteChat = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
-        
-        const validationError = await chatDB.validateGetChatById(req.params.chat_id);
-        if(validationError) return res.status(400).send(validationError);
+    const chatDB = new ChatDB(req, res);
     
-        const response = await chatDB.deleteChat(req.params.chat_id);
-        return res.status(201).send(response);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateGetChatById(req.params.chat_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const response = await chatDB.deleteChat(req.params.chat_id);
+    return res.status(201).send(response);
 };
 
 const createMessage = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
-        
-        const validationError = await chatDB.validateCreateMessage(req.params.chat_id);
-        if(validationError) return res.status(400).send(validationError);
+    const chatDB = new ChatDB(req, res);
     
-        const message = await chatDB.createMessage(req.params.chat_id);
-        return res.status(201).send(message);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateCreateMessage(req.params.chat_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const message = await chatDB.createMessage(req.params.chat_id);
+    return res.status(201).send(message);
 };
 
 const getMessageById = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
+    const chatDB = new ChatDB(req, res);
 
-        const {
-            chat_id,
-            message_id
-        } = req.params;
-        
-        const validationError = await chatDB.validateGetMessageById(chat_id, message_id);
-        if(validationError) return res.status(400).send(validationError);
+    const {
+        chat_id,
+        message_id
+    } = req.params;
     
-        const message = await chatDB.getMessage(message_id);
-        return res.status(201).send(message);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateGetMessageById(chat_id, message_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const message = await chatDB.getMessage(message_id);
+    return res.status(201).send(message);
 };
 
 const getChatMessages = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
-        
-        const validationError = await chatDB.validateGetChatById(req.params.chat_id);
-        if(validationError) return res.status(400).send(validationError);
+    const chatDB = new ChatDB(req, res);
     
-        const chat = await chatDB.getChatMessages(req.params.chat_id);
-        return res.status(201).send(chat);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateGetChatById(req.params.chat_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const chat = await chatDB.getChatMessages(req.params.chat_id);
+    return res.status(201).send(chat);
 };
 
 const updateMessage = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
+    const chatDB = new ChatDB(req, res);
 
-        const {
-            chat_id,
-            message_id
-        } = req.params;
-        
-        const validationError = await chatDB.validateUpdateMessage(chat_id, message_id);
-        if(validationError) return res.status(400).send(validationError);
+    const {
+        chat_id,
+        message_id
+    } = req.params;
     
-        const message = await chatDB.updateMessage(message_id);
-        return res.status(201).send(message);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateUpdateMessage(chat_id, message_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const message = await chatDB.updateMessage(message_id);
+    return res.status(201).send(message);
 };
 
 const deleteMessage = async (req, res) => {
-    try{
-        const chatDB = new ChatDB(req, res);
+    const chatDB = new ChatDB(req, res);
 
-        const {
-            chat_id,
-            message_id
-        } = req.params;
-        
-        const validationError = await chatDB.validateGetMessageById(chat_id, message_id);
-        if(validationError) return res.status(400).send(validationError);
+    const {
+        chat_id,
+        message_id
+    } = req.params;
     
-        const message = await chatDB.deleteMessage(message_id);
-        return res.status(201).send(message);
-    }
-    catch(err){
-        return res.status(500).send(err.message);
-    }
+    const validationError = await chatDB.validateGetMessageById(chat_id, message_id);
+    if(validationError) return res.status(400).send(validationError);
+
+    const message = await chatDB.deleteMessage(message_id);
+    return res.status(201).send(message);
 };
 
 module.exports = {

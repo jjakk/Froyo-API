@@ -29,5 +29,9 @@ router.use('/posts', requireAuth, contentsRouter, postsRouter);
 router.use('/comments', requireAuth, contentsRouter, commentsRouter);
 router.use('/contents', requireAuth, contentsRouter);
 router.use('/chats', requireAuth, chatsRouter);
+router.use((err, req, res, next) => {
+    if(err) return res.status(err.status || 500).send(err.message);
+    next();
+});
 
 module.exports = router;
