@@ -3,27 +3,22 @@ const sortContents = require('../queries/getters/helpers/sortContents');
 const getContents = require('../queries/getters/getContents');
 
 const getFeed = async (req, res) => {
-    try{
-        // Get all the users the current user's following
-        const { followees } = await getConnections(req.user.id);
+    // Get all the users the current user's following
+    const { followees } = await getConnections(req.user.id);
 
-        // Get all their posts, concatenate them, and send back
-        let feedPosts = [];
-        for (let i = 0; i < followees.length; i++) {
-            feedPosts.push(
-                ...(
-                    await getContents('posts', { author_id: followees[i] }, req.user)
-                )
-            );
-        }
-        // Sort the posts
-        feedPosts = sortContents(feedPosts, 'new');
+    // Get all their posts, concatenate them, and send back
+    let feedPosts = [];
+    for (let i = 0; i < followees.length; i++) {
+        feedPosts.push(
+            ...(
+                await getContents('posts', { author_id: followees[i] }, req.user)
+            )
+        );
+    }
+    // Sort the posts
+    feedPosts = sortContents(feedPosts, 'new');
 
-        return res.status(200).send(feedPosts);
-    }
-    catch (err) {
-        return res.status(err.status || 500).send(err.message);
-    }
+    return res.status(200).send(feedPosts);
 };
 
 module.exports = {
