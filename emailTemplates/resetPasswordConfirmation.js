@@ -16,7 +16,7 @@ const resetPasswordConfirmationTemplate = () => {
             <span>
                 <h1>Froyo</h1>
                 <h3>
-                    The Minimalist
+                    The Diet
                     <br>
                     Social Network
                 </h3>
