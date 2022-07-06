@@ -2,17 +2,34 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const queryDB = require('../../queries/queryDB');
-const { getTakeoutDirectory } = require('@froyo-api/constants');
+const { getTakeoutDirectory, API_ENDPOINT } = require('@froyo-api/constants');
 
 class Takeout{
-    constructor(userId){
-        this.userId = userId;
+    constructor(req){
+        this.req = req;
+        this.userId = req.user.id;
+
         this.takeoutDirectory = `${getTakeoutDirectory()}/${this.userId}`;
+        if (!fs.existsSync(this.takeoutDirectory)) fs.mkdirSync(this.takeoutDirectory);
+
+        this.imageDirectory = `${this.takeoutDirectory}/images`;
+        if (!fs.existsSync(this.imageDirectory)) fs.mkdirSync(this.imageDirectory);
+
+        this.cellsDirectory = `${this.takeoutDirectory}/cells`;
+        if (!fs.existsSync(this.cellsDirectory)) fs.mkdirSync(this.cellsDirectory);
     }
 
     exportToZip(){}
     
-    downloadImages(){}
+    async downloadPostImages(){
+        const posts = await queryDB('posts', 'get', { where: ['author_id'] }, [this.userId]);
+        for(const post of posts){
+            const images = await queryDB('images', 'get', { where: ['post_id'] }, [post.id]);
+            for(const image of images){
+                this.writeImage(image.id, image.bucket_key);
+            }
+        }
+    }
 
     async downloadProfilePicture(){
         const [{
@@ -112,9 +129,7 @@ class Takeout{
     writeCSV(name, cells){
         if(cells.length <= 0) return;
 
-        if (!fs.existsSync(this.takeoutDirectory)) fs.mkdirSync(this.takeoutDirectory);
-
-        const writeStream = fs.createWriteStream(`${this.takeoutDirectory}/${name}.csv`);
+        const writeStream = fs.createWriteStream(`${this.cellsDirectory}/${name}.csv`);
         writeStream.write(Object.keys(cells[0]).join(','));
 
         for (const cell of cells){
@@ -126,12 +141,9 @@ class Takeout{
     }
 
     writeImage(name, bucket_id){
-        const imageDirectory = `${this.takeoutDirectory}/images`;
-        if (!fs.existsSync(imageDirectory)) fs.mkdirSync(imageDirectory);
-
-        axios({ url: `https://api.froyo.social/images/${bucket_id}`, responseType: 'stream' })
+        axios({ url: `${API_ENDPOINT}/images/${bucket_id}`, responseType: 'stream' })
         .then(response => {
-            response.data.pipe(fs.createWriteStream(`${imageDirectory}/${name}.png`));
+            response.data.pipe(fs.createWriteStream(`${this.imageDirectory}/${name}.png`));
         }).catch(err => {
             return new Error(err.message);
         });

@@ -1,7 +1,7 @@
 const Takeout = require('./Takeout');
 
 const getTakeout = async (req, res) => {
-    /*const takeout = new Takeout(req.user.id);
+    /*const takeout = new Takeout(req);
 
     await takeout.downloadCells([
         'users',
@@ -14,9 +14,8 @@ const getTakeout = async (req, res) => {
         'messages',
         'likeness'
     ]);
-
-    await takeout.downloadProfilePicture();*/
-    //takeout.downloadImages();
+    await takeout.downloadProfilePicture();
+    await takeout.downloadPostImages();*/
 
     //const zip = takeout.zip();
 
