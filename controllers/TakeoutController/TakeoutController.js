@@ -15,9 +15,8 @@ const getTakeout = async (req, res) => {
         'likeness'
     ]);
     await takeout.downloadProfilePicture();
-    await takeout.downloadPostImages();*/
-
-    //const zip = takeout.zip();
+    await takeout.downloadPostImages();
+    await takeout.createZip();*/
 
     // Download profile picture
     // Download all of the user's other uploaded image files
