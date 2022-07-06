@@ -3,6 +3,7 @@ const { Router } = require('express');
 const authRouter = require('./api/auth');
 const usersRouter = require('./api/users');
 const imagesRouter = require('./api/images');
+const takeoutRouter = require('./api/takeout');
 const feedRouter = require('./api/feed');
 const postsRouter = require('./api/posts');
 const commentsRouter = require('./api/comments');
@@ -17,13 +18,11 @@ const router = Router();
 router.get('/', requireAuth, (req, res) => {
     res.status(200).send(req.user.id);
 });
-router.get('/takeout', requireAuth, (req, res) => {
-    res.send('In development');
-});
 router.use(getTargetResource);
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
 router.use('/images', imagesRouter);
+router.use('/takeout', requireAuth, takeoutRouter);
 router.use('/feed', requireAuth, feedRouter);
 router.use('/posts', requireAuth, contentsRouter, postsRouter);
 router.use('/comments', requireAuth, contentsRouter, commentsRouter);
