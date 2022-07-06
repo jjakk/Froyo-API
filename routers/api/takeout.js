@@ -3,7 +3,7 @@ const { Router } = require('express');
 // Controller
 const {
     getTakeout
-} = require('../../controllers/TakeoutController');
+} = require('../../controllers/TakeoutController/TakeoutController');
 
 const router = Router();
 
