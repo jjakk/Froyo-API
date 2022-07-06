@@ -1,25 +1,45 @@
 const fs = require('fs');
-const path = require('path');
+var archiver = require('archiver');
 const axios = require('axios');
 const queryDB = require('../../queries/queryDB');
-const { getTakeoutDirectory, API_ENDPOINT } = require('@froyo-api/constants');
+const { getRootDirectory, API_ENDPOINT } = require('@froyo-api/constants');
 
 class Takeout{
     constructor(req){
         this.req = req;
         this.userId = req.user.id;
 
-        this.takeoutDirectory = `${getTakeoutDirectory()}/${this.userId}`;
-        if (!fs.existsSync(this.takeoutDirectory)) fs.mkdirSync(this.takeoutDirectory);
-
-        this.imageDirectory = `${this.takeoutDirectory}/images`;
-        if (!fs.existsSync(this.imageDirectory)) fs.mkdirSync(this.imageDirectory);
-
+        this.takeoutsDirectory = `${getRootDirectory()}/takeouts`;
+        this.takeoutDirectory = `${this.takeoutsDirectory}/${this.userId}`;
         this.cellsDirectory = `${this.takeoutDirectory}/cells`;
-        if (!fs.existsSync(this.cellsDirectory)) fs.mkdirSync(this.cellsDirectory);
+        this.imageDirectory = `${this.takeoutDirectory}/images`;
+        this.initiateDirectories([
+            this.takeoutsDirectory,
+            this.takeoutDirectory,
+            this.imageDirectory,
+            this.cellsDirectory
+        ]);
     }
 
-    exportToZip(){}
+    async createZip(){
+        const output = fs.createWriteStream(`${this.takeoutsDirectory}/${this.userId}.zip`);
+        const archive = archiver('zip');
+
+        output.on('close', () => {
+            console.log(archive.pointer() + ' total bytes');
+            console.log('archiver has been finalized and the output file descriptor has closed.');
+        });
+
+        archive.on('error', (err) => {
+            throw err;
+        });
+
+        archive.directory(this.takeoutDirectory, false);
+        archive.pipe(output);
+        archive.finalize();
+
+        //fs.rmSync(this.takeoutDirectory, { recursive: true, force: true });
+    }
     
     async downloadPostImages(){
         const posts = await queryDB('posts', 'get', { where: ['author_id'] }, [this.userId]);
@@ -147,6 +167,12 @@ class Takeout{
         }).catch(err => {
             return new Error(err.message);
         });
+    }
+
+    initiateDirectories(directories){
+        for(const directory of directories){
+            if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+        }
     }
 }
 
