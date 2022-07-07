@@ -1,4 +1,6 @@
 const Takeout = require('./Takeout');
+const fs = require('fs');
+const { getRootDirectory } = require('@froyo-api/constants');
 
 const getTakeout = async (req, res) => {
     /*const takeout = new Takeout(req);
@@ -16,11 +18,17 @@ const getTakeout = async (req, res) => {
     ]);
     await takeout.downloadProfilePicture();
     await takeout.downloadPostImages();
-    await takeout.createZip();*/
+    await takeout.createZip();
 
-    // Download profile picture
-    // Download all of the user's other uploaded image files
-
+    const takeoutPath = `${getRootDirectory()}/takeouts/${req.user.id}.zip`;
+    res.download(
+        takeoutPath,
+        'data-download.zip',
+        (err) => {
+            if(err) return res.status(500).send(err.message);
+            //fs.unlinkSync(takeoutPath);
+        }
+    );*/
     res.send('In development');
 };
 
