@@ -1,6 +1,7 @@
-const app = require('./app');
+const httpServer = require('./app');
+const { PORT } = require('@froyo-api/constants');
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 

@@ -1,5 +1,3 @@
-// CRUD operations for comments
-const queryDB = require('../queries/queryDB');
 const ChatDB = require('../queries/ChatDB/ChatDB');
 
 const createChat = async (req, res) => {
