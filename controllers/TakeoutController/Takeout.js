@@ -25,20 +25,15 @@ class Takeout{
         const output = fs.createWriteStream(`${this.takeoutsDirectory}/${this.userId}.zip`);
         const archive = archiver('zip');
 
-        output.on('close', () => {
-            console.log(archive.pointer() + ' total bytes');
-            console.log('archiver has been finalized and the output file descriptor has closed.');
-        });
-
         archive.on('error', (err) => {
             throw err;
         });
 
-        archive.directory(this.takeoutDirectory, false);
-        archive.pipe(output);
-        archive.finalize();
+        await archive.directory(this.takeoutDirectory, false);
+        await archive.pipe(output);
+        await archive.finalize();
 
-        //fs.rmSync(this.takeoutDirectory, { recursive: true, force: true });
+        //fs.rm(this.takeoutDirectory, { recursive: true, force: true }, () => {});
     }
     
     async downloadPostImages(){
