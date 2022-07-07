@@ -133,7 +133,7 @@ class ChatDB extends DB{
     }
 
     async createMessage(chat_id){
-        const message = await this.queryDB('messages', 'post', { params: ['chat_id', 'author_id', 'text'] }, [chat_id, this.req.user.id, this.text]);
+        const [message] = await this.queryDB('messages', 'post', { params: ['chat_id', 'author_id', 'text'] }, [chat_id, this.req.user.id, this.text]);
         return message;
     }
 
