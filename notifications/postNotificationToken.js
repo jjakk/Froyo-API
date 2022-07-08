@@ -1,6 +1,7 @@
 const queryDB = require('../queries/queryDB');
 
 const postNotificationToken = async (userId, token) => {
+    if(!token) return;
     const notificationTokens = await queryDB('notification_tokens', 'get', { where: ['user_id'] }, [userId]);
     let duplicate = false;
     notificationTokens.forEach(t => {
