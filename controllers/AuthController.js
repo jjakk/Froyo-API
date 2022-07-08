@@ -55,7 +55,7 @@ const login = async (req, res) => {
         ...rest
     } = user;
 
-    return res.status(200).set('authorization', `Bearer ${token}`).send(rest);
+    if (!res.headersSent) res.status(200).set('authorization', `Bearer ${token}`).send(rest);
 };
 
 // Remove relevant information from the database when a user loggs out
@@ -67,7 +67,7 @@ const logout = async (req, res) => {
 
     await deleteNotificationToken(notificationToken);
 
-    return res.status(200).send('Logged out');
+    res.status(200).send('Logged out');
 };
 
 // Check if the given parameter is valid
@@ -96,7 +96,8 @@ const validateParameter = async (req, res) => {
             if(usernameTaken) return res.status(400).send('Username already in use');
             break;
     };
-    return res.status(200).send('Valid parameter');
+
+    res.status(200).send('Valid parameter');
 };
 
 // Send an email with a password reset link
@@ -140,7 +141,7 @@ const sendResetPasswordEmail = async (req, res) => {
     };
     await sendAutomatedEmail(mailOptions);
 
-    return res.status(200).send('Password reset, email sent');
+    res.status(200).send('Password reset, email sent');
 };
 
 // Reset a user's password given a reset token
@@ -193,7 +194,7 @@ const resetPassword = async (req, res) => {
     await sendAutomatedEmail(mailOptions);
 
     // Return success message
-    return res.status(200).send('Password reset!');
+    res.status(200).send('Password reset!');
 };
 
 // GET /reset/:token
@@ -204,7 +205,7 @@ const renderResetPassword = async (req, res) => {
     const [ user ] = await queryDB('users', 'get', { where: ['reset_password_token'] }, [token]);
     const expired = !user;
     
-    return res.render('passwordReset', { token, expired });
+    res.render('passwordReset', { token, expired });
 };
 
 module.exports = {
