@@ -9,13 +9,17 @@ const { sendAutomatedEmail } = require('../helpers/email');
 // Email Templates
 const resetPasswordTemplate = require('../emailTemplates/resetPassword');
 const resetPasswordConfirmationTemplate = require('../emailTemplates/resetPasswordConfirmation');
+// Notifications
+const postNotificationToken = require('../notifications/postNotificationToken');
+const deleteNotificationToken = require('../notifications/deleteNotificationToken');
 
 // Get a authentication token given email and password
 // POST /login
 const login = async (req, res) => {
     const {
         email=null,
-        password: passwordAttempt=null
+        password: passwordAttempt=null,
+        notificationToken=null
     } = req.body;
 
     // Confirm that email and password aren't empty
@@ -37,6 +41,9 @@ const login = async (req, res) => {
     const validPassword = await argon2.verify(user.password, passwordAttempt);
     if(!validPassword) return res.status(422).send('Invalid password');
 
+    // Add the user's notification token to the database if it isn't already there
+    await postNotificationToken(user.id, notificationToken);
+
     // Generate JWT token and attach to response header
     const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
 
@@ -49,6 +56,18 @@ const login = async (req, res) => {
     } = user;
 
     return res.status(200).set('authorization', `Bearer ${token}`).send(rest);
+};
+
+// Remove relevant information from the database when a user loggs out
+// POST /logout
+const logout = async (req, res) => {
+    const {
+        notificationToken=null
+    } = req.body;
+
+    await deleteNotificationToken(notificationToken);
+
+    return res.status(200).send('Logged out');
 };
 
 // Check if the given parameter is valid
@@ -190,6 +209,7 @@ const renderResetPassword = async (req, res) => {
 
 module.exports = {
     login,
+    logout,
     validateParameter,
     sendResetPasswordEmail,
     resetPassword,

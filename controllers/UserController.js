@@ -12,6 +12,8 @@ const { invalidUser } = require('../helpers/validators');
 const { isFollower, isFollowee } = require('../queries/getters/helpers/followStatus');
 const followUser = require('../queries/putters/followUser');
 const getUserConnections = require('../queries/getters/getConnections');
+const postNotificationToken = require('../notifications/postNotificationToken');
+const deleteNotificationToken = require('../notifications/deleteNotificationToken');
 
 const queryUsers = async (req, res) => {
     const {
@@ -36,7 +38,8 @@ const createUser = async (req, res) => {
         dob=null,
         first_name=null,
         last_name=null,
-        password=null
+        password=null,
+        notificationToken=null
     } = req.body;
 
     // Check that all required fields are present
@@ -78,6 +81,9 @@ const createUser = async (req, res) => {
 
     // Get the newly created user
     const [ user ] = await queryDB('users', 'get', { where: ['email'] }, [email]);
+
+    // Store the user's notification token in the database
+    await postNotificationToken(user.id, notificationToken);
 
     // Generate JWT token and attach to response header
     const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
@@ -182,6 +188,9 @@ const deleteUser = async (req, res) => {
 
     // Delete all of the user's likeness
     await queryDB('likeness', 'delete', { where: ['user_id'] }, [req.user.id]);
+
+    // Delete all of the user's notification tokens
+    await queryDB('notification_tokens', 'delete', { where: ['user_id'] }, [req.user.id]);
 
     // Delete the user's profile picture from S3 if they have one
     if(req.user.profile_picture_bucket_key) {
