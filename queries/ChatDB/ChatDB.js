@@ -1,5 +1,6 @@
 const DB = require('./DB');
 const Formatter = require('./Formatter');
+const pushNotificaiton = require('../../notifications/pushNotification');
 
 class ChatDB extends DB{
     constructor(req, res) {
@@ -134,6 +135,33 @@ class ChatDB extends DB{
 
     async createMessage(chat_id){
         const [message] = await this.queryDB('messages', 'post', { params: ['chat_id', 'author_id', 'text'] }, [chat_id, this.req.user.id, this.text]);
+        const [chat] = await this.queryDB('chats', 'get', { where: ['id'] }, [chat_id]);
+        const [author] = await this.queryDB('users', 'get', { where: ['id'] }, [message.author_id]);
+
+        // Push notification to all chat members
+        const chat_members = await this.queryDB('chat_membership', 'get', { where: ['chat_id'] }, [chat_id]);
+        let memberTokens = [];
+        for(const chat_member of chat_members){
+            const tokens = await this.queryDB('notification_tokens', 'get', { where: ['user_id'] }, [chat_member.user_id]);
+            memberTokens = [...memberTokens, ...tokens];
+        }
+        memberTokens = memberTokens.map(token => token.value);
+
+        pushNotificaiton(
+            memberTokens,
+            {
+                title: (
+                    chat.title
+                        ? `${author.first_name} ${author.last_name} - ${chat.title}`
+                        : `${author.first_name} ${author.last_name}`
+                ),
+                body: message.text,
+            }, {
+                type: 'message',
+                chatId: chat_id,
+            }
+        );
+
         return message;
     }
 
