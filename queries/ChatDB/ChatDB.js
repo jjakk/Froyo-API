@@ -159,7 +159,7 @@ class ChatDB extends DB{
                 body: message.text,
             }, {
                 type: 'message',
-                chatId: chat_id,
+                message: message,
             }
         );
 
