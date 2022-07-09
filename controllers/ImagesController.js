@@ -7,7 +7,7 @@ const getImage = (req, res) => {
     readStream.on('error', (err) => {
         return res.status(500).send(err.message);
     });
-    readStream.pipe(res);
+    return readStream.pipe(res);
 };
 
 module.exports = {
