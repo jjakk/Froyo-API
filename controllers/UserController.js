@@ -13,7 +13,6 @@ const { isFollower, isFollowee } = require('../queries/getters/helpers/followSta
 const followUser = require('../queries/putters/followUser');
 const getUserConnections = require('../queries/getters/getConnections');
 const postNotificationToken = require('../notifications/postNotificationToken');
-const deleteNotificationToken = require('../notifications/deleteNotificationToken');
 
 const queryUsers = async (req, res) => {
     const {
@@ -88,7 +87,7 @@ const createUser = async (req, res) => {
     // Generate JWT token and attach to response header
     const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
 
-    res.status(201).set('authorization', `Bearer ${token}`).send(user);
+    return res.status(201).set('authorization', `Bearer ${token}`).send(user);
 }
 
 const updateUser = async (req, res) => {
