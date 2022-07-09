@@ -87,9 +87,8 @@ const createUser = async (req, res) => {
 
     // Generate JWT token and attach to response header
     const token = jwt.sign({ userId: user.id }, process.env.TOKEN_KEY);
-    res.set('authorization', `Bearer ${token}`);
 
-    res.status(201).send(user);
+    res.status(201).set('authorization', `Bearer ${token}`).send(user);
 }
 
 const updateUser = async (req, res) => {
