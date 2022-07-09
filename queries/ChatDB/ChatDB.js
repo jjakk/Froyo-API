@@ -128,7 +128,7 @@ class ChatDB extends DB{
     }
 
     async getChatMessages(chat_id){
-        let messages = await this.queryDB('messages', 'get', { where: ['chat_id'] }, [chat_id]);
+        let { rows: messages } = await this.db.query('SELECT * FROM messages WHERE chat_id = $1 ORDER BY "timestamp"', [chat_id]);
         messages = this.formatter.formatMessages(messages);
         return messages;
     }
@@ -139,7 +139,8 @@ class ChatDB extends DB{
         const [author] = await this.queryDB('users', 'get', { where: ['id'] }, [message.author_id]);
 
         // Push notification to all chat members
-        const chat_members = await this.queryDB('chat_membership', 'get', { where: ['chat_id'] }, [chat_id]);
+        let chat_members = await this.queryDB('chat_membership', 'get', { where: ['chat_id'] }, [chat_id]);
+        chat_members = chat_members.filter(m=>m.user_id !== this.req.user.id);
         let memberTokens = [];
         for(const chat_member of chat_members){
             const tokens = await this.queryDB('notification_tokens', 'get', { where: ['user_id'] }, [chat_member.user_id]);

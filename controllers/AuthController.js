@@ -55,7 +55,7 @@ const login = async (req, res) => {
         ...rest
     } = user;
 
-    if (!res.headersSent) res.status(200).set('authorization', `Bearer ${token}`).send(rest);
+    res.status(200).set('authorization', `Bearer ${token}`).send(rest);
 };
 
 // Remove relevant information from the database when a user loggs out
