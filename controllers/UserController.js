@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const queries = require('../queries/queries');
 const pool = require('../queries/db');
 const queryDB = require('../queries/queryDB');
-const ChatDB = require('../queries/chatDB/ChatDB');
 // File functions
 const { uploadFile, unlinkFile, deleteFile } = require('../aws/s3');
 // Helpers
@@ -172,7 +171,6 @@ const updateUser = async (req, res) => {
 }
 
 const deleteUser = async (req, res) => {
-    const chatDB = new ChatDB(req, res);
     // Check that user exists in the database
     const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
     if(!user) return res.status(404).send('User not found');
@@ -188,20 +186,6 @@ const deleteUser = async (req, res) => {
 
     // Delete all of the user's likeness
     await queryDB('likeness', 'delete', { where: ['user_id'] }, [req.user.id]);
-
-    // Delete all of the user's messages
-    await queryDB('messages', 'delete', { where: ['author_id'] }, [req.user.id]);
-
-    // Delete all of the user's chat memberships and chats if there's only one other member
-    const chatMemberships = await queryDB('chat_membership', 'get', { where: ['user_id'] }, [req.user.id]);
-    for(const membership of chatMemberships) {
-        const chat = await chatDB.getChatById(membership.chat_id);
-        if(chat.members.length === 2) {
-            await queryDB('chat_membership', 'delete', { where: ['chat_id'] }, [chat.id]);
-            await queryDB('chats', 'delete', { where: ['id'] }, [membership.chat_id]);
-        }
-    }
-    await queryDB('chat_membership', 'delete', { where: ['user_id'] }, [req.user.id]);
 
     // Delete all of the user's notification tokens
     await queryDB('notification_tokens', 'delete', { where: ['user_id'] }, [req.user.id]);
