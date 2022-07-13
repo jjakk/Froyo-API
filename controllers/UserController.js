@@ -13,6 +13,7 @@ const { isFollower, isFollowee } = require('../queries/getters/helpers/followSta
 const followUser = require('../queries/putters/followUser');
 const getUserConnections = require('../queries/getters/getConnections');
 const postNotificationToken = require('../notifications/postNotificationToken');
+const { deleteContent } = require('../controllers/ContentsController');
 
 const queryUsers = async (req, res) => {
     const {
@@ -175,11 +176,23 @@ const deleteUser = async (req, res) => {
     const [ user ] = await queryDB('users', 'get', { where: ['id'] }, [req.user.id]);
     if(!user) return res.status(404).send('User not found');
 
-    // Delete all of the user's posts
-    await queryDB('posts', 'delete', { where: ['author_id'] }, [req.user.id]);
-
-    // Delete all of the user's comments
-    await queryDB('comments', 'delete', { where: ['author_id'] }, [req.user.id]);
+    // Delete all of the user's content
+    let contents = await queryDB('posts', 'get', { where: ['author_id'] }, [req.user.id]);
+    contents.concat(
+        await queryDB('comments', 'get', { where: ['author_id'] }, [req.user.id]),
+    );
+    for(const content of contents) {
+        await deleteContent({
+            ...req,
+            params: {
+                id: content.id
+            },
+            resource: {
+                type: content.parent_id ? 'comments' : 'posts',
+                typeName: content.parent_id ? 'comment' : 'post'
+            }
+        }, res);
+    }
 
     // Delete all of a user's connections
     await pool.query(queries.connections.deleteWithOne, [req.user.id]);
