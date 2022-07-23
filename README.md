@@ -7,10 +7,10 @@ So, for example `/users` would refer to `https://froyo.social/users`
 ### Users
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
-| Query users | `/users` | GET | { query: { userId (optional), text (optional) } } | User |
+| Query users | `/users` | GET | { query: { userId (optional), text (optional) } } | Array of Users |
 | Get user by id | `/users/<user_ID>` | GET | None | User |
 | Get user's followers and who their following | `/users/<user_ID>/connections` | GET | None | { followers, followees } |
-| Get if a user is following another user by ID | `/<follower_ID>/following/<followee_ID>` | GET | None | Boolean |
+| Get if a user is following another user by ID | `/<follower_ID>/following/<followee_ID>` | GET | None | boolean |
 | Create an account | `/users` | POST | { email, username, dob, first_name, last_name, password } | text |
 | Update your account information | `/users` | PUT | { email, username, dob, first_name, last_name, description } |  text |
 | Delete your account | `/users` | DELETE | None | text |
