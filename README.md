@@ -45,11 +45,14 @@ Because posts and comments are mostly similar you can request both at the same t
 ### Chats
 | Operation | URL | Method | Request Body | Returns |
 |--|--|--|--|--|
+| Get all personal chats | `/chats` | GET | None | Chat |
 | Create a new chat | `/chats` | POST | { title (optional), members, expiration (optional) } | Chat |
 | Update a chat | `/chats/<chat_ID>` | PUT | { title (optional), members } | Chat |
+| Delete a chat | `/chats/<chat_ID>` | DELETE | None | Message |
 | Get a chat | `/chats/<chat_ID>` | GET | None | Chat |
 | Send a message in a chat | `/chats/<chat_ID>/messages` | POST | { text } | ChatMessage |
 | Update a message in a chat | `/chats/<chat_ID>/messages/<message_ID>` | PUT | { text } | ChatMessage |
+| Delete a message in a chat | `/chats/<chat_ID>/messages/<message_ID>` | DELETE | None | Message |
 | Get a message in a chat | `/chats/<chat_ID>/messages/<message_ID>` | GET | None | ChatMessage |
 ### Images
 | Operation | URL | Method | Request Body | Returns |
