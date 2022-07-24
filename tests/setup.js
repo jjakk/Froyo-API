@@ -3,7 +3,7 @@ const app = require('../app');
 
 const setup = async () => {
     await request(app).post("/users").send({
-        email: "jester@jak.com",
+        email: "jester@jak.bz",
         username: "jester",
         dob: new Date("November 23, 1995"),
         first_name: "jester",
