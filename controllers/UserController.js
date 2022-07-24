@@ -67,7 +67,7 @@ const createUser = async (req, res) => {
     if(emailTaken) return res.status(422).send('Email already in use');
 
     // Check that username isn't already in use
-    const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [email]);
+    const [ usernameTaken ] = await queryDB('users', 'get', { where: ['username'] }, [username]);
     if(usernameTaken) return res.status(422).send('Username already in use');
 
     // Hash the given password before inserting it into the database
