@@ -15,7 +15,7 @@ test('Missing password', async () => {
     expect(response.statusCode).toBe(422);
 });
 
-test('Email & password given. Email not in database', async () => {
+test('Email & password given. Email not in the database', async () => {
     const response = await request(app).post("/auth/login").send({
         email: 'sdfdjsofijsdiofjosidjfoisjfosdjoifjsdoifjoisdjf@gmail.com',
         password: 'password'
