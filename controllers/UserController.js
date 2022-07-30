@@ -24,10 +24,14 @@ const queryUsers = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
-    const { id: userId } = req.params;
-    const user = await getUsers({ userId }, req.user);
-
-    return res.status(200).send(user);
+    try{
+        const { id: userId } = req.params;
+        const [user] = await getUsers({ userId }, req.user);
+        return res.status(200).send(user);
+    }
+    catch(err) {
+        return res.status(err.status || 400).send(err.message);
+    }
 }
 
 const createUser = async (req, res) => {
