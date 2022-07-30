@@ -1,11 +1,7 @@
-test('Todo', () => {
-    expect(true).toBe(true);
-});
-/*const request = require('supertest');
-const { testUser } = require('../testConstants');
+const request = require('supertest');
 const app = require('../../app');
 
-const createUserForm = {
+const deleteUserForm = {
     email: 'createUserTest@jak.bz',
     username: 'createUserTest',
     dob: new Date('January 1, 2000'),
@@ -14,26 +10,26 @@ const createUserForm = {
     password: 'password'
 };
 
-const getAuthToken = () => {
+const getAuthToken = async () => {
     const { headers: { authorization } } = await request(app).post('/auth/login').send({
-        email: createUserForm.email,
-        password: createUserForm.password
+        email: deleteUserForm.email,
+        password: deleteUserForm.password
     });
     return authorization;
 };
 
 beforeEach(async () => {
-    const { headers: { authorization } } = await request(app).post('/users').send(createUserForm);
+    await request(app).post('/users').send(deleteUserForm);
 });
 
 test('Not signed in', async () => {
-    const res = await request(app).delete('/users').set('Authorization', getAuthToken());
-    expect(response.text).toBe('Must provide an email');
-    expect(response.statusCode).toBe(422);
+    const response = await request(app).delete('/users');
+    expect(response.text).toBe('You\'re not logged in');
+    expect(response.statusCode).toBe(200);
 });
 
-test('Missing email', async () => {
-    const res = await request(app).delete('/users').set('Authorization', getAuthToken());
-    expect(response.text).toBe('Must provide an email');
-    expect(response.statusCode).toBe(422);
-});*/
+test('Valid deletion', async () => {
+    const response = await request(app).delete('/users').set('Authorization', await getAuthToken());
+    expect(response.text).toBe('User deleted');
+    expect(response.statusCode).toBe(200);
+});
