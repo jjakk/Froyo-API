@@ -26,7 +26,7 @@ const queryUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     try{
         const { id: userId } = req.params;
-        const [user] = await getUsers({ userId }, req.user);
+        const user = await getUsers({ userId }, req.user);
         return res.status(200).send(user);
     }
     catch(err) {

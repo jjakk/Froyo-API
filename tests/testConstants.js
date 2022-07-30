@@ -10,7 +10,7 @@ const testUser = {
     password: "password"
 }
 
-const getAuthToken = async () => {
+const getTestUserAuthToken = async () => {
     const { headers: { authorization } } = await request(app)
         .post('/auth/login')
         .send({
@@ -20,9 +20,15 @@ const getAuthToken = async () => {
     return authorization;
 }
 
+const getTestUserId = async () => {
+    const res = await request(app).get('/').send({}).set('Authorization', await getTestUserAuthToken());
+    return res.text;
+}
+
 const TEST_CONSTANTS = {
     testUser,
-    getAuthToken
+    getTestUserAuthToken,
+    getTestUserId
 };
 
 module.exports = TEST_CONSTANTS;
