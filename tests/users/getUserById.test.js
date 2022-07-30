@@ -29,6 +29,7 @@ test("User doesn't exist", async () => {
 test('Found a user', async () => {
     const attemptedId = await getTestUserId();
     const response = await request(app).get(`/users/${attemptedId}`).set('Authorization', await getTestUserAuthToken());
+    expect(response.body.email).toBe(testUser.email);
     expect(response.body.username).toBe(testUser.username);
     expect(response.body.first_name).toBe(testUser.first_name);
     expect(response.body.last_name).toBe(testUser.last_name);
