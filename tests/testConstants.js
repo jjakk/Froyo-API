@@ -8,7 +8,7 @@ const testUser = {
     first_name: "jester",
     last_name: "lester",
     password: "password"
-}
+};
 
 const getTestUserAuthToken = async () => {
     const { headers: { authorization } } = await request(app)
@@ -18,12 +18,12 @@ const getTestUserAuthToken = async () => {
             password: testUser.password
         });
     return authorization;
-}
+};
 
 const getTestUserId = async () => {
     const res = await request(app).get('/').send({}).set('Authorization', await getTestUserAuthToken());
     return res.text;
-}
+};
 
 const TEST_CONSTANTS = {
     testUser,
