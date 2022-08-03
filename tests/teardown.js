@@ -8,6 +8,6 @@ const teardown = async () => {
         password: testUser.password
     });
     await request(app).delete('/users').set('Authorization', authorization);
-}
+};
 
 module.exports = teardown;
