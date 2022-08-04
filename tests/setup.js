@@ -1,9 +1,11 @@
 const request = require('supertest');
-const { testUser } = require('./testConstants');
+const { testUsers } = require('./testConstants');
 const app = require('../app');
 
 const setup = async () => {
-    await request(app).post("/users").send(testUser);
+    for(const testUser of testUsers){
+        await request(app).post("/users").send(testUser);
+    }
 };
 
 module.exports = setup;
