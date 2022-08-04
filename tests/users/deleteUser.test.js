@@ -2,10 +2,10 @@ const request = require('supertest');
 const app = require('../../app');
 
 const deleteUserForm = {
-    email: 'createUserTest@jak.bz',
-    username: 'createUserTest',
+    email: 'deleteUserTest@jak.bz',
+    username: 'deleteUserTest',
     dob: new Date('January 1, 2000'),
-    first_name: 'creatUser',
+    first_name: 'deleteUser',
     last_name: 'test',
     password: 'password'
 };

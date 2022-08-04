@@ -1,5 +1,5 @@
 const request = require('supertest');
-const { testUser } = require('../testConstants');
+const { testUsers } = require('../testConstants');
 const app = require('../../app');
 
 const createUserForm = {
@@ -135,7 +135,7 @@ test('All fields are given. Age is <13 years old', async () => {
 
 test('All fields are given. Email is already in use', async () => {
     const response = await request(app).post("/users").send({
-        email: testUser.email,
+        email: testUsers[0].email,
         username: createUserForm.username,
         dob: createUserForm.dob,
         first_name: createUserForm.first_name,
@@ -149,7 +149,7 @@ test('All fields are given. Email is already in use', async () => {
 test('All fields are given. Username is already in use', async () => {
     const response = await request(app).post("/users").send({
         email: createUserForm.email,
-        username: testUser.username,
+        username: testUsers[0].username,
         dob: createUserForm.dob,
         first_name: createUserForm.first_name,
         last_name: createUserForm.last_name,
