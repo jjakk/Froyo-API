@@ -1,0 +1,13 @@
+body {
+    color: black;
+    font-family: arial;
+}
+table, th, td {
+    border: 1px solid gray;
+}
+td{
+    padding: 5px;
+}
+code{
+    background-color: whitesmoke;
+}

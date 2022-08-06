@@ -18,6 +18,9 @@ const router = Router();
 router.get('/', requireAuth, (req, res) => {
     res.status(200).send(req.user.id);
 });
+router.get('/documentation', (req, res) => {
+    res.sendFile('documentation/index.html');
+});
 router.use(getTargetResource);
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
