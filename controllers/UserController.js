@@ -16,11 +16,16 @@ const postNotificationToken = require('../notifications/postNotificationToken');
 const { deleteContent } = require('../controllers/ContentsController');
 
 const queryUsers = async (req, res) => {
-    const {
-        query
-    } = req;
-    const users = await getUsers(query, req.user);
-    return res.status(200).send(users);
+    try{
+        const {
+            query
+        } = req;
+        const users = await getUsers(query, req.user);
+        return res.status(200).send(users);
+    }
+    catch(err) {
+        return res.status(err.status || 500).send(err.message);
+    }
 };
 
 const getUserById = async (req, res) => {
