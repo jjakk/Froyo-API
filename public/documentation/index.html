@@ -122,15 +122,77 @@
         </tbody>
     </table>
     <h3 id="content-posts-comments-">Content (Posts &amp; Comments)</h3>
-    <p>Because posts and comments are mostly similar you can request both at the same time using <code>/content</code> instead of <code>/posts</code> or <code>/comments</code>. Any command that starts with <code>/content</code> can be replaced with <code>/posts</code> or <code>/comments</code> to target that specific content type.</p>
-    | Operation | URL | Method | Request Body | Returns |
-    |--|--|--|--|--|
-    | Query content | <code>/content</code> | GET | None | Array of Content |
-    | Get content by ID | <code>/content/&lt;content_ID&gt;</code> | GET | None | Content |
-    | Get content&#39;s comments | <code>/content/&lt;content_ID&gt;/comments</code> | GET | None | Array of Comments |
-    | Like content by ID | <code>/content/&lt;content_ID&gt;/like</code> | PUT | None | Content |
-    | Dislike content by ID | <code>/content/&lt;content_ID&gt;/dislike</code> | PUT | None | Content |
-    | Delete content by ID | <code>/content/&lt;content_ID&gt;</code> | DELETE | None | Message |
+    <p>
+        Because posts and comments are mostly similar you can request both at the same time
+        using <code>/content</code> instead of <code>/posts</code> or <code>/comments</code>.
+        Any command that starts with <code>/content</code> can be replaced with <code>/posts</code>
+        or <code>/comments</code> to target that specific content type.
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Operation</th>
+                <th>URL</th>
+                <th>Method</th>
+                <th>Request Body</th>
+                <th>Returns</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Query content</td>
+                <td><code>/content</code></td>
+                <td>GET</td>
+                <td>None</td>
+                <td>Content</td>
+            </tr>
+            <tr>
+                <td>Get content by ID</td>
+                <td>
+                    <code>/content/&lt;content_ID&gt;</code>
+                </td>
+                <td>GET</td>
+                <td>None</td>
+                <td>Content</td>
+            </tr>
+            <tr>
+                <td>Get content&#39;s comments</td>
+                <td>
+                    <code>/content/&lt;content_ID&gt;/comments</code>
+                </td>
+                <td>GET</td>
+                <td>None</td>
+                <td>Array of Comments</td>
+            </tr>
+            <tr>
+                <td>Like content by ID</td>
+                <td>
+                    <code>/content/&lt;content_ID&gt;/like</code>
+                </td>
+                <td>PUT</td>
+                <td>None</td>
+                <td>Content</td>
+            </tr>
+            <tr>
+                <td>Dislike content by ID</td>
+                <td>
+                    <code>/content/&lt;content_ID&gt;/dislike</code>
+                </td>
+                <td>PUT</td>
+                <td>None</td>
+                <td>Content</td>
+            </tr>
+            <tr>
+                <td>Delete content by ID</td>
+                <td>
+                    <code>/content/&lt;content_ID&gt;</code>
+                </td>
+                <td>DELETE</td>
+                <td>None</td>
+                <td>Message</td>
+            </tr>
+        </tbody>
+    </table>
     <h3 id="posts">Posts</h3>
     <table>
         <thead>
@@ -143,20 +205,20 @@
             </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>Create a new post</td>
-            <td><code>/posts</code></td>
-            <td>POST</td>
-            <td>{ text }</td>
-            <td>text</td>
+            <tr>
+                <td>Create a new post</td>
+                <td><code>/posts</code></td>
+                <td>POST</td>
+                <td>{ text }</td>
+                <td>text</td>
             </tr>
-        <tr>
-            <td>Edit a post</td>
-            <td><code>/posts/&lt;post_ID&gt;</code></td>
-            <td>PUT</td>
-            <td>{ text }</td>
-            <td>text</td>
-        </tr>
+            <tr>
+                <td>Edit a post</td>
+                <td><code>/posts/&lt;post_ID&gt;</code></td>
+                <td>PUT</td>
+                <td>{ text }</td>
+                <td>text</td>
+            </tr>
         </tbody>
     </table>
     <h3 id="comments">Comments</h3>
