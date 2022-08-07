@@ -18,6 +18,9 @@ const router = Router();
 router.get('/', requireAuth, (req, res) => {
     res.status(200).send(req.user.id);
 });
+router.get('/help', (req, res) => {
+    res.redirect('/documentation');
+});
 router.get('/documentation', (req, res) => {
     res.sendFile('documentation/index.html');
 });
