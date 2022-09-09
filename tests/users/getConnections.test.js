@@ -6,6 +6,17 @@ const {
 } = require('../testConstants');
 const app = require('../../app');
 
+// Make all users unfollow each other after each test
+afterEach(async () => {
+    for(let i = 0; i < testUsers.length; i++){
+        const userId = await getTestUserId(i);
+        const response = await request(app).get(`/users/${userId}/connections`).set('Authorization', await getTestUserAuthToken(i));
+        for(const following of response.body.following){
+            await request(app).put(`/users/${following.id}/follow`).set('Authorization', await getTestUserAuthToken(i));
+        }
+    }
+});
+
 test('Not  signed in', async () => {
     const attemptedId = await getTestUserId(0);
 
@@ -36,8 +47,6 @@ test('following one', async () => {
     expect(response.body.following.length).toStrictEqual(1);
     expect(response.body.following[0].id).toStrictEqual(userToFollowId);
     expect(response.statusCode).toBe(200);
-
-    await request(app).put(`/users/${userToFollowId}/follow`).set('Authorization', await getTestUserAuthToken(0));
 });
 
 test('following two', async () => {
@@ -54,9 +63,6 @@ test('following two', async () => {
     expect(response.body.following[0].id).toStrictEqual(firstUserToFollowId);
     expect(response.body.following[1].id).toStrictEqual(secondUserToFollowId);
     expect(response.statusCode).toBe(200);
-
-    await request(app).put(`/users/${firstUserToFollowId}/follow`).set('Authorization', await getTestUserAuthToken(0));
-    await request(app).put(`/users/${secondUserToFollowId}/follow`).set('Authorization', await getTestUserAuthToken(0));
 });
 
 test('followed by one', async () => {
@@ -70,8 +76,6 @@ test('followed by one', async () => {
     expect(response.body.followers.length).toStrictEqual(1);
     expect(response.body.followers[0].id).toStrictEqual(signedInUser);
     expect(response.statusCode).toBe(200);
-
-    await request(app).put(`/users/${userToFollowId}/follow`).set('Authorization', await getTestUserAuthToken(0));
 });
 
 test('followed by two', async () => {
@@ -88,9 +92,6 @@ test('followed by two', async () => {
     expect(response.body.followers[0].id).toStrictEqual(firstSignedInUserId);
     expect(response.body.followers[1].id).toStrictEqual(secondSignedInUserId);
     expect(response.statusCode).toBe(200);
-
-    await request(app).put(`/users/${userGettingTheFollowersId}/follow`).set('Authorization', await getTestUserAuthToken(0));
-    await request(app).put(`/users/${userGettingTheFollowersId}/follow`).set('Authorization', await getTestUserAuthToken(1));
 });
 
 test('two users follow one another', async () => {
@@ -115,7 +116,4 @@ test('two users follow one another', async () => {
     expect(response.body.followers.length).toStrictEqual(1);
     expect(response.body.followers[0].id).toStrictEqual(firstUserId);
     expect(response.statusCode).toBe(200);
-
-    await request(app).put(`/users/${secondUserId}/follow`).set('Authorization', await getTestUserAuthToken(0));
-    await request(app).put(`/users/${firstUserId}/follow`).set('Authorization', await getTestUserAuthToken(1));
 });

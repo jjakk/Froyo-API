@@ -245,26 +245,36 @@ const getConnections = async (req, res) => {
 };
 
 const getFollowing = async (req, res) => {
-    const { follower_id, followee_id } = req.params;
+    try{
+        const { follower_id, followee_id } = req.params;
 
-    const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
-    if (!connection) return res.status(200).send(false);
+        const { rows: [ connection ] } = await pool.query(queries.connections.get, [follower_id, followee_id]);
+        if (!connection) return res.status(200).send(false);
 
-    const following = isFollower(follower_id, connection);
+        const following = isFollower(follower_id, connection);
 
-    // Return the following status
-    return res.status(200).send(following);
+        // Return the following status
+        return res.status(200).send(following);
+    }
+    catch(err){
+        return res.status(err.status || 400).send(err.message);
+    }
 }
 
 const followUserById = async (req, res) => {
-    const { id: follower_id } = req.user;
-    const { id: followee_id } = req.params;
-    const {
-        status,
-        message
-    } = await followUser(follower_id, followee_id);
-    
-    return res.status(status).send(message);
+    try{
+        const { id: follower_id } = req.user;
+        const { id: followee_id } = req.params;
+        const {
+            status,
+            message
+        } = await followUser(follower_id, followee_id);
+        
+        return res.status(status).send(message);
+    }
+    catch(err){
+        return res.status(err.status || 400).send(err.message);
+    }
 }
 
 module.exports = {
