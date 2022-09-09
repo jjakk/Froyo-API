@@ -13,9 +13,9 @@ test('Not signed in', async () => {
 });
 
 test('Invalid user ID format', async () => {
-    const attmeptedId = '123';
-    const response = await request(app).get(`/users/${attmeptedId}`).set('Authorization', await getTestUserAuthToken(0));
-    expect(response.text).toBe(`invalid input syntax for type uuid: "${attmeptedId}"`);
+    const attemptedId = '123';
+    const response = await request(app).get(`/users/${attemptedId}`).set('Authorization', await getTestUserAuthToken(0));
+    expect(response.text).toBe(`invalid input syntax for type uuid: "${attemptedId}"`);
     expect(response.statusCode).toBe(400);
 });
 
